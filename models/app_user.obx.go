@@ -24,12 +24,21 @@ var AppUserBinding = appUser_EntityInfo{
 
 // AppUser_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var AppUser_ = struct {
-	Id        *objectbox.PropertyInt64
-	ExtId     *objectbox.PropertyString
-	Name      *objectbox.PropertyString
-	IsDeleted *objectbox.PropertyBool
-	CreatedAt *objectbox.PropertyInt64
-	UpdatedAt *objectbox.PropertyInt64
+	Id           *objectbox.PropertyInt64
+	ExtId        *objectbox.PropertyString
+	CreatedAt    *objectbox.PropertyInt64
+	UpdatedAt    *objectbox.PropertyInt64
+	FirstName    *objectbox.PropertyString
+	LastName     *objectbox.PropertyString
+	Email        *objectbox.PropertyString
+	Phone        *objectbox.PropertyString
+	Token        *objectbox.PropertyString
+	IsBlocked    *objectbox.PropertyBool
+	IsFarm       *objectbox.PropertyBool
+	IsGasStation *objectbox.PropertyBool
+	IsHarvesting *objectbox.PropertyBool
+	IsPayDesk    *objectbox.PropertyBool
+	IsWarehouse  *objectbox.PropertyBool
 }{
 	Id: &objectbox.PropertyInt64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -43,18 +52,6 @@ var AppUser_ = struct {
 			Entity: &AppUserBinding.Entity,
 		},
 	},
-	Name: &objectbox.PropertyString{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     3,
-			Entity: &AppUserBinding.Entity,
-		},
-	},
-	IsDeleted: &objectbox.PropertyBool{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     4,
-			Entity: &AppUserBinding.Entity,
-		},
-	},
 	CreatedAt: &objectbox.PropertyInt64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     5,
@@ -64,6 +61,72 @@ var AppUser_ = struct {
 	UpdatedAt: &objectbox.PropertyInt64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     6,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	FirstName: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     7,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	LastName: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     8,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	Email: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     9,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	Phone: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     10,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	Token: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     11,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsBlocked: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     12,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsFarm: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     13,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsGasStation: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     14,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsHarvesting: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     15,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsPayDesk: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     16,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsWarehouse: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     17,
 			Entity: &AppUserBinding.Entity,
 		},
 	},
@@ -80,11 +143,20 @@ func (appUser_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Id", 6, 1, 1727067599752868172)
 	model.PropertyFlags(1)
 	model.Property("ExtId", 9, 2, 1751440294866873485)
-	model.Property("Name", 9, 3, 7391010370114912872)
-	model.Property("IsDeleted", 1, 4, 900923281325091536)
 	model.Property("CreatedAt", 10, 5, 2560859963279789654)
 	model.Property("UpdatedAt", 10, 6, 6879137370614292715)
-	model.EntityLastPropertyId(6, 6879137370614292715)
+	model.Property("FirstName", 9, 7, 5371987638100000232)
+	model.Property("LastName", 9, 8, 7064546187212738440)
+	model.Property("Email", 9, 9, 4256892128440117593)
+	model.Property("Phone", 9, 10, 8766869086574508498)
+	model.Property("Token", 9, 11, 6198435271220425000)
+	model.Property("IsBlocked", 1, 12, 5936673092836650890)
+	model.Property("IsFarm", 1, 13, 6391471651868091211)
+	model.Property("IsGasStation", 1, 14, 8380961054502993825)
+	model.Property("IsHarvesting", 1, 15, 5881266140801353583)
+	model.Property("IsPayDesk", 1, 16, 6970975710831344500)
+	model.Property("IsWarehouse", 1, 17, 6958713036560849743)
+	model.EntityLastPropertyId(17, 6958713036560849743)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -125,14 +197,27 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	}
 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
-	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
+	var offsetFirstName = fbutils.CreateStringOffset(fbb, obj.FirstName)
+	var offsetLastName = fbutils.CreateStringOffset(fbb, obj.LastName)
+	var offsetEmail = fbutils.CreateStringOffset(fbb, obj.Email)
+	var offsetPhone = fbutils.CreateStringOffset(fbb, obj.Phone)
+	var offsetToken = fbutils.CreateStringOffset(fbb, obj.Token)
 
 	// build the FlatBuffers object
-	fbb.StartObject(6)
+	fbb.StartObject(17)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
-	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
-	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
+	fbutils.SetUOffsetTSlot(fbb, 6, offsetFirstName)
+	fbutils.SetUOffsetTSlot(fbb, 7, offsetLastName)
+	fbutils.SetUOffsetTSlot(fbb, 8, offsetEmail)
+	fbutils.SetUOffsetTSlot(fbb, 9, offsetPhone)
+	fbutils.SetUOffsetTSlot(fbb, 10, offsetToken)
+	fbutils.SetBoolSlot(fbb, 11, obj.IsBlocked)
+	fbutils.SetBoolSlot(fbb, 12, obj.IsFarm)
+	fbutils.SetBoolSlot(fbb, 13, obj.IsGasStation)
+	fbutils.SetBoolSlot(fbb, 14, obj.IsHarvesting)
+	fbutils.SetBoolSlot(fbb, 15, obj.IsPayDesk)
+	fbutils.SetBoolSlot(fbb, 16, obj.IsWarehouse)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -162,12 +247,21 @@ func (appUser_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 	}
 
 	return &AppUser{
-		Id:        propId,
-		ExtId:     fbutils.GetStringSlot(table, 6),
-		Name:      fbutils.GetStringSlot(table, 8),
-		IsDeleted: fbutils.GetBoolSlot(table, 10),
-		CreatedAt: propCreatedAt,
-		UpdatedAt: propUpdatedAt,
+		Id:           propId,
+		ExtId:        fbutils.GetStringSlot(table, 6),
+		FirstName:    fbutils.GetStringSlot(table, 16),
+		LastName:     fbutils.GetStringSlot(table, 18),
+		Email:        fbutils.GetStringSlot(table, 20),
+		Phone:        fbutils.GetStringSlot(table, 22),
+		Token:        fbutils.GetStringSlot(table, 24),
+		IsBlocked:    fbutils.GetBoolSlot(table, 26),
+		IsFarm:       fbutils.GetBoolSlot(table, 28),
+		IsGasStation: fbutils.GetBoolSlot(table, 30),
+		IsHarvesting: fbutils.GetBoolSlot(table, 32),
+		IsPayDesk:    fbutils.GetBoolSlot(table, 34),
+		IsWarehouse:  fbutils.GetBoolSlot(table, 36),
+		CreatedAt:    propCreatedAt,
+		UpdatedAt:    propUpdatedAt,
 	}, nil
 }
 

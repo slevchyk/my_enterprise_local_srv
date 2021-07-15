@@ -102,8 +102,8 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			isJsonError = true
 		}
 
-		unit_id, ok := v["unit_id"].(string)
-		if !ok || unit_id == "" {
+		unitId, ok := v["unit_id"].(string)
+		if !ok || unitId == "" {
 			sa.Messages = append(sa.Messages, models.ServerMessage{
 				SourceId: extId,
 				Action:   "checking value",
@@ -142,6 +142,16 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			isJsonError = true
 		}
 
+		createdAt, err := time.Parse("2006-01-02T15:04:05", createdAtStr)
+		if err != nil {
+			sa.Messages = append(sa.Messages, models.ServerMessage{
+				SourceId: extId,
+				Action:   "checking value",
+				Message:  "created_at: cant convert to date format",
+			})
+			isJsonError = true
+		}
+
 		updatedAtStr, ok := v["updated_at"].(string)
 		if !ok || updatedAtStr == "" {
 			sa.Messages = append(sa.Messages, models.ServerMessage{
@@ -152,16 +162,58 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			isJsonError = true
 		}
 
+		updatedAt, err := time.Parse("2006-01-02T15:04:05", updatedAtStr)
+		if err != nil {
+			sa.Messages = append(sa.Messages, models.ServerMessage{
+				SourceId: extId,
+				Action:   "checking value",
+				Message:  "updated_at: cant convert to date format",
+			})
+			isJsonError = true
+		}
+
 		if isJsonError {
 			continue
 		}
 
 		isDataError := false
 
-		unit, sm := dao.GetUnitByExtId(apiV1.obx, unit_id)
+		consignmentNoteIn, sm := dao.GetConsignmentNoteInByExtId(apiV1.obx, consignmentNoteInId)
+		if consignmentNoteIn == nil {
+			sm.SourceId = extId
+			sm.DataId = consignmentNoteInId
+			sa.Messages = append(sa.Messages, sm)
+			isDataError = true
+		}
+
+		subdivision, sm := dao.GetSubdivisionByExtId(apiV1.obx, subdivisionId)
+		if subdivision == nil {
+			sm.SourceId = extId
+			sm.DataId = subdivisionId
+			sa.Messages = append(sa.Messages, sm)
+			isDataError = true
+		}
+
+		goodsGroup, sm := dao.GetGoodsGroupByExtId(apiV1.obx, goodsGroupId)
+		if goodsGroup != nil {
+			sm.SourceId = extId
+			sm.DataId = unitId
+			sa.Messages = append(sa.Messages, sm)
+			isDataError = true
+		}
+
+		goods, sm := dao.GetGoodsByExtId(apiV1.obx, goodsId)
+		if goods != nil {
+			sm.SourceId = extId
+			sm.DataId = unitId
+			sa.Messages = append(sa.Messages, sm)
+			isDataError = true
+		}
+
+		unit, sm := dao.GetUnitByExtId(apiV1.obx, unitId)
 		if unit == nil {
 			sm.SourceId = extId
-			sm.DataId = unit_id
+			sm.DataId = unitId
 			sa.Messages = append(sa.Messages, sm)
 			isDataError = true
 		}
@@ -186,14 +238,22 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 		GoodsConsignmentNoteIn := models.GoodsConsignmentNoteIn{
 			ExtId:             extId,
 			AppId:             appId,
+			ConsignmentNoteIn: consignmentNoteIn,
+			Subdivision:       subdivision,
+			GoodsGroup:        goodsGroup,
+			Goods:             goods,
 			Unit:              unit,
 			LoadingPercentage: loadingPercentage,
 			Quantity:          quantity,
+			CreatedAt:         createdAt,
+			UpdatedAt:         updatedAt,
 		}
 
 		if len(GoodsConsignmentNoteIns) == 0 {
-			GoodsConsignmentNoteIn.CreatedAt = time.Now().UTC()
-			GoodsConsignmentNoteIn.UpdatedAt = time.Now().UTC()
+			if GoodsConsignmentNoteIn.CreatedAt.IsZero() {
+				GoodsConsignmentNoteIn.CreatedAt = time.Now().UTC()
+				GoodsConsignmentNoteIn.UpdatedAt = time.Now().UTC()
+			}
 
 			_, err := box.Put(&GoodsConsignmentNoteIn)
 			if err != nil {
@@ -245,11 +305,19 @@ func (api *ApiV1) GoodsConsignmentNoteInGet(w http.ResponseWriter, r *http.Reque
 	var gs []*models.GoodsConsignmentNoteIn
 	var err error
 
+	fvConsignemntNoteInId := r.FormValue("consignment_note_in_id")
 	fvId := r.FormValue("id")
 
 	sa := models.ServerAnswer{SourceType: "GoodsConsignmentNoteIn",
 		WebMethod: "get",
 		DateUTC:   time.Now().UTC()}
+
+	if fvConsignemntNoteInId == "" {
+		sa.Status = http.StatusBadRequest
+		sa.SourceType = "goods consignament note in"
+		sa.Error = "Consignament note in id is not specified"
+
+	}
 
 	// obx, err := objectbox.NewBuilder().Model(models.ObjectBoxModel()).Build()
 	// if err != nil {

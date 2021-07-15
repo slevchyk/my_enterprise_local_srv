@@ -26,7 +26,6 @@ var ConsignmentNoteInBinding = consignmentNoteIn_EntityInfo{
 var ConsignmentNoteIn_ = struct {
 	Id                          *objectbox.PropertyInt64
 	ExtId                       *objectbox.PropertyString
-	AppId                       *objectbox.PropertyInt
 	Date                        *objectbox.PropertyInt64
 	Number                      *objectbox.PropertyString
 	DepartureDate               *objectbox.PropertyInt64
@@ -45,6 +44,7 @@ var ConsignmentNoteIn_ = struct {
 	ResponsiblePerson           *objectbox.RelationToOne
 	HarvestType                 *objectbox.RelationToOne
 	Vehicle                     *objectbox.RelationToOne
+	AppId                       *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyInt64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -55,12 +55,6 @@ var ConsignmentNoteIn_ = struct {
 	ExtId: &objectbox.PropertyString{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     2,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	AppId: &objectbox.PropertyInt{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     3,
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
@@ -179,6 +173,12 @@ var ConsignmentNoteIn_ = struct {
 		},
 		Target: &VehicleBinding.Entity,
 	},
+	AppId: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     60,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -192,7 +192,6 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Id", 6, 1, 7381584349873625452)
 	model.PropertyFlags(1)
 	model.Property("ExtId", 9, 2, 6555419099548205599)
-	model.Property("AppId", 6, 3, 8854590011868394480)
 	model.Property("Date", 10, 4, 3681808398951988176)
 	model.Property("Number", 9, 5, 3024305087246974805)
 	model.Property("DepartureDate", 10, 14, 214961481867191822)
@@ -225,7 +224,8 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Vehicle", 11, 59, 5453828081365110257)
 	model.PropertyFlags(520)
 	model.PropertyRelation("Vehicle", 18, 2240474060564286524)
-	model.EntityLastPropertyId(59, 5453828081365110257)
+	model.Property("AppId", 9, 60, 6042246242714324374)
+	model.EntityLastPropertyId(60, 6042246242714324374)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -355,6 +355,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetNumber = fbutils.CreateStringOffset(fbb, obj.Number)
+	var offsetAppId = fbutils.CreateStringOffset(fbb, obj.AppId)
 
 	var rIdHarvestType uint64
 	if rel := obj.HarvestType; rel != nil {
@@ -420,10 +421,10 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(59)
+	fbb.StartObject(60)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
-	fbutils.SetInt64Slot(fbb, 2, int64(obj.AppId))
+	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
 	fbutils.SetInt64Slot(fbb, 3, propDate)
 	fbutils.SetUOffsetTSlot(fbb, 4, offsetNumber)
 	if obj.HarvestType != nil {
@@ -448,12 +449,12 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	if obj.ResponsiblePerson != nil {
 		fbutils.SetUint64Slot(fbb, 48, rIdResponsiblePerson)
 	}
-	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetFloat32Slot(fbb, 37, obj.Gross)
 	fbutils.SetFloat32Slot(fbb, 38, obj.Tare)
 	fbutils.SetFloat32Slot(fbb, 39, obj.Net)
 	fbutils.SetFloat32Slot(fbb, 40, obj.Humidity)
 	fbutils.SetFloat32Slot(fbb, 41, obj.Weediness)
+	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 35, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 36, propUpdatedAt)
 	return nil
@@ -558,7 +559,7 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 	return &ConsignmentNoteIn{
 		Id:                          propId,
 		ExtId:                       fbutils.GetStringSlot(table, 6),
-		AppId:                       fbutils.GetIntSlot(table, 8),
+		AppId:                       fbutils.GetStringSlot(table, 122),
 		Date:                        propDate,
 		Number:                      fbutils.GetStringSlot(table, 12),
 		HarvestType:                 relHarvestType,
@@ -569,12 +570,12 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		Sender:                      relSender,
 		MateriallyResponsiblePerson: relMateriallyResponsiblePerson,
 		ResponsiblePerson:           relResponsiblePerson,
-		IsDeleted:                   fbutils.GetBoolSlot(table, 72),
 		Gross:                       fbutils.GetFloat32Slot(table, 78),
 		Tare:                        fbutils.GetFloat32Slot(table, 80),
 		Net:                         fbutils.GetFloat32Slot(table, 82),
 		Humidity:                    fbutils.GetFloat32Slot(table, 84),
 		Weediness:                   fbutils.GetFloat32Slot(table, 86),
+		IsDeleted:                   fbutils.GetBoolSlot(table, 72),
 		CreatedAt:                   propCreatedAt,
 		UpdatedAt:                   propUpdatedAt,
 	}, nil

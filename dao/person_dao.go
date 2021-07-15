@@ -7,15 +7,15 @@ import (
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
 
-func GetPersonByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGroup, models.ServerMessage) {
+func GetPersonByExtId(obx *objectbox.ObjectBox, id string) (*models.Person, models.ServerMessage) {
 
 	var sm models.ServerMessage
 
-	boxGoodsGroup := models.BoxForGoodsGroup(obx)
+	boxPerson := models.BoxForPerson(obx)
 
-	queryGoodsGroup := boxGoodsGroup.Query(models.GoodsGroup_.ExtId.Equals(id, true))
-	GoodsGroups, err := queryGoodsGroup.Find()
-	queryGoodsGroup.Close()
+	queryPerson := boxPerson.Query(models.Person_.ExtId.Equals(id, true))
+	Persons, err := queryPerson.Find()
+	queryPerson.Close()
 
 	if err != nil {
 		sm = models.ServerMessage{
@@ -27,7 +27,7 @@ func GetPersonByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGroup, 
 		return nil, sm
 	}
 
-	if len(GoodsGroups) == 0 {
+	if len(Persons) == 0 {
 		sm = models.ServerMessage{
 			Status:   http.StatusNotFound,
 			DataType: "person",
@@ -36,7 +36,7 @@ func GetPersonByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGroup, 
 		}
 		return nil, sm
 
-	} else if len(GoodsGroups) != 1 {
+	} else if len(Persons) != 1 {
 		sm = models.ServerMessage{
 			Status:   http.StatusBadRequest,
 			DataType: "person",
@@ -46,5 +46,5 @@ func GetPersonByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGroup, 
 		return nil, sm
 	}
 
-	return GoodsGroups[0], sm
+	return Persons[0], sm
 }

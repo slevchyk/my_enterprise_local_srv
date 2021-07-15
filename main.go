@@ -30,6 +30,8 @@ func main() {
 	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
 	http.HandleFunc("/api/v1/unit", unitHandler)
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
+
+	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
 	http.HandleFunc("/test", testHandler)
 	err := http.ListenAndServe(":8002", nil)
 	if err != nil {
@@ -156,7 +158,6 @@ func unitHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
-
 }
 
 func vehicleHandler(w http.ResponseWriter, r *http.Request) {
@@ -167,6 +168,20 @@ func vehicleHandler(w http.ResponseWriter, r *http.Request) {
 		api.VehiclePost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.VehicleGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.ConsignmentNoteInPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.ConsignmentNoteInGet(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
