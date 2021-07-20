@@ -7,7 +7,7 @@ import (
 //go:generate go run github.com/objectbox/objectbox-go/cmd/objectbox-gogen
 
 type Unit struct {
-	Id        int64     `json:"id"`
+	Id        uint64     `json:"id"`
 	ExtId     string    `json:"ext_id"`
 	Name      string    `json:"name"`
 	IsDeleted bool      `json:"is_deleted"`

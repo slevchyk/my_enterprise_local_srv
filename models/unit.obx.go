@@ -24,14 +24,14 @@ var UnitBinding = unit_EntityInfo{
 
 // Unit_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var Unit_ = struct {
-	Id        *objectbox.PropertyInt64
+	Id        *objectbox.PropertyUint64
 	ExtId     *objectbox.PropertyString
 	Name      *objectbox.PropertyString
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
 }{
-	Id: &objectbox.PropertyInt64{
+	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     1,
 			Entity: &UnitBinding.Entity,
@@ -89,12 +89,12 @@ func (unit_EntityInfo) AddToModel(model *objectbox.Model) {
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
 func (unit_EntityInfo) GetId(object interface{}) (uint64, error) {
-	return uint64(object.(*Unit).Id), nil
+	return object.(*Unit).Id, nil
 }
 
 // SetId is called by ObjectBox during Put to update an ID on an object that has just been inserted
 func (unit_EntityInfo) SetId(object interface{}, id uint64) error {
-	object.(*Unit).Id = int64(id)
+	object.(*Unit).Id = id
 	return nil
 }
 
@@ -149,7 +149,7 @@ func (unit_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface{},
 		Pos:   flatbuffers.GetUOffsetT(bytes),
 	}
 
-	var propId = table.GetInt64Slot(4, 0)
+	var propId = table.GetUint64Slot(4, 0)
 
 	propCreatedAt, err := objectbox.TimeInt64ConvertToEntityProperty(fbutils.GetInt64Slot(table, 12))
 	if err != nil {
@@ -290,7 +290,7 @@ func (box *UnitBox) Remove(object *Unit) error {
 func (box *UnitBox) RemoveMany(objects ...*Unit) (uint64, error) {
 	var ids = make([]uint64, len(objects))
 	for k, object := range objects {
-		ids[k] = uint64(object.Id)
+		ids[k] = object.Id
 	}
 	return box.Box.RemoveIds(ids...)
 }

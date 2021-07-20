@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"net/http"
-
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
@@ -10,6 +8,16 @@ import (
 func GetGoodsGroupByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGroup, models.ServerMessage) {
 
 	var sm models.ServerMessage
+
+	if id == "" {
+		sm = models.ServerMessage{
+			DataType: "goods group",
+			DataId: id,
+			Action:   "query",
+			Message:  "an empty id",
+		}
+		return nil, sm
+	}
 
 	boxGoodsGroup := models.BoxForGoodsGroup(obx)
 
@@ -19,8 +27,8 @@ func GetGoodsGroupByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGro
 
 	if err != nil {
 		sm = models.ServerMessage{
-			Status:   http.StatusInternalServerError,
 			DataType: "goods group",
+			DataId: id,
 			Action:   "query",
 			Message:  err.Error(),
 		}
@@ -29,8 +37,8 @@ func GetGoodsGroupByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGro
 
 	if len(GoodsGroups) == 0 {
 		sm = models.ServerMessage{
-			Status:   http.StatusNotFound,
 			DataType: "goods group",
+			DataId: id,
 			Action:   "query",
 			Message:  "not found",
 		}
@@ -38,8 +46,8 @@ func GetGoodsGroupByExtId(obx *objectbox.ObjectBox, id string) (*models.GoodsGro
 
 	} else if len(GoodsGroups) != 1 {
 		sm = models.ServerMessage{
-			Status:   http.StatusBadRequest,
 			DataType: "goods group",
+			DataId: id,
 			Action:   "query",
 			Message:  "more than 1",
 		}

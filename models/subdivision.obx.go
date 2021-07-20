@@ -24,14 +24,14 @@ var SubdivisionBinding = subdivision_EntityInfo{
 
 // Subdivision_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var Subdivision_ = struct {
-	Id        *objectbox.PropertyInt64
+	Id        *objectbox.PropertyUint64
 	ExtId     *objectbox.PropertyString
 	Name      *objectbox.PropertyString
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
 }{
-	Id: &objectbox.PropertyInt64{
+	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     1,
 			Entity: &SubdivisionBinding.Entity,
@@ -89,12 +89,12 @@ func (subdivision_EntityInfo) AddToModel(model *objectbox.Model) {
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
 func (subdivision_EntityInfo) GetId(object interface{}) (uint64, error) {
-	return uint64(object.(*Subdivision).Id), nil
+	return object.(*Subdivision).Id, nil
 }
 
 // SetId is called by ObjectBox during Put to update an ID on an object that has just been inserted
 func (subdivision_EntityInfo) SetId(object interface{}, id uint64) error {
-	object.(*Subdivision).Id = int64(id)
+	object.(*Subdivision).Id = id
 	return nil
 }
 
@@ -149,7 +149,7 @@ func (subdivision_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (inter
 		Pos:   flatbuffers.GetUOffsetT(bytes),
 	}
 
-	var propId = table.GetInt64Slot(4, 0)
+	var propId = table.GetUint64Slot(4, 0)
 
 	propCreatedAt, err := objectbox.TimeInt64ConvertToEntityProperty(fbutils.GetInt64Slot(table, 12))
 	if err != nil {
@@ -290,7 +290,7 @@ func (box *SubdivisionBox) Remove(object *Subdivision) error {
 func (box *SubdivisionBox) RemoveMany(objects ...*Subdivision) (uint64, error) {
 	var ids = make([]uint64, len(objects))
 	for k, object := range objects {
-		ids[k] = uint64(object.Id)
+		ids[k] = object.Id
 	}
 	return box.Box.RemoveIds(ids...)
 }

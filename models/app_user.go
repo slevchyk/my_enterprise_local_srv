@@ -5,7 +5,7 @@ import "time"
 //go:generate go run github.com/objectbox/objectbox-go/cmd/objectbox-gogen
 
 type AppUser struct {
-	Id           int64  `json:"id"`
+	Id           uint64  `json:"id"`
 	ExtId        string `json:"ext_id"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`

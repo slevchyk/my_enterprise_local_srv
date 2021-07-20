@@ -5,9 +5,9 @@ import "time"
 //go:generate go run github.com/objectbox/objectbox-go/cmd/objectbox-gogen
 
 type GoodsConsignmentNoteIn struct {
-	Id                int64              `json:"id"`
+	Id                uint64              `json:"id"`
 	ExtId             string             `json:"ext_id"`
-	AppId             int64              `json:"app_id"`
+	AppId             string             `json:"app_id"`
 	ConsignmentNoteIn *ConsignmentNoteIn `json:"-" objectbox:"link"`
 	Subdivision       *Subdivision       `json:"subdivision" objectbox:"link"`
 	GoodsGroup        *GoodsGroup        `json:"goods_group" objectbox:"link"`

@@ -7,17 +7,23 @@ import (
 )
 
 type ServerAnswer struct {
-	Status     int
-	Error      string
-	SourceType string
-	WebMethod  string
-	DateUTC    time.Time	
-	Messages   []ServerMessage
+	Status        int                   `json:"status"`
+	Object        string                `json:"object"`
+	WebMethod     string                `json:"web_method"`
+	DateUTC       time.Time             `json:"date_utc"`
+	Error         string                `json:"error"`
+	ProcessedData []ServerProcessedData `json:"processed_data"`
+}
+
+type ServerProcessedData struct {
+	Status   int             `json:"status"`
+	AppId    string          `json:"app_id"`
+	SrvId    uint64          `json:"srv_id"`
+	ExtId    string          `json:"ext_id"`
+	Messages []ServerMessage `json:"messages"`
 }
 
 type ServerMessage struct {
-	Status   int    `json:"status"`
-	SourceId string `json:"source_id"`
 	DataType string `json:"data_type"`
 	DataId   string `json:"data_id"`
 	Action   string `json:"action"`
@@ -27,11 +33,7 @@ type ServerMessage struct {
 func (sa ServerAnswer) Send(w http.ResponseWriter) {
 
 	if sa.Status == 0 {
-		if len(sa.Messages) == 0 {
-			sa.Status = http.StatusOK
-		} else {
-			sa.Status = http.StatusBadRequest
-		}
+		sa.Status = http.StatusOK
 	}
 
 	if sa.DateUTC.IsZero() {
@@ -40,7 +42,7 @@ func (sa ServerAnswer) Send(w http.ResponseWriter) {
 
 	bs, err := json.Marshal(sa)
 	if err != nil {
-		http.Error(w, sa.Error, sa.Status)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

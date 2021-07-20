@@ -34,7 +34,6 @@ __debug_bin
 .pub-cache/
 .pub/
 /build/
-**.g.dart
 /objectboxlib/download/
 
 # Web related

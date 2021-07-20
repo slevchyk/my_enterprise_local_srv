@@ -24,7 +24,7 @@ var ConsignmentNoteInBinding = consignmentNoteIn_EntityInfo{
 
 // ConsignmentNoteIn_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var ConsignmentNoteIn_ = struct {
-	Id                          *objectbox.PropertyInt64
+	Id                          *objectbox.PropertyUint64
 	ExtId                       *objectbox.PropertyString
 	Date                        *objectbox.PropertyInt64
 	Number                      *objectbox.PropertyString
@@ -32,11 +32,6 @@ var ConsignmentNoteIn_ = struct {
 	IsDeleted                   *objectbox.PropertyBool
 	CreatedAt                   *objectbox.PropertyInt64
 	UpdatedAt                   *objectbox.PropertyInt64
-	Gross                       *objectbox.PropertyFloat32
-	Tare                        *objectbox.PropertyFloat32
-	Net                         *objectbox.PropertyFloat32
-	Humidity                    *objectbox.PropertyFloat32
-	Weediness                   *objectbox.PropertyFloat32
 	Driver                      *objectbox.RelationToOne
 	Recipient                   *objectbox.RelationToOne
 	Sender                      *objectbox.RelationToOne
@@ -45,8 +40,13 @@ var ConsignmentNoteIn_ = struct {
 	HarvestType                 *objectbox.RelationToOne
 	Vehicle                     *objectbox.RelationToOne
 	AppId                       *objectbox.PropertyString
+	Gross                       *objectbox.PropertyFloat64
+	Tare                        *objectbox.PropertyFloat64
+	Net                         *objectbox.PropertyFloat64
+	Humidity                    *objectbox.PropertyFloat64
+	Weediness                   *objectbox.PropertyFloat64
 }{
-	Id: &objectbox.PropertyInt64{
+	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     1,
 			Entity: &ConsignmentNoteInBinding.Entity,
@@ -91,36 +91,6 @@ var ConsignmentNoteIn_ = struct {
 	UpdatedAt: &objectbox.PropertyInt64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     37,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	Gross: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     38,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	Tare: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     39,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	Net: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     40,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	Humidity: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     41,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-	},
-	Weediness: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     42,
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
@@ -179,6 +149,36 @@ var ConsignmentNoteIn_ = struct {
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
+	Gross: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     61,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Tare: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     62,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Net: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     63,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Humidity: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     64,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Weediness: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     65,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -198,11 +198,6 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 35, 638093717419802601)
 	model.Property("CreatedAt", 10, 36, 8899633992386505214)
 	model.Property("UpdatedAt", 10, 37, 8437818475573608947)
-	model.Property("Gross", 7, 38, 168496893328368879)
-	model.Property("Tare", 7, 39, 3152704045340349885)
-	model.Property("Net", 7, 40, 8081477154265349396)
-	model.Property("Humidity", 7, 41, 338239348335444161)
-	model.Property("Weediness", 7, 42, 5364742737548566781)
 	model.Property("Driver", 11, 45, 6637254081577110712)
 	model.PropertyFlags(520)
 	model.PropertyRelation("Person", 5, 2579239408896235758)
@@ -225,17 +220,22 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.PropertyFlags(520)
 	model.PropertyRelation("Vehicle", 18, 2240474060564286524)
 	model.Property("AppId", 9, 60, 6042246242714324374)
-	model.EntityLastPropertyId(60, 6042246242714324374)
+	model.Property("Gross", 8, 61, 6424679353718418180)
+	model.Property("Tare", 8, 62, 4959522081134873497)
+	model.Property("Net", 8, 63, 51868586889488965)
+	model.Property("Humidity", 8, 64, 7455670039623708115)
+	model.Property("Weediness", 8, 65, 8126686263197659917)
+	model.EntityLastPropertyId(65, 8126686263197659917)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
 func (consignmentNoteIn_EntityInfo) GetId(object interface{}) (uint64, error) {
-	return uint64(object.(*ConsignmentNoteIn).Id), nil
+	return object.(*ConsignmentNoteIn).Id, nil
 }
 
 // SetId is called by ObjectBox during Put to update an ID on an object that has just been inserted
 func (consignmentNoteIn_EntityInfo) SetId(object interface{}, id uint64) error {
-	object.(*ConsignmentNoteIn).Id = int64(id)
+	object.(*ConsignmentNoteIn).Id = id
 	return nil
 }
 
@@ -421,7 +421,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(60)
+	fbb.StartObject(65)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
@@ -449,11 +449,11 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	if obj.ResponsiblePerson != nil {
 		fbutils.SetUint64Slot(fbb, 48, rIdResponsiblePerson)
 	}
-	fbutils.SetFloat32Slot(fbb, 37, obj.Gross)
-	fbutils.SetFloat32Slot(fbb, 38, obj.Tare)
-	fbutils.SetFloat32Slot(fbb, 39, obj.Net)
-	fbutils.SetFloat32Slot(fbb, 40, obj.Humidity)
-	fbutils.SetFloat32Slot(fbb, 41, obj.Weediness)
+	fbutils.SetFloat64Slot(fbb, 60, obj.Gross)
+	fbutils.SetFloat64Slot(fbb, 61, obj.Tare)
+	fbutils.SetFloat64Slot(fbb, 62, obj.Net)
+	fbutils.SetFloat64Slot(fbb, 63, obj.Humidity)
+	fbutils.SetFloat64Slot(fbb, 64, obj.Weediness)
 	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 35, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 36, propUpdatedAt)
@@ -471,7 +471,7 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		Pos:   flatbuffers.GetUOffsetT(bytes),
 	}
 
-	var propId = table.GetInt64Slot(4, 0)
+	var propId = table.GetUint64Slot(4, 0)
 
 	propDate, err := objectbox.TimeInt64ConvertToEntityProperty(fbutils.GetInt64Slot(table, 10))
 	if err != nil {
@@ -570,11 +570,11 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		Sender:                      relSender,
 		MateriallyResponsiblePerson: relMateriallyResponsiblePerson,
 		ResponsiblePerson:           relResponsiblePerson,
-		Gross:                       fbutils.GetFloat32Slot(table, 78),
-		Tare:                        fbutils.GetFloat32Slot(table, 80),
-		Net:                         fbutils.GetFloat32Slot(table, 82),
-		Humidity:                    fbutils.GetFloat32Slot(table, 84),
-		Weediness:                   fbutils.GetFloat32Slot(table, 86),
+		Gross:                       fbutils.GetFloat64Slot(table, 124),
+		Tare:                        fbutils.GetFloat64Slot(table, 126),
+		Net:                         fbutils.GetFloat64Slot(table, 128),
+		Humidity:                    fbutils.GetFloat64Slot(table, 130),
+		Weediness:                   fbutils.GetFloat64Slot(table, 132),
 		IsDeleted:                   fbutils.GetBoolSlot(table, 72),
 		CreatedAt:                   propCreatedAt,
 		UpdatedAt:                   propUpdatedAt,
@@ -700,7 +700,7 @@ func (box *ConsignmentNoteInBox) Remove(object *ConsignmentNoteIn) error {
 func (box *ConsignmentNoteInBox) RemoveMany(objects ...*ConsignmentNoteIn) (uint64, error) {
 	var ids = make([]uint64, len(objects))
 	for k, object := range objects {
-		ids[k] = uint64(object.Id)
+		ids[k] = object.Id
 	}
 	return box.Box.RemoveIds(ids...)
 }

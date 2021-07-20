@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"net/http"
-
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
@@ -19,7 +17,6 @@ func GetVehicleByExtId(obx *objectbox.ObjectBox, id string) (*models.Vehicle, mo
 
 	if err != nil {
 		sm = models.ServerMessage{
-			Status:   http.StatusInternalServerError,
 			DataType: "Vehicle",
 			Action:   "query",
 			Message:  err.Error(),
@@ -29,7 +26,6 @@ func GetVehicleByExtId(obx *objectbox.ObjectBox, id string) (*models.Vehicle, mo
 
 	if len(Vehicles) == 0 {
 		sm = models.ServerMessage{
-			Status:   http.StatusNotFound,
 			DataType: "Vehicle",
 			Action:   "query",
 			Message:  "not found",
@@ -38,7 +34,6 @@ func GetVehicleByExtId(obx *objectbox.ObjectBox, id string) (*models.Vehicle, mo
 
 	} else if len(Vehicles) != 1 {
 		sm = models.ServerMessage{
-			Status:   http.StatusBadRequest,
 			DataType: "Vehicle",
 			Action:   "query",
 			Message:  "more than 1",

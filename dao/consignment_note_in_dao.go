@@ -1,11 +1,42 @@
 package dao
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
+
+func GetConsignmentNoteInById(obx *objectbox.ObjectBox, id uint64) (*models.ConsignmentNoteIn, models.ServerMessage) {
+
+	var sm models.ServerMessage
+
+	if id == 0 {
+		sm = models.ServerMessage{
+			DataType: "ConsignmentNoteIn",
+			DataId: fmt.Sprint(id),
+			Action:   "query",
+			Message:  "id = 0",
+		}
+		return nil, sm
+	} 
+
+	boxConsignmentNoteIn := models.BoxForConsignmentNoteIn(obx)
+
+	ConsignmentNoteIn, err := boxConsignmentNoteIn.Get(id)
+	
+	if err != nil {
+		sm = models.ServerMessage{
+			DataType: "ConsignmentNoteIn",
+			DataId: fmt.Sprint(id),
+			Action:   "query",
+			Message:  err.Error(),
+		}
+		return nil, sm
+	}
+
+	return ConsignmentNoteIn, sm
+}
 
 func GetConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*models.ConsignmentNoteIn, models.ServerMessage) {
 
@@ -19,7 +50,6 @@ func GetConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*models.C
 
 	if err != nil {
 		sm = models.ServerMessage{
-			Status:   http.StatusInternalServerError,
 			DataType: "ConsignmentNoteIn",
 			Action:   "query",
 			Message:  err.Error(),
@@ -29,7 +59,6 @@ func GetConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*models.C
 
 	if len(ConsignmentNoteIns) == 0 {
 		sm = models.ServerMessage{
-			Status:   http.StatusNotFound,
 			DataType: "ConsignmentNoteIn",
 			Action:   "query",
 			Message:  "not found",
@@ -38,7 +67,6 @@ func GetConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*models.C
 
 	} else if len(ConsignmentNoteIns) != 1 {
 		sm = models.ServerMessage{
-			Status:   http.StatusBadRequest,
 			DataType: "ConsignmentNoteIn",
 			Action:   "query",
 			Message:  "more than 1",

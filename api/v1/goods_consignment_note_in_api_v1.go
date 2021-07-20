@@ -15,7 +15,7 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 	var gcnis []models.GoodsConsignmentNoteIn
 	var err error
 
-	sa := models.ServerAnswer{SourceType: "GoodsConsignmentNoteIn",
+	sa := models.ServerAnswer{Object: "GoodsConsignmentNoteIn",
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
@@ -42,183 +42,184 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 
 		isJsonError := false
 
-		extId, ok := v["ext_id"].(string)
-		if !ok || extId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value ext_id",
-				Message:  "ext_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
+		var pd models.ServerProcessedData
 
-		appId, ok := v["app_id"].(int64)
+		var srvId uint64
+		srvIdFloat64, ok := v["srv_id"].(float64)
 		if !ok {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "app_id: incorrect type",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking type",
+				Message: "srv_id: incorrect type",
+			})
+			isJsonError = true
+		} else {
+			srvId = uint64(srvIdFloat64)
+			pd.SrvId = srvId
+		}
+
+		appId, ok := v["app_id"].(string)
+		if !ok {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "app_id: incorrect type",
 			})
 			isJsonError = true
 		}
+		pd.AppId = appId
 
-		consignmentNoteInId, ok := v["consignment_note_in_id"].(string)
-		if !ok || consignmentNoteInId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "consignment_note_in_id: incorrect type or empty",
+		extId, ok := v["ext_id"].(string)
+		if !ok {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value ext_id",
+				Message: "ext_id: incorrect type",
 			})
 			isJsonError = true
+		}
+		pd.ExtId = extId
+
+		var consignmentNoteInId uint64
+		consignmentNoteInIdFloat64, ok := v["consignment_note_in_id"].(float64)
+		if !ok {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "consignment_note_in_id: incorrect type or empty",
+			})
+			isJsonError = true
+		} else {
+			consignmentNoteInId = uint64(consignmentNoteInIdFloat64)
 		}
 
 		subdivisionId, ok := v["subdivision_id"].(string)
 		if !ok || subdivisionId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "subdivision_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "subdivision_id: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		goodsGroupId, ok := v["goods_group_id"].(string)
 		if !ok || goodsGroupId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "goods_group_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "goods_group_id: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		goodsId, ok := v["goods_id"].(string)
 		if !ok || goodsId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "goods_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "goods_id: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		unitId, ok := v["unit_id"].(string)
 		if !ok || unitId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "unit_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "unit_id: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		loadingPercentage, ok := v["loading_percentage"].(float32)
 		if !ok {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "loading_percentage: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "loading_percentage: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		quantity, ok := v["quantity"].(float32)
 		if !ok {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "quantity: incorrect type",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "quantity: incorrect type",
 			})
 			isJsonError = true
 		}
 
 		createdAtStr, ok := v["created_at"].(string)
 		if !ok || createdAtStr == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "created_at: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "created_at: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		createdAt, err := time.Parse("2006-01-02T15:04:05", createdAtStr)
 		if err != nil {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "created_at: cant convert to date format",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "created_at: cant convert to date format",
 			})
 			isJsonError = true
 		}
 
 		updatedAtStr, ok := v["updated_at"].(string)
 		if !ok || updatedAtStr == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "updated_at: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "updated_at: incorrect type or empty",
 			})
 			isJsonError = true
 		}
 
 		updatedAt, err := time.Parse("2006-01-02T15:04:05", updatedAtStr)
 		if err != nil {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "updated_at: cant convert to date format",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "updated_at: cant convert to date format",
 			})
 			isJsonError = true
 		}
 
 		if isJsonError {
+			pd.Status = http.StatusBadRequest
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
 		isDataError := false
 
-		consignmentNoteIn, sm := dao.GetConsignmentNoteInByExtId(apiV1.obx, consignmentNoteInId)
+		consignmentNoteIn, sm := dao.GetConsignmentNoteInById(apiV1.obx, consignmentNoteInId)
 		if consignmentNoteIn == nil {
-			sm.SourceId = extId
-			sm.DataId = consignmentNoteInId
-			sa.Messages = append(sa.Messages, sm)
+			pd.Messages = append(pd.Messages, sm)
 			isDataError = true
 		}
 
 		subdivision, sm := dao.GetSubdivisionByExtId(apiV1.obx, subdivisionId)
 		if subdivision == nil {
-			sm.SourceId = extId
-			sm.DataId = subdivisionId
-			sa.Messages = append(sa.Messages, sm)
+			pd.Messages = append(pd.Messages, sm)
 			isDataError = true
 		}
 
 		goodsGroup, sm := dao.GetGoodsGroupByExtId(apiV1.obx, goodsGroupId)
 		if goodsGroup != nil {
-			sm.SourceId = extId
-			sm.DataId = unitId
-			sa.Messages = append(sa.Messages, sm)
+			pd.Messages = append(pd.Messages, sm)
 			isDataError = true
 		}
 
 		goods, sm := dao.GetGoodsByExtId(apiV1.obx, goodsId)
 		if goods != nil {
-			sm.SourceId = extId
-			sm.DataId = unitId
-			sa.Messages = append(sa.Messages, sm)
+			pd.Messages = append(pd.Messages, sm)
 			isDataError = true
 		}
 
 		unit, sm := dao.GetUnitByExtId(apiV1.obx, unitId)
 		if unit == nil {
-			sm.SourceId = extId
-			sm.DataId = unitId
-			sa.Messages = append(sa.Messages, sm)
+			pd.Messages = append(pd.Messages, sm)
 			isDataError = true
 		}
 
 		if isDataError {
+			pd.Status = http.StatusBadRequest
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
@@ -226,11 +227,15 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 		GoodsConsignmentNoteIns, err := query.Find()
 		query.Close()
 		if err != nil {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "GoodsConsignmentNoteIn",
 				Action:   "query",
 				Message:  err.Error(),
 			})
+
+			pd.Status = http.StatusInternalServerError
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+
 			query.Close()
 			continue
 		}
@@ -257,9 +262,9 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 
 			_, err := box.Put(&GoodsConsignmentNoteIn)
 			if err != nil {
-				sa.Messages = append(sa.Messages, models.ServerMessage{
-					Status:   http.StatusInternalServerError,
-					SourceId: extId,
+				pd.Status = http.StatusInternalServerError
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
 					Action:   "insert",
 					Message:  err.Error(),
 				})
@@ -272,21 +277,23 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 
 			err := box.Update(&GoodsConsignmentNoteIn)
 			if err != nil {
-				sa.Messages = append(sa.Messages, models.ServerMessage{
-					Status:   http.StatusInternalServerError,
-					SourceId: extId,
+				pd.Status = http.StatusInternalServerError
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
 					Action:   "update",
 					Message:  err.Error(),
 				})
 			}
 		} else {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				Status:   http.StatusBadRequest,
-				SourceId: extId,
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "GoodsConsignmentNoteIn",
 				Action:   "more than 1",
 				Message:  err.Error(),
 			})
 		}
+
+		sa.ProcessedData = append(sa.ProcessedData, pd)
 	}
 
 	err = json.Unmarshal(bs, &gcnis)
@@ -308,13 +315,13 @@ func (api *ApiV1) GoodsConsignmentNoteInGet(w http.ResponseWriter, r *http.Reque
 	fvConsignemntNoteInId := r.FormValue("consignment_note_in_id")
 	fvId := r.FormValue("id")
 
-	sa := models.ServerAnswer{SourceType: "GoodsConsignmentNoteIn",
+	sa := models.ServerAnswer{Object: "GoodsConsignmentNoteIn",
 		WebMethod: "get",
 		DateUTC:   time.Now().UTC()}
 
 	if fvConsignemntNoteInId == "" {
 		sa.Status = http.StatusBadRequest
-		sa.SourceType = "goods consignament note in"
+		sa.Object = "goods consignament note in"
 		sa.Error = "Consignament note in id is not specified"
 
 	}
@@ -345,11 +352,6 @@ func (api *ApiV1) GoodsConsignmentNoteInGet(w http.ResponseWriter, r *http.Reque
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: fvId,
-				Action:   "query",
-				Message:  err.Error(),
-			})
 			query.Close()
 			return
 		}

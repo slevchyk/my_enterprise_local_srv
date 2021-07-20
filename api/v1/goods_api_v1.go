@@ -14,7 +14,8 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 	var gs []models.Goods
 	var err error
 
-	sa := models.ServerAnswer{SourceType: "Goods",
+	sa := models.ServerAnswer{
+		Object:    "Goods",
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
@@ -42,89 +43,95 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 
 		jsonError := false
 
+		var pd models.ServerProcessedData
+
 		extId, ok := v["ext_id"].(string)
 		if !ok || extId == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value ext_id",
-				Message:  "ext_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value ext_id",
+				Message: "ext_id: incorrect type or empty",
 			})
 			jsonError = true
 		}
+		pd.ExtId = extId
 
 		name, ok := v["name"].(string)
 		if !ok || name == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "name: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "name: incorrect type or empty",
 			})
 			jsonError = true
 		}
 
 		unit_id, ok := v["unit_id"].(string)
 		if !ok || unit_id == "" {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "checking value",
-				Message:  "unit_id: incorrect type or empty",
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "unit_id: incorrect type or empty",
 			})
 			jsonError = true
 		}
 
 		if jsonError {
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
-		
+
 		queryUnit := boxUnit.Query(models.Unit_.ExtId.Equals(extId, true))
-		units, err := queryUnit.Find()		
+		units, err := queryUnit.Find()
 		queryUnit.Close()
 
 		if err != nil {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				Status:   http.StatusInternalServerError,
-				SourceId: extId,
+			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "unit",
 				DataId:   unit_id,
 				Action:   "query",
 				Message:  err.Error(),
 			})
+
+			pd.Status = http.StatusInternalServerError
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
 		if len(units) == 0 {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				Status:   http.StatusNotFound,
-				SourceId: extId,
+			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "unit",
 				DataId:   unit_id,
 				Action:   "query",
 				Message:  "not found",
 			})
+
+			pd.Status = http.StatusNotFound
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		} else if len(units) != 1 {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				Status:   http.StatusBadRequest,
-				SourceId: extId,
+			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "unit",
 				DataId:   unit_id,
 				Action:   "query",
 				Message:  "more than 1",
 			})
+
+			pd.Status = http.StatusConflict
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
 		unit := units[0]
-		
+
 		query := box.Query(models.Goods_.ExtId.Equals(extId, true))
 		goodss, err := query.Find()
 		query.Close()
 		if err != nil {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: extId,
-				Action:   "query",
-				Message:  err.Error(),
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "query",
+				Message: err.Error(),
 			})
+
+			pd.Status = http.StatusInternalServerError
+			sa.ProcessedData = append(sa.ProcessedData, pd)
 			query.Close()
 			continue
 		}
@@ -141,11 +148,9 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 
 			_, err := box.Put(&goods)
 			if err != nil {
-				sa.Messages = append(sa.Messages, models.ServerMessage{
-					Status:   http.StatusInternalServerError,
-					SourceId: extId,
-					Action:   "insert",
-					Message:  err.Error(),
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "insert",
+					Message: err.Error(),
 				})
 			}
 
@@ -156,19 +161,15 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 
 			err := box.Update(&goods)
 			if err != nil {
-				sa.Messages = append(sa.Messages, models.ServerMessage{
-					Status:   http.StatusInternalServerError,
-					SourceId: extId,
-					Action:   "update",
-					Message:  err.Error(),
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "update",
+					Message: err.Error(),
 				})
 			}
 		} else {
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				Status:   http.StatusBadRequest,
-				SourceId: extId,
-				Action:   "more than 1",
-				Message:  err.Error(),
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "more than 1",
+				Message: err.Error(),
 			})
 		}
 	}
@@ -191,7 +192,7 @@ func (api *ApiV1) GoodsGet(w http.ResponseWriter, r *http.Request) {
 
 	fvId := r.FormValue("id")
 
-	sa := models.ServerAnswer{SourceType: "Goods",
+	sa := models.ServerAnswer{Object: "Goods",
 		WebMethod: "get",
 		DateUTC:   time.Now().UTC()}
 
@@ -221,11 +222,6 @@ func (api *ApiV1) GoodsGet(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
-			sa.Messages = append(sa.Messages, models.ServerMessage{
-				SourceId: fvId,
-				Action:   "query",
-				Message:  err.Error(),
-			})
 			query.Close()
 			return
 		}

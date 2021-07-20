@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"net/http"
-
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
@@ -19,7 +17,6 @@ func GetAppUserByExtId(obx *objectbox.ObjectBox, id string) (*models.AppUser, mo
 
 	if err != nil {
 		sm = models.ServerMessage{
-			Status:   http.StatusInternalServerError,
 			DataType: "app user",
 			Action:   "query",
 			Message:  err.Error(),
@@ -29,7 +26,6 @@ func GetAppUserByExtId(obx *objectbox.ObjectBox, id string) (*models.AppUser, mo
 
 	if len(appUsers) == 0 {
 		sm = models.ServerMessage{
-			Status:   http.StatusNotFound,
 			DataType: "app user",
 			Action:   "query",
 			Message:  "not found",
@@ -38,7 +34,6 @@ func GetAppUserByExtId(obx *objectbox.ObjectBox, id string) (*models.AppUser, mo
 
 	} else if len(appUsers) != 1 {
 		sm = models.ServerMessage{
-			Status:   http.StatusBadRequest,
 			DataType: "app user",
 			Action:   "query",
 			Message:  "more than 1",

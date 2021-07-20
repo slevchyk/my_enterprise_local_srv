@@ -1,8 +1,6 @@
 package dao
 
 import (
-	"net/http"
-
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
@@ -19,7 +17,6 @@ func GetGoodsConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*mod
 
 	if err != nil {
 		sm = models.ServerMessage{
-			Status:   http.StatusInternalServerError,
 			DataType: "GoodsConsignmentNoteIn",
 			Action:   "query",
 			Message:  err.Error(),
@@ -29,7 +26,6 @@ func GetGoodsConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*mod
 
 	if len(GoodsConsignmentNoteIns) == 0 {
 		sm = models.ServerMessage{
-			Status:   http.StatusNotFound,
 			DataType: "GoodsConsignmentNoteIn",
 			Action:   "query",
 			Message:  "not found",
@@ -38,7 +34,6 @@ func GetGoodsConsignmentNoteInByExtId(obx *objectbox.ObjectBox, id string) (*mod
 
 	} else if len(GoodsConsignmentNoteIns) != 1 {
 		sm = models.ServerMessage{
-			Status:   http.StatusBadRequest,
 			DataType: "GoodsConsignmentNoteIn",
 			Action:   "query",
 			Message:  "more than 1",

@@ -24,9 +24,8 @@ var GoodsConsignmentNoteInBinding = goodsConsignmentNoteIn_EntityInfo{
 
 // GoodsConsignmentNoteIn_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var GoodsConsignmentNoteIn_ = struct {
-	Id                *objectbox.PropertyInt64
+	Id                *objectbox.PropertyUint64
 	ExtId             *objectbox.PropertyString
-	AppId             *objectbox.PropertyInt64
 	LoadingPercentage *objectbox.PropertyFloat32
 	Quantity          *objectbox.PropertyFloat32
 	CreatedAt         *objectbox.PropertyInt64
@@ -36,8 +35,9 @@ var GoodsConsignmentNoteIn_ = struct {
 	Goods             *objectbox.RelationToOne
 	Unit              *objectbox.RelationToOne
 	ConsignmentNoteIn *objectbox.RelationToOne
+	AppId             *objectbox.PropertyString
 }{
-	Id: &objectbox.PropertyInt64{
+	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     1,
 			Entity: &GoodsConsignmentNoteInBinding.Entity,
@@ -46,12 +46,6 @@ var GoodsConsignmentNoteIn_ = struct {
 	ExtId: &objectbox.PropertyString{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     2,
-			Entity: &GoodsConsignmentNoteInBinding.Entity,
-		},
-	},
-	AppId: &objectbox.PropertyInt64{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     3,
 			Entity: &GoodsConsignmentNoteInBinding.Entity,
 		},
 	},
@@ -114,6 +108,12 @@ var GoodsConsignmentNoteIn_ = struct {
 		},
 		Target: &ConsignmentNoteInBinding.Entity,
 	},
+	AppId: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     69,
+			Entity: &GoodsConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -127,7 +127,6 @@ func (goodsConsignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Id", 6, 1, 7746942835379170791)
 	model.PropertyFlags(1)
 	model.Property("ExtId", 9, 2, 2286777172924440151)
-	model.Property("AppId", 6, 3, 1749818491695084734)
 	model.Property("LoadingPercentage", 7, 24, 6002045979613560070)
 	model.Property("Quantity", 7, 25, 7898911385562250666)
 	model.Property("CreatedAt", 10, 62, 1137569487564150713)
@@ -147,17 +146,18 @@ func (goodsConsignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("ConsignmentNoteIn", 11, 68, 7586328412098447940)
 	model.PropertyFlags(520)
 	model.PropertyRelation("ConsignmentNoteIn", 25, 8711340933066469198)
-	model.EntityLastPropertyId(68, 7586328412098447940)
+	model.Property("AppId", 9, 69, 6763306841751096049)
+	model.EntityLastPropertyId(69, 6763306841751096049)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
 func (goodsConsignmentNoteIn_EntityInfo) GetId(object interface{}) (uint64, error) {
-	return uint64(object.(*GoodsConsignmentNoteIn).Id), nil
+	return object.(*GoodsConsignmentNoteIn).Id, nil
 }
 
 // SetId is called by ObjectBox during Put to update an ID on an object that has just been inserted
 func (goodsConsignmentNoteIn_EntityInfo) SetId(object interface{}, id uint64) error {
-	object.(*GoodsConsignmentNoteIn).Id = int64(id)
+	object.(*GoodsConsignmentNoteIn).Id = id
 	return nil
 }
 
@@ -238,6 +238,7 @@ func (goodsConsignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbu
 	}
 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
+	var offsetAppId = fbutils.CreateStringOffset(fbb, obj.AppId)
 
 	var rIdConsignmentNoteIn uint64
 	if rel := obj.ConsignmentNoteIn; rel != nil {
@@ -285,10 +286,10 @@ func (goodsConsignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbu
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(68)
+	fbb.StartObject(69)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
-	fbutils.SetInt64Slot(fbb, 2, obj.AppId)
+	fbutils.SetUOffsetTSlot(fbb, 68, offsetAppId)
 	if obj.ConsignmentNoteIn != nil {
 		fbutils.SetUint64Slot(fbb, 67, rIdConsignmentNoteIn)
 	}
@@ -322,7 +323,7 @@ func (goodsConsignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []b
 		Pos:   flatbuffers.GetUOffsetT(bytes),
 	}
 
-	var propId = table.GetInt64Slot(4, 0)
+	var propId = table.GetUint64Slot(4, 0)
 
 	propCreatedAt, err := objectbox.TimeInt64ConvertToEntityProperty(fbutils.GetInt64Slot(table, 126))
 	if err != nil {
@@ -382,7 +383,7 @@ func (goodsConsignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []b
 	return &GoodsConsignmentNoteIn{
 		Id:                propId,
 		ExtId:             fbutils.GetStringSlot(table, 6),
-		AppId:             fbutils.GetInt64Slot(table, 8),
+		AppId:             fbutils.GetStringSlot(table, 140),
 		ConsignmentNoteIn: relConsignmentNoteIn,
 		Subdivision:       relSubdivision,
 		GoodsGroup:        relGoodsGroup,
@@ -514,7 +515,7 @@ func (box *GoodsConsignmentNoteInBox) Remove(object *GoodsConsignmentNoteIn) err
 func (box *GoodsConsignmentNoteInBox) RemoveMany(objects ...*GoodsConsignmentNoteIn) (uint64, error) {
 	var ids = make([]uint64, len(objects))
 	for k, object := range objects {
-		ids[k] = uint64(object.Id)
+		ids[k] = object.Id
 	}
 	return box.Box.RemoveIds(ids...)
 }
