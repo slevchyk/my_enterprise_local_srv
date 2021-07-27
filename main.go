@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/test", testHandler)
 	http.HandleFunc("/deleteall", deleteAllHandeler)
 
+	http.HandleFunc("/api/v1/auth", authHandler)
 	http.HandleFunc("/api/v1/appuser", appUserHandler)
 	http.HandleFunc("/api/v1/goods", goodsHandler)
 	http.HandleFunc("/api/v1/goodsgroup", goodsGroupHandler)
@@ -92,6 +93,12 @@ func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
 	BoxForGoodsConsignmentNoteIn.RemoveAll()
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func authHandler (w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+	api.AppUserAuth(w, r)
 }
 
 func appUserHandler(w http.ResponseWriter, r *http.Request) {

@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
 
@@ -199,6 +201,59 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
 		sa.Send(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(bs)
+}
+
+func (api *ApiV1) AppUserAuth(w http.ResponseWriter, r *http.Request) {
+
+	fvPhone := r.FormValue("phone")
+	fvPassword := r.FormValue("password")
+
+	errMessage := ""
+
+	if fvPhone == "" {
+		errMessage += fmt.Sprintln("phone isn't provided")
+	}
+
+	if fvPassword == "" {
+		errMessage += fmt.Sprintln("password isn't provided")
+	}
+
+	if errMessage != "" {
+		http.Error(w, errMessage, http.StatusBadRequest)
+		return
+	}
+
+	box := models.BoxForAppUser(api.obx)
+
+	query := box.Query(models.AppUser_.Phone.Equals(fvPhone, true), models.AppUser_.Password.Equals(fvPhone, true))
+	aus, err := query.Find()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		query.Close()
+		return
+	}
+
+	if len(aus) > 1 {
+		http.Error(w, "found more than 1", http.StatusConflict)
+		return
+	}
+
+	au := aus[0]
+	au.Token = uuid.NewString()
+	_, err = box.Put(au)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	bs, err := json.Marshal(aus[0])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

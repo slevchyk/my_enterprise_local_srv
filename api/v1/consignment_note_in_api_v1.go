@@ -543,12 +543,12 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 		WebMethod: "get",
 		DateUTC:   time.Now().UTC()}
 
-	if fvSrvId == "" && fvAppId == "" && fvExtId == "" {
-		sa.Status = http.StatusBadRequest
-		sa.Error = "id isn't specified"
-		sa.Send(w)
-		return
-	}
+	// if fvSrvId == "" && fvAppId == "" && fvExtId == "" {
+	// 	sa.Status = http.StatusBadRequest
+	// 	sa.Error = "id isn't specified"
+	// 	sa.Send(w)
+	// 	return
+	// }
 
 	box := models.BoxForConsignmentNoteIn(api.obx)
 
@@ -566,16 +566,17 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 		srvId = 0
 	}
 
-	if srvId == 0 && fvAppId == "" && fvExtId == "" {
-		gs, err = box.GetAll()
-		if err != nil {
-			sa.Status = http.StatusInternalServerError
-			sa.Error = err.Error()
-			sa.Send(w)
-			return
-		}
+	// if srvId == 0 && fvAppId == "" && fvExtId == "" {
+	// 	gs, err = box.GetAll()
+	// 	if err != nil {
+	// 		sa.Status = http.StatusInternalServerError
+	// 		sa.Error = err.Error()
+	// 		sa.Send(w)
+	// 		return
+	// 	}
 
-	} else if srvId != 0 {
+	// } else if srvId != 0 {
+	if srvId != 0 {
 		srvIdInt, err := strconv.Atoi(fvSrvId)
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
@@ -663,6 +664,31 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "query by ext id",
+				Message: err.Error(),
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			sa.Send(w)
+
+			query.Close()
+			return
+		}
+	} else if fvExtId == "" {
+		query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals("", true))
+		gs, err = query.Find()
+		if err != nil {
+			sa.Status = http.StatusInternalServerError
+			sa.Error = err.Error()
+
+			pd := models.ServerProcessedData{
+				SrvId:  srvId,
+				AppId:  fvAppId,
+				ExtId:  fvExtId,
+				Status: http.StatusInternalServerError,
+			}
+
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "query all new for ext db",
 				Message: err.Error(),
 			})
 

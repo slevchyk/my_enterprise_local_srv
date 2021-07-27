@@ -4,5 +4,6 @@ go 1.14
 
 require (
 	github.com/google/flatbuffers v2.0.0+incompatible
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/objectbox/objectbox-go v1.4.0
 )

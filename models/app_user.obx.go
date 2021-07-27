@@ -39,6 +39,7 @@ var AppUser_ = struct {
 	IsHarvesting *objectbox.PropertyBool
 	IsPayDesk    *objectbox.PropertyBool
 	IsWarehouse  *objectbox.PropertyBool
+	Password     *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -130,6 +131,12 @@ var AppUser_ = struct {
 			Entity: &AppUserBinding.Entity,
 		},
 	},
+	Password: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     18,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -156,7 +163,8 @@ func (appUser_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsHarvesting", 1, 15, 5881266140801353583)
 	model.Property("IsPayDesk", 1, 16, 6970975710831344500)
 	model.Property("IsWarehouse", 1, 17, 6958713036560849743)
-	model.EntityLastPropertyId(17, 6958713036560849743)
+	model.Property("Password", 9, 18, 7965139643554191174)
+	model.EntityLastPropertyId(18, 7965139643554191174)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -202,15 +210,17 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetEmail = fbutils.CreateStringOffset(fbb, obj.Email)
 	var offsetPhone = fbutils.CreateStringOffset(fbb, obj.Phone)
 	var offsetToken = fbutils.CreateStringOffset(fbb, obj.Token)
+	var offsetPassword = fbutils.CreateStringOffset(fbb, obj.Password)
 
 	// build the FlatBuffers object
-	fbb.StartObject(17)
+	fbb.StartObject(18)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 6, offsetFirstName)
 	fbutils.SetUOffsetTSlot(fbb, 7, offsetLastName)
 	fbutils.SetUOffsetTSlot(fbb, 8, offsetEmail)
 	fbutils.SetUOffsetTSlot(fbb, 9, offsetPhone)
+	fbutils.SetUOffsetTSlot(fbb, 17, offsetPassword)
 	fbutils.SetUOffsetTSlot(fbb, 10, offsetToken)
 	fbutils.SetBoolSlot(fbb, 11, obj.IsBlocked)
 	fbutils.SetBoolSlot(fbb, 12, obj.IsFarm)
@@ -253,6 +263,7 @@ func (appUser_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		LastName:     fbutils.GetStringSlot(table, 18),
 		Email:        fbutils.GetStringSlot(table, 20),
 		Phone:        fbutils.GetStringSlot(table, 22),
+		Password:     fbutils.GetStringSlot(table, 38),
 		Token:        fbutils.GetStringSlot(table, 24),
 		IsBlocked:    fbutils.GetBoolSlot(table, 26),
 		IsFarm:       fbutils.GetBoolSlot(table, 28),
