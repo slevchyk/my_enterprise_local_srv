@@ -60,11 +60,27 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 			})
 			isDataError = true
 		}
-		
+
 		if v.LastName == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
 				Message: "last name is empty",
+			})
+			isDataError = true
+		}
+
+		if v.Phone == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "phone is empty",
+			})
+			isDataError = true
+		}
+
+		if v.Password == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "password is empty",
 			})
 			isDataError = true
 		}
@@ -98,10 +114,14 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 
 			_, err := box.Put(&v)
 			if err != nil {
+				pd.Status = http.StatusInternalServerError
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "insert",
 					Message: err.Error(),
 				})
+
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 
 		} else if len(appUsers) == 1 {
@@ -112,21 +132,29 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 			// pd.SrvId = string(v.Id)
 			pd.SrvId = v.Id
 
-
 			err := box.Update(&v)
 			if err != nil {
+				pd.Status = http.StatusInternalServerError
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "update",
 					Message: err.Error(),
 				})
+
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 		} else {
+			pd.Status = http.StatusConflict
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "more than 1",
 				Message: err.Error(),
 			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
 		}
 
+		pd.Status = http.StatusOK
 		sa.ProcessedData = append(sa.ProcessedData, pd)
 	}
 

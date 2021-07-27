@@ -11,7 +11,7 @@ import (
 
 func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
-	var aus []models.Vehicle
+	var vs []models.Vehicle
 	var err error
 
 	sa := models.ServerAnswer{
@@ -27,7 +27,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(bs, &aus)
+	err = json.Unmarshal(bs, &vs)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -37,7 +37,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
 	box := models.BoxForVehicle(apiV1.obx)
 
-	for _, v := range aus {
+	for _, v := range vs {
 
 		pd := models.ServerProcessedData{
 			ExtId: v.ExtId,
@@ -66,7 +66,6 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
-	
 
 		query := box.Query(models.Vehicle_.ExtId.Equals(v.ExtId, true))
 		Vehicles, err := query.Find()
@@ -95,6 +94,9 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 					Action:  "insert",
 					Message: err.Error(),
 				})
+				pd.Status = http.StatusInternalServerError
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 
 		} else if len(Vehicles) == 1 {
@@ -110,14 +112,21 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 					Action:  "update",
 					Message: err.Error(),
 				})
+				pd.Status = http.StatusInternalServerError
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 		} else {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "more than 1",
 				Message: err.Error(),
 			})
+			pd.Status = http.StatusConflict
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
 		}
 
+		pd.Status = http.StatusOK
 		sa.ProcessedData = append(sa.ProcessedData, pd)
 	}
 
@@ -126,7 +135,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
 func (api *ApiV1) VehicleGet(w http.ResponseWriter, r *http.Request) {
 
-	var aus []*models.Vehicle
+	var vs []*models.Vehicle
 	var err error
 
 	fvId := r.FormValue("id")
@@ -138,7 +147,7 @@ func (api *ApiV1) VehicleGet(w http.ResponseWriter, r *http.Request) {
 	box := models.BoxForVehicle(api.obx)
 
 	if fvId == "" {
-		aus, err = box.GetAll()
+		vs, err = box.GetAll()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -148,7 +157,7 @@ func (api *ApiV1) VehicleGet(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		query := box.Query(models.Vehicle_.ExtId.Equals(fvId, true))
-		aus, err = query.Find()
+		vs, err = query.Find()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -157,7 +166,7 @@ func (api *ApiV1) VehicleGet(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	bs, err := json.Marshal(aus)
+	bs, err := json.Marshal(vs)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()

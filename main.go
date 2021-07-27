@@ -21,6 +21,9 @@ func init() {
 
 func main() {
 	http.Handle("/favicon.ico", http.NotFoundHandler())
+	http.HandleFunc("/test", testHandler)
+	http.HandleFunc("/deleteall", deleteAllHandeler)
+
 	http.HandleFunc("/api/v1/appuser", appUserHandler)
 	http.HandleFunc("/api/v1/goods", goodsHandler)
 	http.HandleFunc("/api/v1/goodsgroup", goodsGroupHandler)
@@ -32,7 +35,7 @@ func main() {
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
 
 	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
-	http.HandleFunc("/test", testHandler)
+
 	err := http.ListenAndServe(":8002", nil)
 	if err != nil {
 		panic(err)
@@ -46,6 +49,48 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	message = "Hi there!"
 
 	w.Write([]byte(message))
+	w.WriteHeader(http.StatusOK)
+}
+
+func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
+	BoxForAppUser := models.BoxForAppUser(obx)
+	BoxForAppUser.RemoveAll()
+
+	BoxForGoods := models.BoxForGoods(obx)
+	BoxForGoods.RemoveAll()
+
+	BoxForGoodsGroup := models.BoxForGoodsGroup(obx)
+	BoxForGoodsGroup.RemoveAll()
+
+	BoxForHarvestType := models.BoxForHarvestType(obx)
+	BoxForHarvestType.RemoveAll()
+
+	BoxForStorage := models.BoxForStorage(obx)
+	BoxForStorage.RemoveAll()
+
+	box := models.BoxForAppUser(obx)
+	box.RemoveAll()
+
+	BoxForPerson := models.BoxForPerson(obx)
+	BoxForPerson.RemoveAll()
+
+	BoxForSubdivision := models.BoxForSubdivision(obx)
+	BoxForSubdivision.RemoveAll()
+
+	BoxForUnit := models.BoxForUnit(obx)
+	BoxForUnit.RemoveAll()
+
+	BoxForVehicle := models.BoxForVehicle(obx)
+	BoxForVehicle.RemoveAll()
+
+	//документи
+
+	BoxForConsignmentNoteIn := models.BoxForConsignmentNoteIn(obx)
+	BoxForConsignmentNoteIn.RemoveAll()
+
+	BoxForGoodsConsignmentNoteIn := models.BoxForGoodsConsignmentNoteIn(obx)
+	BoxForGoodsConsignmentNoteIn.RemoveAll()
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -138,7 +183,7 @@ func subdivisionHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
-		api.SubdivisionGet(w, r)
+		api.SubdivisionPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.SubdivisionGet(w, r)
 	} else {

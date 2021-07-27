@@ -11,7 +11,7 @@ import (
 
 func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 
-	var aus []models.Unit
+	var us []models.Unit
 	var err error
 
 	sa := models.ServerAnswer{
@@ -27,7 +27,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(bs, &aus)
+	err = json.Unmarshal(bs, &us)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -37,7 +37,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 
 	box := models.BoxForUnit(apiV1.obx)
 
-	for _, v := range aus {
+	for _, v := range us {
 
 		pd := models.ServerProcessedData{
 			ExtId: v.ExtId,
@@ -66,10 +66,9 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
-	
 
 		query := box.Query(models.Unit_.ExtId.Equals(v.ExtId, true))
-		Units, err := query.Find()
+		units, err := query.Find()
 		query.Close()
 
 		if err != nil {
@@ -85,7 +84,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if len(Units) == 0 {
+		if len(units) == 0 {
 			v.CreatedAt = time.Now().UTC()
 			v.UpdatedAt = time.Now().UTC()
 
@@ -95,11 +94,14 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 					Action:  "insert",
 					Message: err.Error(),
 				})
+				pd.Status = http.StatusInternalServerError
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 
-		} else if len(Units) == 1 {
-			v.Id = Units[0].Id
-			v.CreatedAt = Units[0].CreatedAt
+		} else if len(units) == 1 {
+			v.Id = units[0].Id
+			v.CreatedAt = units[0].CreatedAt
 			v.UpdatedAt = time.Now().UTC()
 
 			pd.SrvId = v.Id
@@ -110,14 +112,21 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 					Action:  "update",
 					Message: err.Error(),
 				})
+				pd.Status = http.StatusInternalServerError
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
 			}
 		} else {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "more than 1",
 				Message: err.Error(),
 			})
+			pd.Status = http.StatusConflict
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
 		}
 
+		pd.Status = http.StatusOK
 		sa.ProcessedData = append(sa.ProcessedData, pd)
 	}
 
@@ -126,7 +135,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 
 func (api *ApiV1) UnitGet(w http.ResponseWriter, r *http.Request) {
 
-	var aus []*models.Unit
+	var us []*models.Unit
 	var err error
 
 	fvId := r.FormValue("id")
@@ -138,7 +147,7 @@ func (api *ApiV1) UnitGet(w http.ResponseWriter, r *http.Request) {
 	box := models.BoxForUnit(api.obx)
 
 	if fvId == "" {
-		aus, err = box.GetAll()
+		us, err = box.GetAll()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -148,7 +157,7 @@ func (api *ApiV1) UnitGet(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		query := box.Query(models.Unit_.ExtId.Equals(fvId, true))
-		aus, err = query.Find()
+		us, err = query.Find()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -157,7 +166,7 @@ func (api *ApiV1) UnitGet(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	bs, err := json.Marshal(aus)
+	bs, err := json.Marshal(us)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
