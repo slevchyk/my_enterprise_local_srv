@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/deleteall", deleteAllHandeler)
 
 	http.HandleFunc("/api/v1/auth", authHandler)
+	
 	http.HandleFunc("/api/v1/appuser", appUserHandler)
 	http.HandleFunc("/api/v1/goods", goodsHandler)
 	http.HandleFunc("/api/v1/goodsgroup", goodsGroupHandler)

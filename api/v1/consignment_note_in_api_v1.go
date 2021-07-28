@@ -185,10 +185,8 @@ func (apiV1 *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request
 			isJsonError = true
 		}
 
-		responsiblePersonId, ok := v["responsible_person_id"].(string)
-		//TODO: change back
-		// if !ok || responsiblePersonId == "" {
-		if !ok {
+		responsiblePersonId, ok := v["app_user_id"].(string)
+		if !ok || responsiblePersonId == "" {		
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
 				Message: "responsible_person_id: incorrect type or empty",

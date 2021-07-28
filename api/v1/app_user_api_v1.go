@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +16,8 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 
 	var aus []models.AppUser
 	var err error
+
+	fvFrom := r.FormValue("from")
 
 	sa := models.ServerAnswer{
 		Object:    "AppUser",
@@ -156,6 +159,52 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		if fvFrom == "accounting" {
+
+			cu := map[string]interface{}{
+				"id_settings": 2,
+				"phone": v.Phone,
+				"pin":   v.Password,}
+
+			bs, err := json.Marshal(cu)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			hc := &http.Client{}
+			// TODO: change to config
+			// URL := cfg.MainSrv + "/api/clouddbuser"
+			URL := "http://95.217.41.66:8811/api/clouddbuser"
+			b := bytes.NewBuffer(bs)
+			req, err := http.NewRequest("POST", URL, b)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// TODO: change to config file
+			// req.SetBasicAuth(cfg.MainAuth.User, cfg.MainAuth.Password)
+
+			req.SetBasicAuth("barkom", "^8Y!e4v?nqC3sAJ]")
+			resp, err := hc.Do(req)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				bs, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				http.Error(w, string(bs), resp.StatusCode)
+				return
+			}
+		}
+
 		pd.Status = http.StatusOK
 		sa.ProcessedData = append(sa.ProcessedData, pd)
 	}
@@ -230,11 +279,16 @@ func (api *ApiV1) AppUserAuth(w http.ResponseWriter, r *http.Request) {
 
 	box := models.BoxForAppUser(api.obx)
 
-	query := box.Query(models.AppUser_.Phone.Equals(fvPhone, true), models.AppUser_.Password.Equals(fvPhone, true))
+	query := box.Query(models.AppUser_.Phone.Equals(fvPhone, true), models.AppUser_.Password.Equals(fvPassword, true))
 	aus, err := query.Find()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		query.Close()
+		return
+	}
+
+	if len(aus) == 0 {
+		http.Error(w, "access denied", http.StatusUnauthorized)
 		return
 	}
 

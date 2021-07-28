@@ -11,7 +11,7 @@ type AppUser struct {
 	LastName     string    `json:"last_name"`
 	Email        string    `json:"email"`
 	Phone        string    `json:"phone"`
-	Password     string    `json:"password"`
+	Password     string    `json:"-"`
 	Token        string    `json:"token"`
 	IsBlocked    bool      `json:"is_blocked"`
 	IsFarm       bool      `json:"is_farm"`
