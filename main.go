@@ -25,7 +25,7 @@ func main() {
 	http.HandleFunc("/deleteall", deleteAllHandeler)
 
 	http.HandleFunc("/api/v1/auth", authHandler)
-	
+
 	http.HandleFunc("/api/v1/appuser", appUserHandler)
 	http.HandleFunc("/api/v1/goods", goodsHandler)
 	http.HandleFunc("/api/v1/goodsgroup", goodsGroupHandler)
@@ -35,8 +35,11 @@ func main() {
 	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
 	http.HandleFunc("/api/v1/unit", unitHandler)
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
-
 	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
+
+	//app
+	http.HandleFunc("/api/app/v1/consignmentnotein", appConsignmentnoteinHandler)
+	http.HandleFunc("/api/app/v1/consignmentnotein/processed", appConsignmentnoteinProcessedHandler)
 
 	err := http.ListenAndServe(":8002", nil)
 	if err != nil {
@@ -46,9 +49,7 @@ func main() {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	var message string
-
-	message = "Hi there!"
+	var message = "Hi there!"
 
 	w.Write([]byte(message))
 	w.WriteHeader(http.StatusOK)
@@ -96,7 +97,7 @@ func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func authHandler (w http.ResponseWriter, r *http.Request) {
+func authHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
 	api.AppUserAuth(w, r)
@@ -235,6 +236,32 @@ func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 		api.ConsignmentNoteInPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.ConsignmentNoteInGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func appConsignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.ConsignmentNoteInAppPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.ConsignmentNoteInAppGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func appConsignmentnoteinProcessedHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.ConsignmentNoteInAppProcessed(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}

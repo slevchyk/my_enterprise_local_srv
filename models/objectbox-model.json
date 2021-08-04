@@ -43,7 +43,7 @@
     },
     {
       "id": "2:3772536781229214116",
-      "lastPropertyId": "18:7965139643554191174",
+      "lastPropertyId": "21:6565581724974588785",
       "name": "AppUser",
       "properties": [
         {
@@ -126,12 +126,27 @@
           "id": "18:7965139643554191174",
           "name": "Password",
           "type": 9
+        },
+        {
+          "id": "19:3797028530307446237",
+          "name": "IsAdministrator",
+          "type": 1
+        },
+        {
+          "id": "20:6894104621440000829",
+          "name": "IsDictionaries",
+          "type": 1
+        },
+        {
+          "id": "21:6565581724974588785",
+          "name": "TokenExpirationDate",
+          "type": 10
         }
       ]
     },
     {
       "id": "3:8603667634404417786",
-      "lastPropertyId": "65:8126686263197659917",
+      "lastPropertyId": "68:3935944489437497465",
       "name": "ConsignmentNoteIn",
       "properties": [
         {
@@ -200,22 +215,6 @@
           "relationTarget": "Storage"
         },
         {
-          "id": "48:5997134771254352687",
-          "name": "MateriallyResponsiblePerson",
-          "indexId": "8:5316614334196485573",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "AppUser"
-        },
-        {
-          "id": "49:5596784390887832759",
-          "name": "ResponsiblePerson",
-          "indexId": "9:316337868423412833",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "AppUser"
-        },
-        {
           "id": "58:3732019176814765919",
           "name": "HarvestType",
           "indexId": "17:5703090548301462582",
@@ -260,6 +259,24 @@
           "id": "65:8126686263197659917",
           "name": "Weediness",
           "type": 8
+        },
+        {
+          "id": "66:5908904309199154956",
+          "name": "AppUser",
+          "indexId": "26:2796045731298863334",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "AppUser"
+        },
+        {
+          "id": "67:5779134778575088849",
+          "name": "ChangedByAcc",
+          "type": 1
+        },
+        {
+          "id": "68:3935944489437497465",
+          "name": "ChangedByApp",
+          "type": 1
         }
       ]
     },
@@ -622,7 +639,7 @@
     }
   ],
   "lastEntityId": "11:1924487076928445410",
-  "lastIndexId": "25:8711340933066469198",
+  "lastIndexId": "26:2796045731298863334",
   "lastRelationId": "1:7352375471897382812",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
@@ -639,7 +656,9 @@
     7535475070846681924,
     3551300256144436787,
     7404961686637105834,
-    4129891640972407455
+    4129891640972407455,
+    316337868423412833,
+    5316614334196485573
   ],
   "retiredPropertyUids": [
     8494658191607713675,
@@ -752,7 +771,9 @@
     8081477154265349396,
     338239348335444161,
     5364742737548566781,
-    1749818491695084734
+    1749818491695084734,
+    5596784390887832759,
+    5997134771254352687
   ],
   "retiredRelationUids": [
     7352375471897382812

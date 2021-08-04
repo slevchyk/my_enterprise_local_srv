@@ -24,22 +24,25 @@ var AppUserBinding = appUser_EntityInfo{
 
 // AppUser_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var AppUser_ = struct {
-	Id           *objectbox.PropertyUint64
-	ExtId        *objectbox.PropertyString
-	CreatedAt    *objectbox.PropertyInt64
-	UpdatedAt    *objectbox.PropertyInt64
-	FirstName    *objectbox.PropertyString
-	LastName     *objectbox.PropertyString
-	Email        *objectbox.PropertyString
-	Phone        *objectbox.PropertyString
-	Token        *objectbox.PropertyString
-	IsBlocked    *objectbox.PropertyBool
-	IsFarm       *objectbox.PropertyBool
-	IsGasStation *objectbox.PropertyBool
-	IsHarvesting *objectbox.PropertyBool
-	IsPayDesk    *objectbox.PropertyBool
-	IsWarehouse  *objectbox.PropertyBool
-	Password     *objectbox.PropertyString
+	Id                  *objectbox.PropertyUint64
+	ExtId               *objectbox.PropertyString
+	CreatedAt           *objectbox.PropertyInt64
+	UpdatedAt           *objectbox.PropertyInt64
+	FirstName           *objectbox.PropertyString
+	LastName            *objectbox.PropertyString
+	Email               *objectbox.PropertyString
+	Phone               *objectbox.PropertyString
+	Token               *objectbox.PropertyString
+	IsBlocked           *objectbox.PropertyBool
+	IsFarm              *objectbox.PropertyBool
+	IsGasStation        *objectbox.PropertyBool
+	IsHarvesting        *objectbox.PropertyBool
+	IsPayDesk           *objectbox.PropertyBool
+	IsWarehouse         *objectbox.PropertyBool
+	Password            *objectbox.PropertyString
+	IsAdministrator     *objectbox.PropertyBool
+	IsDictionaries      *objectbox.PropertyBool
+	TokenExpirationDate *objectbox.PropertyInt64
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -137,6 +140,24 @@ var AppUser_ = struct {
 			Entity: &AppUserBinding.Entity,
 		},
 	},
+	IsAdministrator: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     19,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	IsDictionaries: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     20,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
+	TokenExpirationDate: &objectbox.PropertyInt64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     21,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -164,7 +185,10 @@ func (appUser_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsPayDesk", 1, 16, 6970975710831344500)
 	model.Property("IsWarehouse", 1, 17, 6958713036560849743)
 	model.Property("Password", 9, 18, 7965139643554191174)
-	model.EntityLastPropertyId(18, 7965139643554191174)
+	model.Property("IsAdministrator", 1, 19, 3797028530307446237)
+	model.Property("IsDictionaries", 1, 20, 6894104621440000829)
+	model.Property("TokenExpirationDate", 10, 21, 6565581724974588785)
+	model.EntityLastPropertyId(21, 6565581724974588785)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -204,6 +228,15 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 		}
 	}
 
+	var propTokenExpirationDate int64
+	{
+		var err error
+		propTokenExpirationDate, err = objectbox.TimeInt64ConvertToDatabaseValue(obj.TokenExpirationDate)
+		if err != nil {
+			return errors.New("converter objectbox.TimeInt64ConvertToDatabaseValue() failed on AppUser.TokenExpirationDate: " + err.Error())
+		}
+	}
+
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetFirstName = fbutils.CreateStringOffset(fbb, obj.FirstName)
 	var offsetLastName = fbutils.CreateStringOffset(fbb, obj.LastName)
@@ -213,7 +246,7 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetPassword = fbutils.CreateStringOffset(fbb, obj.Password)
 
 	// build the FlatBuffers object
-	fbb.StartObject(18)
+	fbb.StartObject(21)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 6, offsetFirstName)
@@ -222,12 +255,15 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	fbutils.SetUOffsetTSlot(fbb, 9, offsetPhone)
 	fbutils.SetUOffsetTSlot(fbb, 17, offsetPassword)
 	fbutils.SetUOffsetTSlot(fbb, 10, offsetToken)
+	fbutils.SetInt64Slot(fbb, 20, propTokenExpirationDate)
+	fbutils.SetBoolSlot(fbb, 18, obj.IsAdministrator)
 	fbutils.SetBoolSlot(fbb, 11, obj.IsBlocked)
 	fbutils.SetBoolSlot(fbb, 12, obj.IsFarm)
 	fbutils.SetBoolSlot(fbb, 13, obj.IsGasStation)
 	fbutils.SetBoolSlot(fbb, 14, obj.IsHarvesting)
 	fbutils.SetBoolSlot(fbb, 15, obj.IsPayDesk)
 	fbutils.SetBoolSlot(fbb, 16, obj.IsWarehouse)
+	fbutils.SetBoolSlot(fbb, 19, obj.IsDictionaries)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -256,23 +292,31 @@ func (appUser_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		return nil, errors.New("converter objectbox.TimeInt64ConvertToEntityProperty() failed on AppUser.UpdatedAt: " + err.Error())
 	}
 
+	propTokenExpirationDate, err := objectbox.TimeInt64ConvertToEntityProperty(fbutils.GetInt64Slot(table, 44))
+	if err != nil {
+		return nil, errors.New("converter objectbox.TimeInt64ConvertToEntityProperty() failed on AppUser.TokenExpirationDate: " + err.Error())
+	}
+
 	return &AppUser{
-		Id:           propId,
-		ExtId:        fbutils.GetStringSlot(table, 6),
-		FirstName:    fbutils.GetStringSlot(table, 16),
-		LastName:     fbutils.GetStringSlot(table, 18),
-		Email:        fbutils.GetStringSlot(table, 20),
-		Phone:        fbutils.GetStringSlot(table, 22),
-		Password:     fbutils.GetStringSlot(table, 38),
-		Token:        fbutils.GetStringSlot(table, 24),
-		IsBlocked:    fbutils.GetBoolSlot(table, 26),
-		IsFarm:       fbutils.GetBoolSlot(table, 28),
-		IsGasStation: fbutils.GetBoolSlot(table, 30),
-		IsHarvesting: fbutils.GetBoolSlot(table, 32),
-		IsPayDesk:    fbutils.GetBoolSlot(table, 34),
-		IsWarehouse:  fbutils.GetBoolSlot(table, 36),
-		CreatedAt:    propCreatedAt,
-		UpdatedAt:    propUpdatedAt,
+		Id:                  propId,
+		ExtId:               fbutils.GetStringSlot(table, 6),
+		FirstName:           fbutils.GetStringSlot(table, 16),
+		LastName:            fbutils.GetStringSlot(table, 18),
+		Email:               fbutils.GetStringSlot(table, 20),
+		Phone:               fbutils.GetStringSlot(table, 22),
+		Password:            fbutils.GetStringSlot(table, 38),
+		Token:               fbutils.GetStringSlot(table, 24),
+		TokenExpirationDate: propTokenExpirationDate,
+		IsAdministrator:     fbutils.GetBoolSlot(table, 40),
+		IsBlocked:           fbutils.GetBoolSlot(table, 26),
+		IsFarm:              fbutils.GetBoolSlot(table, 28),
+		IsGasStation:        fbutils.GetBoolSlot(table, 30),
+		IsHarvesting:        fbutils.GetBoolSlot(table, 32),
+		IsPayDesk:           fbutils.GetBoolSlot(table, 34),
+		IsWarehouse:         fbutils.GetBoolSlot(table, 36),
+		IsDictionaries:      fbutils.GetBoolSlot(table, 42),
+		CreatedAt:           propCreatedAt,
+		UpdatedAt:           propUpdatedAt,
 	}, nil
 }
 

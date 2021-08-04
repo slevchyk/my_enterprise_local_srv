@@ -24,27 +24,28 @@ var ConsignmentNoteInBinding = consignmentNoteIn_EntityInfo{
 
 // ConsignmentNoteIn_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var ConsignmentNoteIn_ = struct {
-	Id                          *objectbox.PropertyUint64
-	ExtId                       *objectbox.PropertyString
-	Date                        *objectbox.PropertyInt64
-	Number                      *objectbox.PropertyString
-	DepartureDate               *objectbox.PropertyInt64
-	IsDeleted                   *objectbox.PropertyBool
-	CreatedAt                   *objectbox.PropertyInt64
-	UpdatedAt                   *objectbox.PropertyInt64
-	Driver                      *objectbox.RelationToOne
-	Recipient                   *objectbox.RelationToOne
-	Sender                      *objectbox.RelationToOne
-	MateriallyResponsiblePerson *objectbox.RelationToOne
-	ResponsiblePerson           *objectbox.RelationToOne
-	HarvestType                 *objectbox.RelationToOne
-	Vehicle                     *objectbox.RelationToOne
-	AppId                       *objectbox.PropertyString
-	Gross                       *objectbox.PropertyFloat64
-	Tare                        *objectbox.PropertyFloat64
-	Net                         *objectbox.PropertyFloat64
-	Humidity                    *objectbox.PropertyFloat64
-	Weediness                   *objectbox.PropertyFloat64
+	Id            *objectbox.PropertyUint64
+	ExtId         *objectbox.PropertyString
+	Date          *objectbox.PropertyInt64
+	Number        *objectbox.PropertyString
+	DepartureDate *objectbox.PropertyInt64
+	IsDeleted     *objectbox.PropertyBool
+	CreatedAt     *objectbox.PropertyInt64
+	UpdatedAt     *objectbox.PropertyInt64
+	Driver        *objectbox.RelationToOne
+	Recipient     *objectbox.RelationToOne
+	Sender        *objectbox.RelationToOne
+	HarvestType   *objectbox.RelationToOne
+	Vehicle       *objectbox.RelationToOne
+	AppId         *objectbox.PropertyString
+	Gross         *objectbox.PropertyFloat64
+	Tare          *objectbox.PropertyFloat64
+	Net           *objectbox.PropertyFloat64
+	Humidity      *objectbox.PropertyFloat64
+	Weediness     *objectbox.PropertyFloat64
+	AppUser       *objectbox.RelationToOne
+	ChangedByAcc  *objectbox.PropertyBool
+	ChangedByApp  *objectbox.PropertyBool
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -115,20 +116,6 @@ var ConsignmentNoteIn_ = struct {
 		},
 		Target: &StorageBinding.Entity,
 	},
-	MateriallyResponsiblePerson: &objectbox.RelationToOne{
-		Property: &objectbox.BaseProperty{
-			Id:     48,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-		Target: &AppUserBinding.Entity,
-	},
-	ResponsiblePerson: &objectbox.RelationToOne{
-		Property: &objectbox.BaseProperty{
-			Id:     49,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-		Target: &AppUserBinding.Entity,
-	},
 	HarvestType: &objectbox.RelationToOne{
 		Property: &objectbox.BaseProperty{
 			Id:     58,
@@ -179,6 +166,25 @@ var ConsignmentNoteIn_ = struct {
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
+	AppUser: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     66,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+		Target: &AppUserBinding.Entity,
+	},
+	ChangedByAcc: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     67,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	ChangedByApp: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     68,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -207,12 +213,6 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Sender", 11, 47, 5548493982286844419)
 	model.PropertyFlags(520)
 	model.PropertyRelation("Storage", 7, 8776324619587302163)
-	model.Property("MateriallyResponsiblePerson", 11, 48, 5997134771254352687)
-	model.PropertyFlags(520)
-	model.PropertyRelation("AppUser", 8, 5316614334196485573)
-	model.Property("ResponsiblePerson", 11, 49, 5596784390887832759)
-	model.PropertyFlags(520)
-	model.PropertyRelation("AppUser", 9, 316337868423412833)
 	model.Property("HarvestType", 11, 58, 3732019176814765919)
 	model.PropertyFlags(520)
 	model.PropertyRelation("HarvestType", 17, 5703090548301462582)
@@ -225,7 +225,12 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Net", 8, 63, 51868586889488965)
 	model.Property("Humidity", 8, 64, 7455670039623708115)
 	model.Property("Weediness", 8, 65, 8126686263197659917)
-	model.EntityLastPropertyId(65, 8126686263197659917)
+	model.Property("AppUser", 11, 66, 5908904309199154956)
+	model.PropertyFlags(520)
+	model.PropertyRelation("AppUser", 26, 2796045731298863334)
+	model.Property("ChangedByAcc", 1, 67, 5779134778575088849)
+	model.Property("ChangedByApp", 1, 68, 3935944489437497465)
+	model.EntityLastPropertyId(68, 3935944489437497465)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -291,17 +296,7 @@ func (consignmentNoteIn_EntityInfo) PutRelated(ob *objectbox.ObjectBox, object i
 			}
 		}
 	}
-	if rel := object.(*ConsignmentNoteIn).MateriallyResponsiblePerson; rel != nil {
-		if rId, err := AppUserBinding.GetId(rel); err != nil {
-			return err
-		} else if rId == 0 {
-			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
-			if _, err := BoxForAppUser(ob).Put(rel); err != nil {
-				return err
-			}
-		}
-	}
-	if rel := object.(*ConsignmentNoteIn).ResponsiblePerson; rel != nil {
+	if rel := object.(*ConsignmentNoteIn).AppUser; rel != nil {
 		if rId, err := AppUserBinding.GetId(rel); err != nil {
 			return err
 		} else if rId == 0 {
@@ -402,26 +397,17 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 		}
 	}
 
-	var rIdMateriallyResponsiblePerson uint64
-	if rel := obj.MateriallyResponsiblePerson; rel != nil {
+	var rIdAppUser uint64
+	if rel := obj.AppUser; rel != nil {
 		if rId, err := AppUserBinding.GetId(rel); err != nil {
 			return err
 		} else {
-			rIdMateriallyResponsiblePerson = rId
-		}
-	}
-
-	var rIdResponsiblePerson uint64
-	if rel := obj.ResponsiblePerson; rel != nil {
-		if rId, err := AppUserBinding.GetId(rel); err != nil {
-			return err
-		} else {
-			rIdResponsiblePerson = rId
+			rIdAppUser = rId
 		}
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(65)
+	fbb.StartObject(68)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
@@ -443,11 +429,8 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	if obj.Sender != nil {
 		fbutils.SetUint64Slot(fbb, 46, rIdSender)
 	}
-	if obj.MateriallyResponsiblePerson != nil {
-		fbutils.SetUint64Slot(fbb, 47, rIdMateriallyResponsiblePerson)
-	}
-	if obj.ResponsiblePerson != nil {
-		fbutils.SetUint64Slot(fbb, 48, rIdResponsiblePerson)
+	if obj.AppUser != nil {
+		fbutils.SetUint64Slot(fbb, 65, rIdAppUser)
 	}
 	fbutils.SetFloat64Slot(fbb, 60, obj.Gross)
 	fbutils.SetFloat64Slot(fbb, 61, obj.Tare)
@@ -457,6 +440,8 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 35, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 36, propUpdatedAt)
+	fbutils.SetBoolSlot(fbb, 67, obj.ChangedByApp)
+	fbutils.SetBoolSlot(fbb, 66, obj.ChangedByAcc)
 	return nil
 }
 
@@ -538,46 +523,38 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		}
 	}
 
-	var relMateriallyResponsiblePerson *AppUser
-	if rId := fbutils.GetUint64PtrSlot(table, 98); rId != nil && *rId > 0 {
+	var relAppUser *AppUser
+	if rId := fbutils.GetUint64PtrSlot(table, 134); rId != nil && *rId > 0 {
 		if rObject, err := BoxForAppUser(ob).Get(*rId); err != nil {
 			return nil, err
 		} else {
-			relMateriallyResponsiblePerson = rObject
-		}
-	}
-
-	var relResponsiblePerson *AppUser
-	if rId := fbutils.GetUint64PtrSlot(table, 100); rId != nil && *rId > 0 {
-		if rObject, err := BoxForAppUser(ob).Get(*rId); err != nil {
-			return nil, err
-		} else {
-			relResponsiblePerson = rObject
+			relAppUser = rObject
 		}
 	}
 
 	return &ConsignmentNoteIn{
-		Id:                          propId,
-		ExtId:                       fbutils.GetStringSlot(table, 6),
-		AppId:                       fbutils.GetStringSlot(table, 122),
-		Date:                        propDate,
-		Number:                      fbutils.GetStringSlot(table, 12),
-		HarvestType:                 relHarvestType,
-		Vehicle:                     relVehicle,
-		DepartureDate:               propDepartureDate,
-		Driver:                      relDriver,
-		Recipient:                   relRecipient,
-		Sender:                      relSender,
-		MateriallyResponsiblePerson: relMateriallyResponsiblePerson,
-		ResponsiblePerson:           relResponsiblePerson,
-		Gross:                       fbutils.GetFloat64Slot(table, 124),
-		Tare:                        fbutils.GetFloat64Slot(table, 126),
-		Net:                         fbutils.GetFloat64Slot(table, 128),
-		Humidity:                    fbutils.GetFloat64Slot(table, 130),
-		Weediness:                   fbutils.GetFloat64Slot(table, 132),
-		IsDeleted:                   fbutils.GetBoolSlot(table, 72),
-		CreatedAt:                   propCreatedAt,
-		UpdatedAt:                   propUpdatedAt,
+		Id:            propId,
+		ExtId:         fbutils.GetStringSlot(table, 6),
+		AppId:         fbutils.GetStringSlot(table, 122),
+		Date:          propDate,
+		Number:        fbutils.GetStringSlot(table, 12),
+		HarvestType:   relHarvestType,
+		Vehicle:       relVehicle,
+		DepartureDate: propDepartureDate,
+		Driver:        relDriver,
+		Recipient:     relRecipient,
+		Sender:        relSender,
+		AppUser:       relAppUser,
+		Gross:         fbutils.GetFloat64Slot(table, 124),
+		Tare:          fbutils.GetFloat64Slot(table, 126),
+		Net:           fbutils.GetFloat64Slot(table, 128),
+		Humidity:      fbutils.GetFloat64Slot(table, 130),
+		Weediness:     fbutils.GetFloat64Slot(table, 132),
+		IsDeleted:     fbutils.GetBoolSlot(table, 72),
+		CreatedAt:     propCreatedAt,
+		UpdatedAt:     propUpdatedAt,
+		ChangedByApp:  fbutils.GetBoolSlot(table, 138),
+		ChangedByAcc:  fbutils.GetBoolSlot(table, 136),
 	}, nil
 }
 

@@ -16,11 +16,12 @@ type ServerAnswer struct {
 }
 
 type ServerProcessedData struct {
-	Status   int             `json:"status"`
-	AppId    string          `json:"app_id"`
-	SrvId    uint64          `json:"srv_id"`
-	ExtId    string          `json:"ext_id"`
-	Messages []ServerMessage `json:"messages"`
+	Status       int             `json:"status"`
+	ChangedByAcc bool            `json:"changed_by_app"`
+	AppId        string          `json:"app_id"`
+	SrvId        uint64          `json:"srv_id"`
+	ExtId        string          `json:"ext_id"`
+	Messages     []ServerMessage `json:"messages"`
 }
 
 type ServerMessage struct {

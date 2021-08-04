@@ -163,8 +163,8 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 
 			cu := map[string]interface{}{
 				"id_settings": 2,
-				"phone": v.Phone,
-				"pin":   v.Password,}
+				"phone":       v.Phone,
+				"pin":         v.Password}
 
 			bs, err := json.Marshal(cu)
 			if err != nil {
@@ -299,6 +299,8 @@ func (api *ApiV1) AppUserAuth(w http.ResponseWriter, r *http.Request) {
 
 	au := aus[0]
 	au.Token = uuid.NewString()
+	au.TokenExpirationDate = time.Now().UTC().AddDate(0, 0, 7)
+	
 	_, err = box.Put(au)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
