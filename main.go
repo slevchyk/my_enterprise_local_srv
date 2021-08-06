@@ -236,6 +236,8 @@ func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 		api.ConsignmentNoteInPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.ConsignmentNoteInGet(w, r)
+	} else if r.Method == http.MethodDelete {
+		api.ConsignmentNoteInDelete(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}

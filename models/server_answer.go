@@ -27,6 +27,7 @@ type ServerProcessedData struct {
 type ServerMessage struct {
 	DataType string `json:"data_type"`
 	DataId   string `json:"data_id"`
+	RowId    string `json:"row_id"`
 	Action   string `json:"action"`
 	Message  string `json:"message"`
 }

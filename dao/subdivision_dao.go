@@ -19,11 +19,11 @@ func GetSubdivisionByExtId(obx *objectbox.ObjectBox, id string) (*models.Subdivi
 		return nil, sm
 	}
 
-	boxGoodsGroup := models.BoxForSubdivision(obx)
+	boxSubdivision := models.BoxForSubdivision(obx)
 
-	queryGoodsGroup := boxGoodsGroup.Query(models.GoodsGroup_.ExtId.Equals(id, true))
-	GoodsGroups, err := queryGoodsGroup.Find()
-	queryGoodsGroup.Close()
+	querySubdivision := boxSubdivision.Query(models.Subdivision_.ExtId.Equals(id, true))
+	Subdivisions, err := querySubdivision.Find()
+	querySubdivision.Close()
 
 	if err != nil {
 		sm = models.ServerMessage{
@@ -35,7 +35,7 @@ func GetSubdivisionByExtId(obx *objectbox.ObjectBox, id string) (*models.Subdivi
 		return nil, sm
 	}
 
-	if len(GoodsGroups) == 0 {
+	if len(Subdivisions) == 0 {
 		sm = models.ServerMessage{
 			DataType: "Subdivision",
 			DataId: id,
@@ -44,7 +44,7 @@ func GetSubdivisionByExtId(obx *objectbox.ObjectBox, id string) (*models.Subdivi
 		}
 		return nil, sm
 
-	} else if len(GoodsGroups) != 1 {
+	} else if len(Subdivisions) != 1 {
 		sm = models.ServerMessage{
 			DataType: "Subdivision",
 			DataId: id,
@@ -54,5 +54,5 @@ func GetSubdivisionByExtId(obx *objectbox.ObjectBox, id string) (*models.Subdivi
 		return nil, sm
 	}
 
-	return GoodsGroups[0], sm
+	return Subdivisions[0], sm
 }

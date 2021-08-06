@@ -158,7 +158,9 @@
         {
           "id": "2:6555419099548205599",
           "name": "ExtId",
-          "type": 9
+          "indexId": "27:8472944323867149148",
+          "type": 9,
+          "flags": 2080
         },
         {
           "id": "4:3681808398951988176",
@@ -233,7 +235,9 @@
         {
           "id": "60:6042246242714324374",
           "name": "AppId",
-          "type": 9
+          "indexId": "28:529896894866044814",
+          "type": 9,
+          "flags": 2080
         },
         {
           "id": "61:6424679353718418180",
@@ -294,7 +298,9 @@
         {
           "id": "2:2286777172924440151",
           "name": "ExtId",
-          "type": 9
+          "indexId": "29:8173145340567612110",
+          "type": 9,
+          "flags": 2080
         },
         {
           "id": "24:6002045979613560070",
@@ -359,7 +365,9 @@
         {
           "id": "69:6763306841751096049",
           "name": "AppId",
-          "type": 9
+          "indexId": "30:3500087503737737130",
+          "type": 9,
+          "flags": 2080
         }
       ]
     },
@@ -636,11 +644,138 @@
           "type": 10
         }
       ]
+    },
+    {
+      "id": "12:934482826225446963",
+      "lastPropertyId": "18:1889231728560269932",
+      "name": "ConsignmentNoteInExport",
+      "properties": [
+        {
+          "id": "1:2420795784119769358",
+          "name": "document_Id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:724115152975813365",
+          "name": "document_ExtId",
+          "indexId": "31:3081901199680037725",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:3667975431755800659",
+          "name": "document_AppId",
+          "indexId": "32:2174578005547960443",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "4:764468959555945948",
+          "name": "document_Number",
+          "type": 9
+        },
+        {
+          "id": "5:80219014777230864",
+          "name": "document_HarvestType",
+          "indexId": "33:5466606402988476659",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "HarvestType"
+        },
+        {
+          "id": "6:4539185226458782123",
+          "name": "document_Vehicle",
+          "indexId": "34:9051091469624359279",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Vehicle"
+        },
+        {
+          "id": "7:7022981452506921744",
+          "name": "document_Driver",
+          "indexId": "35:6334620045348154009",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Person"
+        },
+        {
+          "id": "8:1033880861332949164",
+          "name": "document_Recipient",
+          "indexId": "36:2265646705671422312",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Storage"
+        },
+        {
+          "id": "9:6109048959092040098",
+          "name": "document_Sender",
+          "indexId": "37:6128774977113775311",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Storage"
+        },
+        {
+          "id": "10:2930159870264585794",
+          "name": "document_AppUser",
+          "indexId": "38:7156736318521247646",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "AppUser"
+        },
+        {
+          "id": "11:4171079243365597252",
+          "name": "document_Gross",
+          "type": 8
+        },
+        {
+          "id": "12:6141572571462227605",
+          "name": "document_Tare",
+          "type": 8
+        },
+        {
+          "id": "13:1464137919603915888",
+          "name": "document_Net",
+          "type": 8
+        },
+        {
+          "id": "14:6639569708666128940",
+          "name": "document_Humidity",
+          "type": 8
+        },
+        {
+          "id": "15:3745211061716169811",
+          "name": "document_Weediness",
+          "type": 8
+        },
+        {
+          "id": "16:6879855998827382225",
+          "name": "document_IsDeleted",
+          "type": 1
+        },
+        {
+          "id": "17:2387939850651566025",
+          "name": "document_ChangedByApp",
+          "type": 1
+        },
+        {
+          "id": "18:1889231728560269932",
+          "name": "document_ChangedByAcc",
+          "type": 1
+        }
+      ],
+      "relations": [
+        {
+          "id": "2:1629334969059597573",
+          "name": "TableGoods",
+          "targetId": "4:8444046993855405783"
+        }
+      ]
     }
   ],
-  "lastEntityId": "11:1924487076928445410",
-  "lastIndexId": "26:2796045731298863334",
-  "lastRelationId": "1:7352375471897382812",
+  "lastEntityId": "12:934482826225446963",
+  "lastIndexId": "38:7156736318521247646",
+  "lastRelationId": "2:1629334969059597573",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],

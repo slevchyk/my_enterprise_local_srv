@@ -127,6 +127,8 @@ func (goodsConsignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Id", 6, 1, 7746942835379170791)
 	model.PropertyFlags(1)
 	model.Property("ExtId", 9, 2, 2286777172924440151)
+	model.PropertyFlags(2080)
+	model.PropertyIndex(29, 8173145340567612110)
 	model.Property("LoadingPercentage", 7, 24, 6002045979613560070)
 	model.Property("Quantity", 7, 25, 7898911385562250666)
 	model.Property("CreatedAt", 10, 62, 1137569487564150713)
@@ -147,6 +149,8 @@ func (goodsConsignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.PropertyFlags(520)
 	model.PropertyRelation("ConsignmentNoteIn", 25, 8711340933066469198)
 	model.Property("AppId", 9, 69, 6763306841751096049)
+	model.PropertyFlags(2080)
+	model.PropertyIndex(30, 3500087503737737130)
 	model.EntityLastPropertyId(69, 6763306841751096049)
 }
 

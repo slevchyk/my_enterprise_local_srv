@@ -23,9 +23,9 @@ func ObjectBoxModel() *objectbox.Model {
 	model.RegisterBinding(SubdivisionBinding)
 	model.RegisterBinding(UnitBinding)
 	model.RegisterBinding(VehicleBinding)
-	model.LastEntityId(11, 1924487076928445410)
-	model.LastIndexId(26, 2796045731298863334)
-	model.LastRelationId(1, 7352375471897382812)
+	model.LastEntityId(12, 934482826225446963)
+	model.LastIndexId(38, 7156736318521247646)
+	model.LastRelationId(2, 1629334969059597573)
 
 	return model
 }
