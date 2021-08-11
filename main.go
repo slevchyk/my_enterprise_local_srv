@@ -40,6 +40,7 @@ func main() {
 	//app
 	http.HandleFunc("/api/app/v1/consignmentnotein", appConsignmentnoteinHandler)
 	http.HandleFunc("/api/app/v1/consignmentnotein/processed", appConsignmentnoteinProcessedHandler)
+	http.HandleFunc("/api/app/v1/consignmentnotein/changed", appConsignmentnoteinChangedHandler)
 
 	err := http.ListenAndServe(":8002", nil)
 	if err != nil {
@@ -264,6 +265,17 @@ func appConsignmentnoteinProcessedHandler(w http.ResponseWriter, r *http.Request
 
 	if r.Method == http.MethodPost {
 		api.ConsignmentNoteInAppProcessed(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+func appConsignmentnoteinChangedHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodGet {
+		api.ConsignmentNoteInAppChanged(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}

@@ -23,5 +23,5 @@ type ConsignmentNoteInImport struct {
 	UpdatedAt       string                         `json:"updated_at"`
 	ChangedByApp    bool                           `json:"changed_by_app"`
 	ChangedByAcc    bool                           `json:"changed_by_acc"`
-	Goods           []GoodsConsignmentNoteInImport `goods:"goods"`
+	Goods           []GoodsConsignmentNoteInImport `json:"table_goods"`
 }

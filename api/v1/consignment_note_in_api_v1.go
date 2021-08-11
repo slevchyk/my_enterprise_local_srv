@@ -16,12 +16,11 @@ import (
 func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) {
 
 	var err error
+	var cniis []models.ConsignmentNoteInImport
 
-	// var sas []models.ServerAnswer
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		Status:    http.StatusOK,
 		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
@@ -32,8 +31,7 @@ func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var jsonData []map[string]interface{}
-	err = json.Unmarshal(bs, &jsonData)
+	err = json.Unmarshal(bs, &cniis)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -41,329 +39,14 @@ func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	box := models.BoxForConsignmentNoteIn(api.obx)
+	for _, v := range cniis {
 
-	for _, v := range jsonData {
+		pd := postConsignmentNoteIn(api.obx, v, true)
 
-		var pd models.ServerProcessedData
-
-		isJsonError := false
-
-		srvIdFloat64, ok := v["srv_id"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking type",
-				Message: "srv_id: incorrect type",
-			})
-			isJsonError = true
-		}
-		srvId := uint64(srvIdFloat64)
-		pd.SrvId = srvId
-
-		extId, ok := v["ext_id"].(string)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking type",
-				Message: "ext_id: incorrect type",
-			})
-			isJsonError = true
-		}
-		pd.ExtId = extId
-
-		dateStr, ok := v["date"].(string)
-		if !ok || dateStr == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "date: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		date, err := time.Parse("2006-01-02T15:04:05", dateStr)
-		if err != nil {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "date: can't convert to date format",
-			})
-			isJsonError = true
-		}
-
-		number, ok := v["number"].(string)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "number: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		harvestTypeId, ok := v["harvest_type_id"].(string)
-		if !ok || harvestTypeId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "HarvestType",
-				Action:   "checking value",
-				Message:  "harvest_type_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		vehicleId, ok := v["vehicle_id"].(string)
-		if !ok || vehicleId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Vehicle",
-				Action:   "checking value",
-				Message:  "vehicle_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		departureDateStr, ok := v["departure_date"].(string)
-		if !ok || departureDateStr == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "departure_date",
-				Action:   "checking value",
-				Message:  "departure_date: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		departureDate, err := time.Parse("2006-01-02T15:04:05", departureDateStr)
-		if err != nil {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "departure_date",
-				Action:   "checking value",
-				Message:  "departure_date: can't convert to date format",
-			})
-			isJsonError = true
-		}
-
-		driverId, ok := v["driver_id"].(string)
-		if !ok || driverId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Driver",
-				Action:   "checking value",
-				Message:  "driver_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		recipientId, ok := v["recipient_id"].(string)
-		if !ok || recipientId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "recipient_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		senderId, ok := v["sender_id"].(string)
-		if !ok || senderId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "sender_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		appUserId, ok := v["app_user_id"].(string)
-		if !ok || appUserId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "responsible_person_id: incorrect type or empty",
-			})
-			isJsonError = true
-		}
-
-		gross, ok := v["gross"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "gross: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		tare, ok := v["tare"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "tare: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		net, ok := v["net"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "net: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		humidity, ok := v["humidity"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "humidity: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		weediness, ok := v["weediness"].(float64)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "weediness: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		isDeleted, ok := v["is_deleted"].(bool)
-		if !ok {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "is_deleted: incorrect type",
-			})
-			isJsonError = true
-		}
-
-		if isJsonError {
+		if len(pd.Messages) > 0 {
 			pd.Status = http.StatusBadRequest
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-			continue
 		}
-
-		isDataError := false
-
-		harvestType, sm := dao.GetHarvestTypeByExtId(api.obx, harvestTypeId)
-		if harvestType == nil {
-			sm.DataType = "HarvestType"
-			sm.DataId = harvestTypeId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		vehicle, sm := dao.GetVehicleByExtId(api.obx, vehicleId)
-		if vehicle == nil {
-			sm.DataType = "Vehicle"
-			sm.DataId = vehicleId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		driver, sm := dao.GetPersonByExtId(api.obx, driverId)
-		if driver == nil {
-			sm.DataType = "Driver"
-			sm.DataId = driverId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		recipient, sm := dao.GetStorageByExtId(api.obx, recipientId)
-		if recipient == nil {
-			sm.DataType = "Storage"
-			sm.DataId = recipientId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		sender, sm := dao.GetStorageByExtId(api.obx, senderId)
-		if sender == nil {
-			sm.DataType = "Storage"
-			sm.DataId = senderId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		appUser, sm := dao.GetAppUserByExtId(api.obx, appUserId)
-		if appUser == nil {
-			sm.DataType = "AppUser"
-			sm.DataId = appUserId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-
-		if isDataError {
-			pd.Status = http.StatusBadRequest
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-			continue
-		}
-
-		cni, err := box.Get(srvId)
-		if err != nil {
-			pd.Status = http.StatusInternalServerError
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "ConsignmentNoteIn",
-				DataId:   fmt.Sprint(srvId),
-				Action:   "query by id",
-				Message:  err.Error(),
-			})
-		}
-
-		ConsignmentNoteIn := models.ConsignmentNoteIn{
-			ExtId:         extId,
-			Date:          date,
-			Number:        number,
-			HarvestType:   harvestType,
-			Vehicle:       vehicle,
-			DepartureDate: departureDate,
-			Driver:        driver,
-			Recipient:     recipient,
-			Sender:        sender,
-			AppUser:       appUser,
-			Gross:         gross,
-			Tare:          tare,
-			Net:           net,
-			Humidity:      humidity,
-			Weediness:     weediness,
-			IsDeleted:     isDeleted,
-			ChangedByAcc:  true,
-		}
-
-		ConsignmentNoteIn.Id = cni.Id
-		ConsignmentNoteIn.AppId = cni.AppId
-		ConsignmentNoteIn.CreatedAt = cni.CreatedAt
-		ConsignmentNoteIn.UpdatedAt = time.Now().UTC()
-
-		err = box.Update(&ConsignmentNoteIn)
-		if err != nil {
-			pd.Status = http.StatusInternalServerError
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "ConsignmentNoteIn",
-				DataId:   fmt.Sprint(srvId),
-				Action:   "update",
-				Message:  err.Error(),
-			})
-
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-
-			continue
-		}
-
-		pd.Status = http.StatusOK
-		pd.SrvId = ConsignmentNoteIn.Id
-
 		sa.ProcessedData = append(sa.ProcessedData, pd)
-
 	}
 
 	sa.Send(w)
@@ -619,13 +302,9 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	box := models.BoxForConsignmentNoteIn(api.obx)
-	boxGoodsConsignmentNoteIn := models.BoxForGoodsConsignmentNoteIn(api.obx)
-
 	for _, v := range cniis {
 
 		var pd models.ServerProcessedData
-		var cnis []*models.ConsignmentNoteIn
 
 		pd.SrvId = v.Id
 		pd.AppId = v.AppId
@@ -642,171 +321,7 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 			continue
 		}
 
-		ConsignmentNoteIn, gcnis, pd := getConsignmentNoteIn(api.obx, v)
-		ConsignmentNoteIn.ChangedByApp = true
-
-		if pd.Status != http.StatusOK {
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-			continue
-		}
-
-		if v.Id > 0 {
-			cni, err := box.Get(v.Id)
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "query by id",
-					Message:  err.Error(),
-				})
-			}
-			cnis = append(cnis, cni)
-		} else if v.ExtId != "" {
-			query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals(v.ExtId, true))
-			cnis, err = query.Find()
-			query.Close()
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "query by ext id",
-					Message:  err.Error(),
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				query.Close()
-				continue
-			}
-		} else if v.AppId != "" {
-			query := box.Query(models.ConsignmentNoteIn_.AppId.Equals(v.AppId, true))
-			cnis, err = query.Find()
-			query.Close()
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "query by app id",
-					Message:  err.Error(),
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				query.Close()
-				continue
-			}
-		}
-
-		if len(cnis) == 0 {
-
-			if ConsignmentNoteIn.CreatedAt.IsZero() {
-				ConsignmentNoteIn.CreatedAt = time.Now().UTC()
-				ConsignmentNoteIn.UpdatedAt = time.Now().UTC()
-			}
-
-			srvId, err := box.Put(&ConsignmentNoteIn)
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(srvId),
-					Action:   "insert",
-					Message:  err.Error(),
-				})
-			}
-
-			pd.Status = http.StatusOK
-			pd.SrvId = srvId
-
-		} else if len(cnis) == 1 {
-
-			if cnis[0].ChangedByAcc {
-				pd.Status = http.StatusLocked
-				pd.ChangedByAcc = true
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "update",
-					Message:  "changed by accounting db",
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				continue
-			}
-
-			ConsignmentNoteIn.Id = cnis[0].Id
-			ConsignmentNoteIn.CreatedAt = cnis[0].CreatedAt
-			ConsignmentNoteIn.UpdatedAt = time.Now().UTC()
-
-			err := box.Update(&ConsignmentNoteIn)
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "ConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "update",
-					Message:  err.Error(),
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				continue
-			}
-
-			queryGoodsConsignmentNoteIn := boxGoodsConsignmentNoteIn.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(ConsignmentNoteIn.Id))
-			egcnis, err := queryGoodsConsignmentNoteIn.FindIds()
-			queryGoodsConsignmentNoteIn.Close()
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "GoodsConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "query",
-					Message:  err.Error(),
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				continue
-			}
-
-			_, err = boxGoodsConsignmentNoteIn.RemoveIds(egcnis...)
-			if err != nil {
-				pd.Status = http.StatusInternalServerError
-				pd.Messages = append(pd.Messages, models.ServerMessage{
-					DataType: "GoodsConsignmentNoteIn",
-					DataId:   fmt.Sprint(v.Id),
-					Action:   "delete",
-					Message:  err.Error(),
-				})
-				sa.ProcessedData = append(sa.ProcessedData, pd)
-				continue
-			}
-
-			for _, gcni := range gcnis {
-				gcni.ConsignmentNoteIn = &ConsignmentNoteIn
-				_, err := boxGoodsConsignmentNoteIn.Put(&gcni)
-				if err != nil {
-					pd.Status = http.StatusInternalServerError
-					pd.Messages = append(pd.Messages, models.ServerMessage{
-						DataType: "GoodsConsignmentNoteIn",
-						DataId:   fmt.Sprint(v.Id),
-						RowId:    gcni.AppId,
-						Action:   "insert",
-						Message:  err.Error(),
-					})
-					sa.ProcessedData = append(sa.ProcessedData, pd)
-					continue
-				}
-
-			}
-
-			pd.Status = http.StatusOK
-			pd.SrvId = ConsignmentNoteIn.Id
-
-		} else {
-			pd.Status = http.StatusInternalServerError
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "ConsignmentNoteIn",
-				DataId:   fmt.Sprint(v.Id),
-				Action:   "select",
-				Message:  "more than 1",
-			})
-		}
+		pd = postConsignmentNoteIn(api.obx, v, false)
 
 		if len(pd.Messages) > 0 {
 			pd.Status = http.StatusBadRequest
@@ -820,9 +335,10 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 
 func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request) {
 
-	var cs []*models.ConsignmentNoteIn
+	var cnis []*models.ConsignmentNoteIn
 	var err error
 	var query *models.ConsignmentNoteInQuery
+	var cnies []*models.ConsignmentNoteInExport
 
 	fvToken := r.FormValue("token")
 	fvAll := r.FormValue("all")
@@ -830,7 +346,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	if fvToken == "" {
 		sa.Status = http.StatusBadRequest
@@ -853,7 +369,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 		query = box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.ChangedByAcc.Equals(true))
 	}
 
-	cs, err = query.Find()
+	cnis, err = query.Find()
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -863,7 +379,39 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	bs, err := json.Marshal(cs)
+	boxGoodsConsignmentNoteIn := models.BoxForGoodsConsignmentNoteIn(api.obx)
+	for _, cni := range cnis {
+
+		query := boxGoodsConsignmentNoteIn.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(cni.Id))
+		gcnis, err := query.Find()
+		query.Close()
+		if err != nil {
+			pd := models.ServerProcessedData{
+				SrvId:  cni.Id,
+				AppId:  cni.AppId,
+				ExtId:  cni.ExtId,
+				Status: http.StatusInternalServerError,
+			}
+
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "query goods rows",
+				Message: err.Error(),
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			sa.Send(w)
+
+			query.Close()
+			return
+		}
+
+		cnies = append(cnies, &models.ConsignmentNoteInExport{
+			Document:   cni,
+			TableGoods: gcnis,
+		})
+	}
+
+	bs, err := json.Marshal(cnies)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -953,7 +501,61 @@ func (api *ApiV1) ConsignmentNoteInAppProcessed(w http.ResponseWriter, r *http.R
 	sa.Send(w)
 }
 
-func getConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
+func (api *ApiV1) ConsignmentNoteInAppChanged(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	fvToken := r.FormValue("token")
+
+	sa := models.ServerAnswer{
+		Object:    "ConsignmentNoteIn",
+		WebMethod: "get",
+		DateUTC:   time.Now()}
+
+	if fvToken == "" {
+		sa.Status = http.StatusBadRequest
+		sa.Error = "token isn't specified"
+		sa.Send(w)
+		return
+	}
+
+	au, err := models.GtAppUserByToken(api.obx, fvToken)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	box := models.BoxForConsignmentNoteIn(api.obx)
+
+	query := box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.ChangedByAcc.Equals(true))
+	ids, err := query.FindIds()
+	if err != nil {
+		sa.Status = http.StatusBadRequest
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
+	}
+
+	bs, err := json.Marshal(ids)
+	if err != nil {
+		sa.Status = http.StatusBadRequest
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(bs)
+}
+
+func (api *ApiV1) ConsignmentNoteInDelete(w http.ResponseWriter, r *http.Request) {
+
+	box := models.BoxForGoodsConsignmentNoteIn(api.obx)
+	box.RemoveAll()
+
+}
+
+func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
 
 	var pd models.ServerProcessedData
 	var sm models.ServerMessage
@@ -1117,36 +719,58 @@ func getConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteI
 		}
 	}
 
-	createdAt, err := time.Parse("2006-01-02T15:04:05", cnii.CreatedAt)
-	if err != nil {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			Action:  "checking value",
-			Message: "createdAt: can't convert to date format",
-		})
+	var createdAt time.Time
+	if isAcc {
+		createdAt = time.Now()
+	} else {
+		createdAt, err = time.Parse("2006-01-02T15:04:05", cnii.CreatedAt)
+		if err != nil {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "createdAt: can't convert to date format",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	}
 
-	updatedAt, err := time.Parse("2006-01-02T15:04:05", cnii.UpdatedAt)
-	if err != nil {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			Action:  "checking value",
-			Message: "updatedAt: can't convert to date format",
-		})
+	var updatedAt time.Time
+	if isAcc {
+		updatedAt = time.Now()
+	} else {
+		updatedAt, err = time.Parse("2006-01-02T15:04:05", cnii.UpdatedAt)
+		if err != nil {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "updatedAt: can't convert to date format",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	}
 
 	for _, gcnii := range cnii.Goods {
 
-		if gcnii.AppId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				RowId:   gcnii.AppId,
-				Action:  "checking value",
-				Message: "row app id isn't specified",
-			})
+		if isAcc {
+			if gcnii.ExtId == "" {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					RowId:   gcnii.ExtId,
+					Action:  "checking value",
+					Message: "row ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
+		} else {
+			if gcnii.AppId == "" {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					RowId:   gcnii.AppId,
+					Action:  "checking value",
+					Message: "row app id isn't specified",
+				})
+
+				isDataError = true
+			}
 		}
 
 		var rowSubdivision *models.Subdivision
@@ -1237,24 +861,34 @@ func getConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteI
 			}
 		}
 
-		rowCreatedAt, err := time.Parse("2006-01-02T15:04:05", gcnii.CreatedAt)
-		if err != nil {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "row createdAt: can't convert to date format",
-			})
+		var rowCreatedAt time.Time
+		if isAcc {
+			rowCreatedAt = time.Now()
+		} else {
+			rowCreatedAt, err = time.Parse("2006-01-02T15:04:05", gcnii.CreatedAt)
+			if err != nil {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "checking value",
+					Message: "row createdAt: can't convert to date format",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		}
 
-		rowUpdatedAt, err := time.Parse("2006-01-02T15:04:05", gcnii.UpdatedAt)
-		if err != nil {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking value",
-				Message: "updatedAt: can't convert to date format",
-			})
+		var rowUpdatedAt time.Time
+		if isAcc {
+			rowUpdatedAt = time.Now()
+		} else {
+			rowUpdatedAt, err = time.Parse("2006-01-02T15:04:05", gcnii.UpdatedAt)
+			if err != nil {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "checking value",
+					Message: "updatedAt: can't convert to date format",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		}
 
 		gcnis = append(gcnis, models.GoodsConsignmentNoteIn{
@@ -1293,7 +927,6 @@ func getConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteI
 		IsDeleted:     cnii.IsDeleted,
 		CreatedAt:     createdAt,
 		UpdatedAt:     updatedAt,
-		// Goods:         gcnis,
 	}
 
 	pd.Status = http.StatusOK
@@ -1304,9 +937,368 @@ func getConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteI
 	return cni, gcnis, pd
 }
 
-func (api *ApiV1) ConsignmentNoteInDelete(w http.ResponseWriter, r *http.Request) {
+func postGoodsConsignmentNoteIn(obx *objectbox.ObjectBox, cni models.ConsignmentNoteIn, gcnis []models.GoodsConsignmentNoteIn) models.ServerProcessedData {
 
-	box := models.BoxForGoodsConsignmentNoteIn(api.obx)
-	box.RemoveAll()
+	var rowId string
+	var existGcnis []*models.GoodsConsignmentNoteIn
+	var toDeleteIds []uint64
+	var err error
+	var spd models.ServerProcessedData
 
+	spd.Status = http.StatusOK
+	spd.SrvId = cni.Id
+	spd.AppId = cni.AppId
+	spd.ExtId = cni.ExtId
+
+	box := models.BoxForGoodsConsignmentNoteIn(obx)
+
+	// виберемо всі рядки документа із БД
+	query := box.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(cni.Id))
+	dbIds, err := query.FindIds()
+	if err != nil {
+		spd.Status = http.StatusInternalServerError
+		spd.Messages = append(spd.Messages, models.ServerMessage{
+			DataType: "ConsignmentNoteIn",
+			DataId:   fmt.Sprint(cni.Id),
+			Action:   "query by cni id",
+			Message:  err.Error(),
+		})
+
+		return spd
+	}
+
+	// знайдемо слайс всіх ід які є в базі але вже немає в докумені
+	for _, v := range dbIds {
+		found := false
+		for _, gcni := range gcnis {
+			if v == gcni.Id {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			toDeleteIds = append(toDeleteIds, v)
+		}
+	}
+
+	// видалимо з бд рядки яких вже немає в документі
+	if len(toDeleteIds) > 0 {
+		_, err = box.RemoveIds(toDeleteIds...)
+		if err != nil {
+			spd.Status = http.StatusInternalServerError
+			spd.Messages = append(spd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cni.Id),
+				Action:   "delete rows",
+				Message:  err.Error(),
+			})
+
+			return spd
+		}
+	}
+
+	// створимо/оновимо рядки
+	isError := false
+	for _, gcni := range gcnis {
+
+		if gcni.Id > 0 {
+			rowId = fmt.Sprint(gcni.Id)
+		} else if gcni.ExtId != "" {
+			rowId = fmt.Sprint(gcni.ExtId)
+		} else {
+			rowId = fmt.Sprint(gcni.AppId)
+		}
+
+		var spr models.ServerProcessedRow
+
+		spr.Status = http.StatusOK
+		spr.SrvId = gcni.Id
+		spr.AppId = gcni.AppId
+		spr.ExtId = gcni.ExtId
+
+		if gcni.Id > 0 {
+			query := box.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(cni.Id), models.GoodsConsignmentNoteIn_.Id.Equals(gcni.Id))
+			existGcnis, err = query.Find()
+			query.Close()
+			if err != nil {
+				spr.Status = http.StatusInternalServerError
+				spr.Messages = append(spd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
+					DataId:   rowId,
+					Action:   "query by id",
+					Message:  err.Error(),
+				})
+
+				spd.Rows = append(spd.Rows, spr)
+				isError = true
+				continue
+			}
+
+		} else if gcni.ExtId != "" {
+			query := box.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(cni.Id), models.GoodsConsignmentNoteIn_.ExtId.Equals(gcni.ExtId, true))
+			existGcnis, err = query.Find()
+			query.Close()
+			if err != nil {
+				spr.Status = http.StatusInternalServerError
+				spr.Messages = append(spd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
+					RowId:    rowId,
+					Action:   "query by ext id",
+					Message:  err.Error(),
+				})
+
+				spd.Rows = append(spd.Rows, spr)
+				isError = true
+				continue
+			}
+		} else if gcni.AppId != "" {
+			query := box.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(cni.Id), models.GoodsConsignmentNoteIn_.AppId.Equals(gcni.AppId, true))
+			existGcnis, err = query.Find()
+			query.Close()
+			if err != nil {
+				spr.Status = http.StatusInternalServerError
+				spr.Messages = append(spd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
+					RowId:    rowId,
+					Action:   "query by app id",
+					Message:  err.Error(),
+				})
+
+				spd.Rows = append(spd.Rows, spr)
+				isError = true
+				continue
+			}
+		} else {
+			spr.Status = http.StatusBadRequest
+			spr.Messages = append(spd.Messages, models.ServerMessage{
+				DataType: "GoodsConsignmentNoteIn",
+				RowId:    rowId,
+				Action:   "id isn't specified",
+				Message:  err.Error(),
+			})
+
+			spd.Rows = append(spd.Rows, spr)
+			isError = true
+			continue
+		}
+
+		if len(existGcnis) == 0 {
+			gcni.Id = 0
+			gcni.ConsignmentNoteIn = &cni
+			id, err := box.Put(&gcni)
+			if err != nil {
+				spr.Status = http.StatusInternalServerError
+				spr.Messages = append(spd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
+					RowId:    rowId,
+					Action:   "insert",
+					Message:  err.Error(),
+				})
+
+				spd.Rows = append(spd.Rows, spr)
+				isError = true
+				continue
+			}
+
+			spr.SrvId = id
+			spd.Rows = append(spd.Rows, spr)
+
+		} else if len(existGcnis) == 1 {
+			gcni.Id = existGcnis[0].Id
+			gcni.ConsignmentNoteIn = &cni
+			gcni.CreatedAt = existGcnis[0].CreatedAt
+			gcni.UpdatedAt = time.Now().UTC()
+
+			err = box.Update(&gcni)
+			if err != nil {
+				spr.Status = http.StatusInternalServerError
+				spr.Messages = append(spd.Messages, models.ServerMessage{
+					DataType: "GoodsConsignmentNoteIn",
+					RowId:    rowId,
+					Action:   "update",
+					Message:  err.Error(),
+				})
+
+				spd.Rows = append(spd.Rows, spr)
+				isError = true
+				continue
+			}
+
+			spr.SrvId = gcni.Id
+			spd.Rows = append(spd.Rows, spr)
+			continue
+		} else {
+			spr.Status = http.StatusConflict
+			spr.Messages = append(spd.Messages, models.ServerMessage{
+				DataType: "GoodsConsignmentNoteIn",
+				DataId:   fmt.Sprint(gcni.Id),
+				RowId:    rowId,
+				Action:   "select",
+				Message:  "more than 1 found",
+			})
+
+			spd.Rows = append(spd.Rows, spr)
+			isError = true
+			continue
+		}
+	}
+
+	if isError {
+		spd.Status = http.StatusBadRequest
+	}
+
+	return spd
+}
+
+func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool) models.ServerProcessedData {
+
+	var existCni *models.ConsignmentNoteIn
+	var err error
+	var cnis []*models.ConsignmentNoteIn
+	var pd models.ServerProcessedData
+
+	pd.SrvId = cnii.Id
+	pd.AppId = cnii.AppId
+	pd.ExtId = cnii.ExtId
+
+	box := models.BoxForConsignmentNoteIn(obx)
+
+	cni, gcnis, pd := parseConsignmentNoteIn(obx, cnii, isAcc)
+	cni.ChangedByApp = true
+
+	if pd.Status != http.StatusOK {
+		// sa.ProcessedData = append(sa.ProcessedData, pd)
+		//continue
+		return pd
+	}
+
+	if cnii.Id > 0 {
+		existCni, err = box.Get(cnii.Id)
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "query by id",
+				Message:  err.Error(),
+			})
+		}
+		cnis = append(cnis, existCni)
+	} else if cnii.ExtId != "" {
+		query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals(cnii.ExtId, true))
+		cnis, err = query.Find()
+		query.Close()
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "query by ext id",
+				Message:  err.Error(),
+			})
+			// sa.ProcessedData = append(sa.ProcessedData, pd)
+			query.Close()
+			// continue
+			return pd
+		}
+	} else if cnii.AppId != "" {
+		query := box.Query(models.ConsignmentNoteIn_.AppId.Equals(cnii.AppId, true))
+		cnis, err = query.Find()
+		query.Close()
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "query by app id",
+				Message:  err.Error(),
+			})
+			// sa.ProcessedData = append(sa.ProcessedData, pd)
+			query.Close()
+			// continue
+			return pd
+		}
+	}
+
+	if len(cnis) == 0 {
+
+		if cni.CreatedAt.IsZero() {
+			cni.CreatedAt = time.Now().UTC()
+			cni.UpdatedAt = time.Now().UTC()
+		}
+
+		srvId, err := box.Put(&cni)
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(srvId),
+				Action:   "insert",
+				Message:  err.Error(),
+			})
+		}
+
+		gspd := postGoodsConsignmentNoteIn(obx, cni, gcnis)
+		if gspd.Status != http.StatusOK {
+			return pd
+		}
+
+		pd.Status = http.StatusOK
+		pd.Rows = append(pd.Rows, gspd.Rows...)
+		pd.Messages = append(pd.Messages, gspd.Messages...)
+
+	} else if len(cnis) == 1 {
+
+		if !isAcc && cnis[0].ChangedByAcc {
+			pd.Status = http.StatusLocked
+			pd.ChangedByAcc = true
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "update",
+				Message:  "changed by accounting db",
+			})
+
+			return pd
+		}
+
+		cni.Id = cnis[0].Id
+		cni.CreatedAt = cnis[0].CreatedAt
+		cni.UpdatedAt = time.Now().UTC()
+		cni.ChangedByAcc = isAcc
+		cni.ChangedByApp = !isAcc
+
+		err := box.Update(&cni)
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "update",
+				Message:  err.Error(),
+			})
+
+			return pd
+		}
+
+		gspd := postGoodsConsignmentNoteIn(obx, cni, gcnis)
+		pd.Rows = append(pd.Rows, gspd.Rows...)
+		pd.Messages = append(pd.Messages, gspd.Messages...)
+
+		if gspd.Status != http.StatusOK {
+			pd.Status = gspd.Status
+			return pd
+		}
+	} else {
+		pd.Status = http.StatusInternalServerError
+		pd.Messages = append(pd.Messages, models.ServerMessage{
+			DataType: "ConsignmentNoteIn",
+			DataId:   fmt.Sprint(cnii.Id),
+			Action:   "select",
+			Message:  "more than 1",
+		})
+	}
+
+	return pd
 }
