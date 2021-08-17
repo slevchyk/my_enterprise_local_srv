@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Subdivision",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(Subdivisions) == 0 {
-			v.CreatedAt = time.Now().UTC()
-			v.UpdatedAt = time.Now().UTC()
+			v.CreatedAt = time.Now()
+			v.UpdatedAt = time.Now()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(Subdivisions) == 1 {
 			v.Id = Subdivisions[0].Id
 			v.CreatedAt = Subdivisions[0].CreatedAt
-			v.UpdatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) SubdivisionGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Subdivision",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	box := models.BoxForSubdivision(api.obx)
 

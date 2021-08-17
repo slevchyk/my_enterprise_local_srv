@@ -21,7 +21,7 @@ func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) 
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -66,7 +66,7 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	box := models.BoxForConsignmentNoteIn(api.obx)
 
@@ -271,7 +271,7 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	if fvToken == "" {
 		sa.Status = http.StatusUnauthorized
@@ -433,7 +433,7 @@ func (api *ApiV1) ConsignmentNoteInAppProcessed(w http.ResponseWriter, r *http.R
 		Status:    http.StatusOK,
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -676,24 +676,48 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var sender *models.Storage
-	if cnii.SenderId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "Storage",
-			Action:   "checking data Sender",
-			Message:  "ext id isn't specified",
-		})
-
-		isDataError = true
-	} else {
-		sender, sm = dao.GetStorageByExtId(obx, cnii.SenderId)
-		if sender == nil {
-			sm.DataType = "Storage"
-			sm.DataId = cnii.SenderId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
+	var manager *models.AppUser
+	if cnii.OperationId == 0 {
+		if cnii.ManagerId == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "AppUser",
+				Action:   "checking data Manager",
+				Message:  "ext id isn't specified",
+			})
 
 			isDataError = true
+		} else {
+			manager, sm = dao.GetAppUserByExtId(obx, cnii.ManagerId)
+			if manager == nil {
+				sm.DataType = "AppUser"
+				sm.DataId = cnii.ManagerId
+				sm.Action = "db select by ext id"
+				sm.Message = "not found"
+				pd.Messages = append(pd.Messages, sm)
+
+				isDataError = true
+			}
+		}
+	} else {
+		if cnii.SenderId == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "Storage",
+				Action:   "checking data Sender",
+				Message:  "ext id isn't specified",
+			})
+
+			isDataError = true
+		} else {
+			sender, sm = dao.GetStorageByExtId(obx, cnii.SenderId)
+			if sender == nil {
+				sm.DataType = "Storage"
+				sm.DataId = cnii.SenderId
+				sm.Action = "db select by ext id"
+				sm.Message = "not found"
+				pd.Messages = append(pd.Messages, sm)
+
+				isDataError = true
+			}
 		}
 	}
 
@@ -912,11 +936,14 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		AppId:         cnii.AppId,
 		Date:          date,
 		Number:        cnii.Number,
+		OperationId:   cnii.OperationId,
+		ExtNumber:     cnii.ExtNumber,
 		HarvestType:   harvestType,
 		Vehicle:       vehicle,
 		DepartureDate: departureDate,
 		Driver:        driver,
 		Recipient:     recipient,
+		Manager:       manager,
 		Sender:        sender,
 		AppUser:       appUser,
 		Gross:         cnii.Gross,
@@ -1108,7 +1135,7 @@ func postGoodsConsignmentNoteIn(obx *objectbox.ObjectBox, cni models.Consignment
 			gcni.Id = existGcnis[0].Id
 			gcni.ConsignmentNoteIn = &cni
 			gcni.CreatedAt = existGcnis[0].CreatedAt
-			gcni.UpdatedAt = time.Now().UTC()
+			gcni.UpdatedAt = time.Now()
 
 			err = box.Update(&gcni)
 			if err != nil {
@@ -1224,8 +1251,8 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 	if len(cnis) == 0 {
 
 		if cni.CreatedAt.IsZero() {
-			cni.CreatedAt = time.Now().UTC()
-			cni.UpdatedAt = time.Now().UTC()
+			cni.CreatedAt = time.Now()
+			cni.UpdatedAt = time.Now()
 		}
 
 		srvId, err := box.Put(&cni)
@@ -1265,7 +1292,7 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 
 		cni.Id = cnis[0].Id
 		cni.CreatedAt = cnis[0].CreatedAt
-		cni.UpdatedAt = time.Now().UTC()
+		cni.UpdatedAt = time.Now()
 		cni.ChangedByAcc = isAcc
 		cni.ChangedByApp = !isAcc
 

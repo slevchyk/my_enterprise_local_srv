@@ -146,7 +146,7 @@
     },
     {
       "id": "3:8603667634404417786",
-      "lastPropertyId": "68:3935944489437497465",
+      "lastPropertyId": "71:3219645736053079691",
       "name": "ConsignmentNoteIn",
       "properties": [
         {
@@ -281,6 +281,24 @@
           "id": "68:3935944489437497465",
           "name": "ChangedByApp",
           "type": 1
+        },
+        {
+          "id": "69:4391081084529335233",
+          "name": "OperationId",
+          "type": 6
+        },
+        {
+          "id": "70:1796256610543734889",
+          "name": "ExtNumber",
+          "type": 9
+        },
+        {
+          "id": "71:3219645736053079691",
+          "name": "Manager",
+          "indexId": "39:7088705508277379986",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "AppUser"
         }
       ]
     },
@@ -774,7 +792,7 @@
     }
   ],
   "lastEntityId": "12:934482826225446963",
-  "lastIndexId": "38:7156736318521247646",
+  "lastIndexId": "39:7088705508277379986",
   "lastRelationId": "2:1629334969059597573",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,

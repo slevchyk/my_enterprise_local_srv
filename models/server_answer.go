@@ -47,7 +47,7 @@ func (sa ServerAnswer) Send(w http.ResponseWriter) {
 	}
 
 	if sa.DateUTC.IsZero() {
-		sa.DateUTC = time.Now().UTC()
+		sa.DateUTC = time.Now()
 	}
 
 	bs, err := json.Marshal(sa)

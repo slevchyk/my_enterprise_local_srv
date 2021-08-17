@@ -6,11 +6,14 @@ type ConsignmentNoteInImport struct {
 	AppId           string                         `json:"app_id"`
 	Date            string                         `json:"date"`
 	Number          string                         `json:"number"`
+	OperationId     int                            `json:"operation_id"`
+	ExtNumber       string                         `json:"ext_number"`
 	HarvestTypeId   string                         `json:"harvest_type_id"`
 	VehicleId       string                         `json:"vehicle_id"`
 	DepartureDateId string                         `json:"departure_date"`
 	DriverId        string                         `json:"driver_id"`
 	RecipientId     string                         `json:"recipient_id"`
+	ManagerId       string                         `json:"manager_id"`
 	SenderId        string                         `json:"sender_id"`
 	AppUserId       string                         `json:"app_user_id"`
 	Gross           float64                        `json:"gross"`

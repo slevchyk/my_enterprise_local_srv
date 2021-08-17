@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Unit",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(units) == 0 {
-			v.CreatedAt = time.Now().UTC()
-			v.UpdatedAt = time.Now().UTC()
+			v.CreatedAt = time.Now()
+			v.UpdatedAt = time.Now()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(units) == 1 {
 			v.Id = units[0].Id
 			v.CreatedAt = units[0].CreatedAt
-			v.UpdatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) UnitGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Unit",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	box := models.BoxForUnit(api.obx)
 

@@ -48,7 +48,7 @@ func GtAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) {
 
 	au := aus[0]
 
-	if au.TokenExpirationDate.Before(time.Now().UTC()) {
+	if au.TokenExpirationDate.Before(time.Now()) {
 		return nil, errors.New("token expire")
 	}
 

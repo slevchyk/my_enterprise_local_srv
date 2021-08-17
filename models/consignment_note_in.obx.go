@@ -46,6 +46,9 @@ var ConsignmentNoteIn_ = struct {
 	AppUser       *objectbox.RelationToOne
 	ChangedByAcc  *objectbox.PropertyBool
 	ChangedByApp  *objectbox.PropertyBool
+	OperationId   *objectbox.PropertyInt
+	ExtNumber     *objectbox.PropertyString
+	Manager       *objectbox.RelationToOne
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -185,6 +188,25 @@ var ConsignmentNoteIn_ = struct {
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
+	OperationId: &objectbox.PropertyInt{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     69,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	ExtNumber: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     70,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Manager: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     71,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+		Target: &AppUserBinding.Entity,
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -234,7 +256,12 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.PropertyRelation("AppUser", 26, 2796045731298863334)
 	model.Property("ChangedByAcc", 1, 67, 5779134778575088849)
 	model.Property("ChangedByApp", 1, 68, 3935944489437497465)
-	model.EntityLastPropertyId(68, 3935944489437497465)
+	model.Property("OperationId", 6, 69, 4391081084529335233)
+	model.Property("ExtNumber", 9, 70, 1796256610543734889)
+	model.Property("Manager", 11, 71, 3219645736053079691)
+	model.PropertyFlags(520)
+	model.PropertyRelation("AppUser", 39, 7088705508277379986)
+	model.EntityLastPropertyId(71, 3219645736053079691)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -286,6 +313,16 @@ func (consignmentNoteIn_EntityInfo) PutRelated(ob *objectbox.ObjectBox, object i
 		} else if rId == 0 {
 			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
 			if _, err := BoxForStorage(ob).Put(rel); err != nil {
+				return err
+			}
+		}
+	}
+	if rel := object.(*ConsignmentNoteIn).Manager; rel != nil {
+		if rId, err := AppUserBinding.GetId(rel); err != nil {
+			return err
+		} else if rId == 0 {
+			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
+			if _, err := BoxForAppUser(ob).Put(rel); err != nil {
 				return err
 			}
 		}
@@ -355,6 +392,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetNumber = fbutils.CreateStringOffset(fbb, obj.Number)
 	var offsetAppId = fbutils.CreateStringOffset(fbb, obj.AppId)
+	var offsetExtNumber = fbutils.CreateStringOffset(fbb, obj.ExtNumber)
 
 	var rIdHarvestType uint64
 	if rel := obj.HarvestType; rel != nil {
@@ -392,6 +430,15 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 		}
 	}
 
+	var rIdManager uint64
+	if rel := obj.Manager; rel != nil {
+		if rId, err := AppUserBinding.GetId(rel); err != nil {
+			return err
+		} else {
+			rIdManager = rId
+		}
+	}
+
 	var rIdSender uint64
 	if rel := obj.Sender; rel != nil {
 		if rId, err := StorageBinding.GetId(rel); err != nil {
@@ -411,12 +458,14 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(68)
+	fbb.StartObject(71)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
 	fbutils.SetInt64Slot(fbb, 3, propDate)
 	fbutils.SetUOffsetTSlot(fbb, 4, offsetNumber)
+	fbutils.SetInt64Slot(fbb, 68, int64(obj.OperationId))
+	fbutils.SetUOffsetTSlot(fbb, 69, offsetExtNumber)
 	if obj.HarvestType != nil {
 		fbutils.SetUint64Slot(fbb, 57, rIdHarvestType)
 	}
@@ -429,6 +478,9 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 	if obj.Recipient != nil {
 		fbutils.SetUint64Slot(fbb, 45, rIdRecipient)
+	}
+	if obj.Manager != nil {
+		fbutils.SetUint64Slot(fbb, 70, rIdManager)
 	}
 	if obj.Sender != nil {
 		fbutils.SetUint64Slot(fbb, 46, rIdSender)
@@ -518,6 +570,15 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		}
 	}
 
+	var relManager *AppUser
+	if rId := fbutils.GetUint64PtrSlot(table, 144); rId != nil && *rId > 0 {
+		if rObject, err := BoxForAppUser(ob).Get(*rId); err != nil {
+			return nil, err
+		} else {
+			relManager = rObject
+		}
+	}
+
 	var relSender *Storage
 	if rId := fbutils.GetUint64PtrSlot(table, 96); rId != nil && *rId > 0 {
 		if rObject, err := BoxForStorage(ob).Get(*rId); err != nil {
@@ -542,11 +603,14 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		AppId:         fbutils.GetStringSlot(table, 122),
 		Date:          propDate,
 		Number:        fbutils.GetStringSlot(table, 12),
+		OperationId:   fbutils.GetIntSlot(table, 140),
+		ExtNumber:     fbutils.GetStringSlot(table, 142),
 		HarvestType:   relHarvestType,
 		Vehicle:       relVehicle,
 		DepartureDate: propDepartureDate,
 		Driver:        relDriver,
 		Recipient:     relRecipient,
+		Manager:       relManager,
 		Sender:        relSender,
 		AppUser:       relAppUser,
 		Gross:         fbutils.GetFloat64Slot(table, 124),

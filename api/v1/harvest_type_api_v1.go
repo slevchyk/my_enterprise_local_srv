@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) HarvestTypePost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "HarvestType",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) HarvestTypePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(HarvestTypes) == 0 {
-			v.CreatedAt = time.Now().UTC()
-			v.UpdatedAt = time.Now().UTC()
+			v.CreatedAt = time.Now()
+			v.UpdatedAt = time.Now()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) HarvestTypePost(w http.ResponseWriter, r *http.Request) {
 		} else if len(HarvestTypes) == 1 {
 			v.Id = HarvestTypes[0].Id
 			v.CreatedAt = HarvestTypes[0].CreatedAt
-			v.UpdatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) HarvestTypeGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "HarvestType",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	box := models.BoxForHarvestType(api.obx)
 

@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) StoragePost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Storage",
 		WebMethod: "post",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) StoragePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(Storages) == 0 {
-			v.CreatedAt = time.Now().UTC()
-			v.UpdatedAt = time.Now().UTC()
+			v.CreatedAt = time.Now()
+			v.UpdatedAt = time.Now()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) StoragePost(w http.ResponseWriter, r *http.Request) {
 		} else if len(Storages) == 1 {
 			v.Id = Storages[0].Id
 			v.CreatedAt = Storages[0].CreatedAt
-			v.UpdatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) StorageGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Storage",
 		WebMethod: "get",
-		DateUTC:   time.Now().UTC()}
+		DateUTC:   time.Now()}
 
 	box := models.BoxForStorage(api.obx)
 
