@@ -142,6 +142,7 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	} else if fvAppId != "" {
 		query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals(fvAppId, true))
 		cnis, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -167,6 +168,7 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	} else if fvExtId != "" {
 		query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals(fvExtId, true))
 		cnis, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -192,6 +194,7 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query := box.Query(models.ConsignmentNoteIn_.ChangedByApp.Equals(true))
 		cnis, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -370,6 +373,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 	}
 
 	cnis, err = query.Find()
+	query.Close()
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()

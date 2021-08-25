@@ -1,17 +1,31 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
+	"github.com/kardianos/service"
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/api/v1"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
 
 var obx *objectbox.ObjectBox
+var cfg models.Config
+var logger service.Logger
 
 func init() {
 	var err error
+
+	cfg, err = getConfig()
+	if err != nil {
+		panic(err)
+	}
 
 	obx, err = objectbox.NewBuilder().Model(models.ObjectBoxModel()).Build()
 	if err != nil {
@@ -20,6 +34,76 @@ func init() {
 }
 
 func main() {
+	svcFlag := flag.String("service", "", "Control the system service.")
+	flag.Parse()
+
+	svcConfig := &service.Config{
+		Name:        cfg.ServiceConfig.Name,
+		DisplayName: cfg.ServiceConfig.DisplayName,
+		Description: cfg.ServiceConfig.Description,
+	}
+
+	as := &apiServer{}
+	s, err := service.New(as, svcConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger, err = s.Logger(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(*svcFlag) != 0 {
+		err := service.Control(s, *svcFlag)
+		if err != nil {
+			log.Printf("Valid actions: %q\n", service.ControlAction)
+			log.Fatal(err)
+		}
+		return
+	}
+
+	err = s.Run()
+	if err != nil {
+		logger.Error(err)
+	}
+
+}
+
+func getConfig() (models.Config, error) {
+	var cfg models.Config
+
+	fullexecpath, err := os.Executable()
+	if err != nil {
+		return cfg, err
+	}
+
+	dir, _ := filepath.Split(fullexecpath)
+	path := filepath.Join(dir, "config.json")
+
+	f, err := os.ReadFile(path)
+	if err != nil {
+		return cfg, err
+	}
+
+	err = json.Unmarshal(f, &cfg)
+	if err != nil {
+		log.Println(err)
+		return cfg, err
+	}
+
+	return cfg, nil
+}
+
+type apiServer struct{}
+
+func (as *apiServer) Start(s service.Service) error {
+	// Start should not block. Do the actual work async.
+	go as.run()
+	return nil
+}
+
+func (as *apiServer) run() {
+	// Do work here
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.HandleFunc("/test", testHandler)
 	http.HandleFunc("/deleteall", deleteAllHandeler)
@@ -42,11 +126,16 @@ func main() {
 	http.HandleFunc("/api/app/v1/consignmentnotein/processed", appConsignmentnoteinProcessedHandler)
 	http.HandleFunc("/api/app/v1/consignmentnotein/changed", appConsignmentnoteinChangedHandler)
 
-	err := http.ListenAndServe(":8002", nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Server.Port), nil)
 	if err != nil {
 		panic(err)
 	}
 	defer obx.Close()
+}
+
+func (as *apiServer) Stop(s service.Service) error {
+	// Stop should not block. Return with a few seconds.
+	return nil
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {

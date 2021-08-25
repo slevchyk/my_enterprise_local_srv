@@ -237,6 +237,7 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query := box.Query(models.AppUser_.ExtId.Equals(fvId, true))
 		aus, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
@@ -281,6 +282,7 @@ func (api *ApiV1) AppUserAuth(w http.ResponseWriter, r *http.Request) {
 
 	query := box.Query(models.AppUser_.Phone.Equals(fvPhone, true), models.AppUser_.Password.Equals(fvPassword, true))
 	aus, err := query.Find()
+	query.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		query.Close()

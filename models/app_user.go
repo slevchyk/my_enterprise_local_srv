@@ -36,6 +36,7 @@ func GtAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) {
 	box := BoxForAppUser(ob)
 	query := box.Query(AppUser_.Token.Equals(token, true))
 	aus, err := query.Find()
+	query.Close()
 	if err != nil {
 		return nil, err
 	}

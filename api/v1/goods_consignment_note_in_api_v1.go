@@ -349,6 +349,7 @@ func (api *ApiV1) GoodsConsignmentNoteInGet(w http.ResponseWriter, r *http.Reque
 	} else {
 		query := box.Query(models.GoodsConsignmentNoteIn_.ExtId.Equals(fvId, true))
 		gs, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()

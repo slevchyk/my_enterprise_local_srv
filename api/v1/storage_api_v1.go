@@ -158,6 +158,7 @@ func (api *ApiV1) StorageGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query := box.Query(models.Storage_.ExtId.Equals(fvId, true))
 		ss, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()

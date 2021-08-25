@@ -158,6 +158,7 @@ func (api *ApiV1) PersonGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query := box.Query(models.Person_.ExtId.Equals(fvId, true))
 		ps, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()

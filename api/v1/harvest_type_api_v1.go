@@ -158,6 +158,7 @@ func (api *ApiV1) HarvestTypeGet(w http.ResponseWriter, r *http.Request) {
 	} else {
 		query := box.Query(models.HarvestType_.ExtId.Equals(fvId, true))
 		hts, err = query.Find()
+		query.Close()
 		if err != nil {
 			sa.Status = http.StatusInternalServerError
 			sa.Error = err.Error()
