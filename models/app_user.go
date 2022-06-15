@@ -17,6 +17,7 @@ type AppUser struct {
 	Email               string    `json:"email"`
 	Phone               string    `json:"phone"`
 	Password            string    `json:"password"`
+	PhotoPath           string    `json:"photo_path"`
 	Token               string    `json:"token"`
 	TokenExpirationDate time.Time `json:"-"`
 	IsAdministrator     bool      `json:"is_administrator"`

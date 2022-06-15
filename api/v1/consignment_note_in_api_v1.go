@@ -581,6 +581,28 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		isDataError = true
 	}
 
+	var harvestStatus *models.HarvestStatus
+	if cnii.HarvestStatusId == "" {
+		pd.Messages = append(pd.Messages, models.ServerMessage{
+			DataType: "HarvestStatus",
+			Action:   "checking data",
+			Message:  "ext id isn't specified",
+		})
+
+		isDataError = true
+	} else {
+		harvestStatus, sm = dao.GetHarvestStatusByExtId(obx, cnii.HarvestStatusId)
+		if harvestStatus == nil {
+			sm.DataType = "HarvestStatus"
+			sm.DataId = cnii.HarvestStatusId
+			sm.Action = "db select by ext id"
+			sm.Message = "not found"
+			pd.Messages = append(pd.Messages, sm)
+
+			isDataError = true
+		}
+	}
+
 	var harvestType *models.HarvestType
 	if cnii.HarvestTypeId == "" {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -617,6 +639,28 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		if vehicle == nil {
 			sm.DataType = "Vehicle"
 			sm.DataId = cnii.VehicleId
+			sm.Action = "db select by ext id"
+			sm.Message = "not found"
+			pd.Messages = append(pd.Messages, sm)
+
+			isDataError = true
+		}
+	}
+
+	var trailer *models.Trailer
+	if cnii.TrailerId == "" {
+		pd.Messages = append(pd.Messages, models.ServerMessage{
+			DataType: "Trailer",
+			Action:   "checking data",
+			Message:  "ext id isn't specified",
+		})
+
+		isDataError = true
+	} else {
+		trailer, sm = dao.GetTrailerByExtId(obx, cnii.VehicleId)
+		if trailer == nil {
+			sm.DataType = "Trailer"
+			sm.DataId = cnii.TrailerId
 			sm.Action = "db select by ext id"
 			sm.Message = "not found"
 			pd.Messages = append(pd.Messages, sm)
@@ -942,8 +986,10 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		Number:        cnii.Number,
 		OperationId:   cnii.OperationId,
 		ExtNumber:     cnii.ExtNumber,
+		HarvestStatus: harvestStatus,
 		HarvestType:   harvestType,
 		Vehicle:       vehicle,
+		Trailer:       trailer,
 		DepartureDate: departureDate,
 		Driver:        driver,
 		Recipient:     recipient,

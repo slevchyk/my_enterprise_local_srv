@@ -8,8 +8,10 @@ type ConsignmentNoteInImport struct {
 	Number          string                         `json:"number"`
 	OperationId     int                            `json:"operation_id"`
 	ExtNumber       string                         `json:"ext_number"`
+	HarvestStatusId string                         `json:"harvest_status_id"`
 	HarvestTypeId   string                         `json:"harvest_type_id"`
 	VehicleId       string                         `json:"vehicle_id"`
+	TrailerId       string                         `json:"trailer_id"`
 	DepartureDateId string                         `json:"departure_date"`
 	DriverId        string                         `json:"driver_id"`
 	RecipientId     string                         `json:"recipient_id"`

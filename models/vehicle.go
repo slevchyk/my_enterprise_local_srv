@@ -9,6 +9,8 @@ type Vehicle struct {
 	ExtId     string    `json:"ext_id"`
 	Name      string    `json:"name"`
 	IsDeleted bool      `json:"is_deleted"`
+	MaxWeight float32   `json:"max_weight"`
+	PhotoPath string    `json:"photo_path"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

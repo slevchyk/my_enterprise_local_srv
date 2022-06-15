@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -27,7 +28,8 @@ func init() {
 		panic(err)
 	}
 
-	obx, err = objectbox.NewBuilder().Model(models.ObjectBoxModel()).Build()
+	obx, err = objectbox.NewBuilder().Directory(cfg.DatabaseConfig.Path).Model(models.ObjectBoxModel()).Build()
+
 	if err != nil {
 		panic(err)
 	}
@@ -72,12 +74,20 @@ func main() {
 func getConfig() (models.Config, error) {
 	var cfg models.Config
 
-	fullexecpath, err := os.Executable()
-	if err != nil {
-		return cfg, err
+	// fullexecpath, err := os.Executable()
+	// if err != nil {
+	// 	return cfg, err
+	// }
+
+	// dir, _ := filepath.Split(fullexecpath)
+
+	dir := os.Getenv("MYENTPRS")
+	if dir == "" {
+		msg := "environment variable \"MYENTPRS\" not specified"
+		log.Println(msg)
+		return cfg, errors.New(msg)
 	}
 
-	dir, _ := filepath.Split(fullexecpath)
 	path := filepath.Join(dir, "config.json")
 
 	f, err := os.ReadFile(path)
@@ -119,6 +129,8 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
 	http.HandleFunc("/api/v1/unit", unitHandler)
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
+	http.HandleFunc("/api/v1/trailer", trailerHandler)
+	http.HandleFunc("/api/v1/harveststatus", harvestStatusHandler)
 	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
 
 	//app
@@ -126,7 +138,8 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/app/v1/consignmentnotein/processed", appConsignmentnoteinProcessedHandler)
 	http.HandleFunc("/api/app/v1/consignmentnotein/changed", appConsignmentnoteinChangedHandler)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Server.Port), nil)
+	port := fmt.Sprintf(":%v", cfg.ServerConfig.Port)
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -312,6 +325,34 @@ func vehicleHandler(w http.ResponseWriter, r *http.Request) {
 		api.VehiclePost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.VehicleGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func trailerHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.TrailerPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.TrailerGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func harvestStatusHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.HarvestStatusPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.HarvestStatusGet(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
