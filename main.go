@@ -127,6 +127,7 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/v1/storage", storageHandler)
 	http.HandleFunc("/api/v1/person", personHandler)
 	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
+	http.HandleFunc("/api/v1/locality", localityHandler)
 	http.HandleFunc("/api/v1/unit", unitHandler)
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
 	http.HandleFunc("/api/v1/trailer", trailerHandler)
@@ -298,6 +299,20 @@ func subdivisionHandler(w http.ResponseWriter, r *http.Request) {
 		api.SubdivisionPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.SubdivisionGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func localityHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.LocalityPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.LocalityGet(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}

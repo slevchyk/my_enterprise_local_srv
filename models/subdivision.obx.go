@@ -30,6 +30,7 @@ var Subdivision_ = struct {
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
+	Locality  *objectbox.RelationToOne
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -67,6 +68,13 @@ var Subdivision_ = struct {
 			Entity: &SubdivisionBinding.Entity,
 		},
 	},
+	Locality: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     7,
+			Entity: &SubdivisionBinding.Entity,
+		},
+		Target: &LocalityBinding.Entity,
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -84,7 +92,10 @@ func (subdivision_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 4, 6519561072805446948)
 	model.Property("CreatedAt", 10, 5, 5635390990865168775)
 	model.Property("UpdatedAt", 10, 6, 448129442438902162)
-	model.EntityLastPropertyId(6, 448129442438902162)
+	model.Property("Locality", 11, 7, 7154096928326330674)
+	model.PropertyFlags(520)
+	model.PropertyRelation("Locality", 40, 6925959717295263574)
+	model.EntityLastPropertyId(7, 7154096928326330674)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -100,6 +111,16 @@ func (subdivision_EntityInfo) SetId(object interface{}, id uint64) error {
 
 // PutRelated is called by ObjectBox to put related entities before the object itself is flattened and put
 func (subdivision_EntityInfo) PutRelated(ob *objectbox.ObjectBox, object interface{}, id uint64) error {
+	if rel := object.(*Subdivision).Locality; rel != nil {
+		if rId, err := LocalityBinding.GetId(rel); err != nil {
+			return err
+		} else if rId == 0 {
+			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
+			if _, err := BoxForLocality(ob).Put(rel); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
@@ -127,12 +148,24 @@ func (subdivision_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Build
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 
+	var rIdLocality uint64
+	if rel := obj.Locality; rel != nil {
+		if rId, err := LocalityBinding.GetId(rel); err != nil {
+			return err
+		} else {
+			rIdLocality = rId
+		}
+	}
+
 	// build the FlatBuffers object
-	fbb.StartObject(6)
+	fbb.StartObject(7)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
+	if obj.Locality != nil {
+		fbutils.SetUint64Slot(fbb, 6, rIdLocality)
+	}
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -161,11 +194,21 @@ func (subdivision_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (inter
 		return nil, errors.New("converter objectbox.TimeInt64ConvertToEntityProperty() failed on Subdivision.UpdatedAt: " + err.Error())
 	}
 
+	var relLocality *Locality
+	if rId := fbutils.GetUint64PtrSlot(table, 16); rId != nil && *rId > 0 {
+		if rObject, err := BoxForLocality(ob).Get(*rId); err != nil {
+			return nil, err
+		} else {
+			relLocality = rObject
+		}
+	}
+
 	return &Subdivision{
 		Id:        propId,
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
+		Locality:  relLocality,
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,
 	}, nil

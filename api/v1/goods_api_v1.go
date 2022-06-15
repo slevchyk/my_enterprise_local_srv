@@ -65,7 +65,7 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		unit_ext_id, ok := v["unit_ext_id"].(string)
-		if !ok || unit_ext_id == "" {			
+		if !ok || unit_ext_id == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
 				Message: "unit_ext_id: incorrect type or empty",

@@ -11,7 +11,7 @@ import (
 
 func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 
-	var ss []models.Subdivision
+	var gs []models.Subdivision
 	var err error
 
 	sa := models.ServerAnswer{
@@ -27,7 +27,8 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(bs, &ss)
+	var jsonData []map[string]interface{}
+	err = json.Unmarshal(bs, &jsonData)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -36,98 +37,162 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	box := models.BoxForSubdivision(apiV1.obx)
+	boxLocality := models.BoxForLocality(apiV1.obx)
 
-	for _, v := range ss {
+	for _, v := range jsonData {
 
-		pd := models.ServerProcessedData{
-			ExtId: v.ExtId,
+		jsonError := false
+
+		var pd models.ServerProcessedData
+
+		extId, ok := v["ext_id"].(string)
+		if !ok || extId == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value ext_id",
+				Message: "ext_id: incorrect type or empty",
+			})
+			jsonError = true
 		}
+		pd.ExtId = extId
 
-		isDataError := false
-
-		if v.ExtId == "" {
+		name, ok := v["name"].(string)
+		if !ok || name == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
-				Message: "ext id is empty",
+				Message: "name: incorrect type or empty",
 			})
-			isDataError = true
+			jsonError = true
 		}
 
-		if v.Name == "" {
+		locality_ext_id, ok := v["locality_ext_id"].(string)
+		if !ok || locality_ext_id == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
-				Message: "name is empty",
+				Message: "locality_ext_id: incorrect type or empty",
 			})
-			isDataError = true
+			jsonError = true
 		}
 
-		if isDataError {
+		if jsonError {
 			pd.Status = http.StatusBadRequest
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
-		query := box.Query(models.Subdivision_.ExtId.Equals(v.ExtId, true))
-		Subdivisions, err := query.Find()
-		query.Close()
+		queryLocality := boxLocality.Query(models.Unit_.ExtId.Equals(locality_ext_id, true))
+		localities, err := queryLocality.Find()
+		queryLocality.Close()
 
 		if err != nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "locality",
+				DataId:   locality_ext_id,
+				Action:   "query",
+				Message:  err.Error(),
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
+		}
+
+		if len(localities) == 0 {
+			pd.Status = http.StatusNotFound
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "locality",
+				DataId:   locality_ext_id,
+				Action:   "query",
+				Message:  "not found",
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
+		} else if len(localities) != 1 {
+			pd.Status = http.StatusConflict
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "locality",
+				DataId:   locality_ext_id,
+				Action:   "query",
+				Message:  "more than 1",
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
+		}
+
+		locality := localities[0]
+
+		query := box.Query(models.Subdivision_.ExtId.Equals(extId, true))
+		Subdivisions, err := query.Find()
+		query.Close()
+		if err != nil {
+			pd.Status = http.StatusInternalServerError
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "query",
 				Message: err.Error(),
 			})
 
-			pd.Status = http.StatusInternalServerError
 			sa.ProcessedData = append(sa.ProcessedData, pd)
-
 			query.Close()
 			continue
 		}
 
-		if len(Subdivisions) == 0 {
-			v.CreatedAt = time.Now()
-			v.UpdatedAt = time.Now()
+		Subdivision := models.Subdivision{
+			ExtId:    extId,
+			Name:     name,
+			Locality: locality,
+		}
 
-			_, err := box.Put(&v)
+		if len(Subdivisions) == 0 {
+			Subdivision.CreatedAt = time.Now()
+			Subdivision.UpdatedAt = time.Now()
+
+			_, err := box.Put(&Subdivision)
 			if err != nil {
+				pd.Status = http.StatusInternalServerError
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "insert",
 					Message: err.Error(),
 				})
-				pd.Status = http.StatusInternalServerError
 				sa.ProcessedData = append(sa.ProcessedData, pd)
 				continue
 			}
 
 		} else if len(Subdivisions) == 1 {
-			v.Id = Subdivisions[0].Id
-			v.CreatedAt = Subdivisions[0].CreatedAt
-			v.UpdatedAt = time.Now()
+			Subdivision.Id = Subdivisions[0].Id
+			Subdivision.CreatedAt = Subdivisions[0].CreatedAt
+			Subdivision.UpdatedAt = time.Now()
 
-			pd.SrvId = v.Id
-
-			err := box.Update(&v)
+			err := box.Update(&Subdivision)
 			if err != nil {
+				pd.Status = http.StatusInternalServerError
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "update",
 					Message: err.Error(),
 				})
-				pd.Status = http.StatusInternalServerError
 				sa.ProcessedData = append(sa.ProcessedData, pd)
 				continue
 			}
 		} else {
+			pd.Status = http.StatusConflict
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "more than 1",
 				Message: err.Error(),
 			})
-			pd.Status = http.StatusConflict
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
 		}
 
 		pd.Status = http.StatusOK
 		sa.ProcessedData = append(sa.ProcessedData, pd)
+	}
+
+	err = json.Unmarshal(bs, &gs)
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
 	}
 
 	sa.Send(w)

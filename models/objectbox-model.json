@@ -551,7 +551,7 @@
     },
     {
       "id": "9:2902826944044842194",
-      "lastPropertyId": "6:448129442438902162",
+      "lastPropertyId": "7:7154096928326330674",
       "name": "Subdivision",
       "properties": [
         {
@@ -584,6 +584,14 @@
           "id": "6:448129442438902162",
           "name": "UpdatedAt",
           "type": 10
+        },
+        {
+          "id": "7:7154096928326330674",
+          "name": "Locality",
+          "indexId": "40:6925959717295263574",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Locality"
         }
       ]
     },
@@ -875,10 +883,48 @@
           "type": 10
         }
       ]
+    },
+    {
+      "id": "15:1595499329022426042",
+      "lastPropertyId": "6:2502464712672005609",
+      "name": "Locality",
+      "properties": [
+        {
+          "id": "1:4814862771751732888",
+          "name": "Id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3327636998049389955",
+          "name": "ExtId",
+          "type": 9
+        },
+        {
+          "id": "3:8905571290053045147",
+          "name": "Name",
+          "type": 9
+        },
+        {
+          "id": "4:6240246113460005734",
+          "name": "IsDeleted",
+          "type": 1
+        },
+        {
+          "id": "5:5332092169727819491",
+          "name": "CreatedAt",
+          "type": 10
+        },
+        {
+          "id": "6:2502464712672005609",
+          "name": "UpdatedAt",
+          "type": 10
+        }
+      ]
     }
   ],
-  "lastEntityId": "14:285776978365605757",
-  "lastIndexId": "39:7088705508277379986",
+  "lastEntityId": "15:1595499329022426042",
+  "lastIndexId": "40:6925959717295263574",
   "lastRelationId": "2:1629334969059597573",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
