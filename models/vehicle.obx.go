@@ -30,6 +30,8 @@ var Vehicle_ = struct {
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
+	MaxWeight *objectbox.PropertyFloat32
+	PhotoPath *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -67,6 +69,18 @@ var Vehicle_ = struct {
 			Entity: &VehicleBinding.Entity,
 		},
 	},
+	MaxWeight: &objectbox.PropertyFloat32{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     7,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	PhotoPath: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     8,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -84,7 +98,9 @@ func (vehicle_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 4, 2047802226670451377)
 	model.Property("CreatedAt", 10, 5, 8294796580298202505)
 	model.Property("UpdatedAt", 10, 6, 7281112080798607170)
-	model.EntityLastPropertyId(6, 7281112080798607170)
+	model.Property("MaxWeight", 7, 7, 5026788527388023970)
+	model.Property("PhotoPath", 9, 8, 6739210181211194073)
+	model.EntityLastPropertyId(8, 6739210181211194073)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -126,13 +142,16 @@ func (vehicle_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
+	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
 
 	// build the FlatBuffers object
-	fbb.StartObject(6)
+	fbb.StartObject(8)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
+	fbutils.SetFloat32Slot(fbb, 6, obj.MaxWeight)
+	fbutils.SetUOffsetTSlot(fbb, 7, offsetPhotoPath)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -166,6 +185,8 @@ func (vehicle_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
+		MaxWeight: fbutils.GetFloat32Slot(table, 16),
+		PhotoPath: fbutils.GetStringSlot(table, 18),
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,
 	}, nil

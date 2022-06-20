@@ -9,6 +9,7 @@ type GoodsConsignmentNoteIn struct {
 	ExtId             string             `json:"ext_id" objectbox:"index, unique"`
 	AppId             string             `json:"app_id" objectbox:"index, unique"`
 	ConsignmentNoteIn *ConsignmentNoteIn `json:"-" objectbox:"link"`
+	Locality          *Locality          `json:"locality" objectbox:"link"`
 	Subdivision       *Subdivision       `json:"subdivision" objectbox:"link"`
 	GoodsGroup        *GoodsGroup        `json:"goods_group" objectbox:"link"`
 	Goods             *Goods             `json:"goods" objectbox:"link"`
@@ -18,4 +19,3 @@ type GoodsConsignmentNoteIn struct {
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
 }
-

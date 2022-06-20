@@ -79,7 +79,7 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		queryLocality := boxLocality.Query(models.Unit_.ExtId.Equals(locality_ext_id, true))
+		queryLocality := boxLocality.Query(models.Locality_.ExtId.Equals(locality_ext_id, true))
 		localities, err := queryLocality.Find()
 		queryLocality.Close()
 

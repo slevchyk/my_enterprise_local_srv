@@ -7,8 +7,8 @@ type ConsignmentNoteInImport struct {
 	Date            string                         `json:"date"`
 	Number          string                         `json:"number"`
 	OperationId     int                            `json:"operation_id"`
+	StatusId        int                            `json:"status_id"`
 	ExtNumber       string                         `json:"ext_number"`
-	HarvestStatusId string                         `json:"harvest_status_id"`
 	HarvestTypeId   string                         `json:"harvest_type_id"`
 	VehicleId       string                         `json:"vehicle_id"`
 	TrailerId       string                         `json:"trailer_id"`
@@ -18,6 +18,7 @@ type ConsignmentNoteInImport struct {
 	ManagerId       string                         `json:"manager_id"`
 	SenderId        string                         `json:"sender_id"`
 	AppUserId       string                         `json:"app_user_id"`
+	Comment         string                         `json:"comment"`
 	Gross           float64                        `json:"gross"`
 	Tare            float64                        `json:"tare"`
 	Net             float64                        `json:"net"`

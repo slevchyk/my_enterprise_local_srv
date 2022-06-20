@@ -11,17 +11,18 @@ type ConsignmentNoteIn struct {
 	Date          time.Time      `json:"date"`
 	Number        string         `json:"number"`
 	OperationId   int            `json:"operation_id"`
+	StatusId      int            `json:"status_id"`
 	ExtNumber     string         `json:"ext_number"`
-	HarvestStatus *HarvestStatus `json:"harvest_status" objectbox:"link"`
 	HarvestType   *HarvestType   `json:"harvest_type" objectbox:"link"`
 	Vehicle       *Vehicle       `json:"vehicle" objectbox:"link"`
 	Trailer       *Trailer       `json:"traile" objectbox:"link"`
 	DepartureDate time.Time      `json:"departure_date"`
-	Driver        *Person        `json:"driver" objectbox:"link"`
+	Driver        *ServiceWorker `json:"driver" objectbox:"link"`
 	Recipient     *Storage       `json:"recipient" objectbox:"link"`
 	Manager       *AppUser       `json:"manager" objectbox:"link"`
 	Sender        *Storage       `json:"sender" objectbox:"link"`
 	AppUser       *AppUser       `json:"app_user" objectbox:"link"`
+	Comment       string         `json:"comment"`
 	Gross         float64        `json:"gross"`
 	Tare          float64        `json:"tare"`
 	Net           float64        `json:"net"`

@@ -54,3 +54,5 @@ app.*.map.json
 *.xxjson
 *.crt
 *.key
+
+*.exe

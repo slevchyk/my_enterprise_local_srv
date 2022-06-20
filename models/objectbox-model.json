@@ -43,7 +43,7 @@
     },
     {
       "id": "2:3772536781229214116",
-      "lastPropertyId": "21:6565581724974588785",
+      "lastPropertyId": "22:2572403520298632668",
       "name": "AppUser",
       "properties": [
         {
@@ -141,12 +141,17 @@
           "id": "21:6565581724974588785",
           "name": "TokenExpirationDate",
           "type": 10
+        },
+        {
+          "id": "22:2572403520298632668",
+          "name": "PhotoPath",
+          "type": 9
         }
       ]
     },
     {
       "id": "3:8603667634404417786",
-      "lastPropertyId": "71:3219645736053079691",
+      "lastPropertyId": "75:275258255946157640",
       "name": "ConsignmentNoteIn",
       "properties": [
         {
@@ -191,14 +196,6 @@
           "id": "37:8437818475573608947",
           "name": "UpdatedAt",
           "type": 10
-        },
-        {
-          "id": "45:6637254081577110712",
-          "name": "Driver",
-          "indexId": "5:2579239408896235758",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Person"
         },
         {
           "id": "46:1634970022263309275",
@@ -299,12 +296,38 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "AppUser"
+        },
+        {
+          "id": "72:9193349120053975423",
+          "name": "StatusId",
+          "type": 6
+        },
+        {
+          "id": "73:6433115845668663641",
+          "name": "Trailer",
+          "indexId": "41:1905530829399511176",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Trailer"
+        },
+        {
+          "id": "74:4525146217534664158",
+          "name": "Comment",
+          "type": 9
+        },
+        {
+          "id": "75:275258255946157640",
+          "name": "Driver",
+          "indexId": "43:2175209146638276724",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ServiceWorker"
         }
       ]
     },
     {
       "id": "4:8444046993855405783",
-      "lastPropertyId": "69:6763306841751096049",
+      "lastPropertyId": "70:7898631285694533807",
       "name": "GoodsConsignmentNoteIn",
       "properties": [
         {
@@ -386,6 +409,14 @@
           "indexId": "30:3500087503737737130",
           "type": 9,
           "flags": 2080
+        },
+        {
+          "id": "70:7898631285694533807",
+          "name": "Locality",
+          "indexId": "42:6729944132186829092",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Locality"
         }
       ]
     },
@@ -475,7 +506,7 @@
     },
     {
       "id": "7:995889323428318313",
-      "lastPropertyId": "6:4233746714675610160",
+      "lastPropertyId": "7:3612702368769711068",
       "name": "HarvestType",
       "properties": [
         {
@@ -508,6 +539,11 @@
           "id": "6:4233746714675610160",
           "name": "UpdatedAt",
           "type": 10
+        },
+        {
+          "id": "7:3612702368769711068",
+          "name": "Year",
+          "type": 6
         }
       ]
     },
@@ -635,7 +671,7 @@
     },
     {
       "id": "11:1924487076928445410",
-      "lastPropertyId": "6:7281112080798607170",
+      "lastPropertyId": "8:6739210181211194073",
       "name": "Vehicle",
       "properties": [
         {
@@ -668,133 +704,16 @@
           "id": "6:7281112080798607170",
           "name": "UpdatedAt",
           "type": 10
-        }
-      ]
-    },
-    {
-      "id": "12:934482826225446963",
-      "lastPropertyId": "18:1889231728560269932",
-      "name": "ConsignmentNoteInExport",
-      "properties": [
-        {
-          "id": "1:2420795784119769358",
-          "name": "document_Id",
-          "type": 6,
-          "flags": 1
         },
         {
-          "id": "2:724115152975813365",
-          "name": "document_ExtId",
-          "indexId": "31:3081901199680037725",
-          "type": 9,
-          "flags": 2080
+          "id": "7:5026788527388023970",
+          "name": "MaxWeight",
+          "type": 7
         },
         {
-          "id": "3:3667975431755800659",
-          "name": "document_AppId",
-          "indexId": "32:2174578005547960443",
-          "type": 9,
-          "flags": 2080
-        },
-        {
-          "id": "4:764468959555945948",
-          "name": "document_Number",
+          "id": "8:6739210181211194073",
+          "name": "PhotoPath",
           "type": 9
-        },
-        {
-          "id": "5:80219014777230864",
-          "name": "document_HarvestType",
-          "indexId": "33:5466606402988476659",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "HarvestType"
-        },
-        {
-          "id": "6:4539185226458782123",
-          "name": "document_Vehicle",
-          "indexId": "34:9051091469624359279",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Vehicle"
-        },
-        {
-          "id": "7:7022981452506921744",
-          "name": "document_Driver",
-          "indexId": "35:6334620045348154009",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Person"
-        },
-        {
-          "id": "8:1033880861332949164",
-          "name": "document_Recipient",
-          "indexId": "36:2265646705671422312",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Storage"
-        },
-        {
-          "id": "9:6109048959092040098",
-          "name": "document_Sender",
-          "indexId": "37:6128774977113775311",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Storage"
-        },
-        {
-          "id": "10:2930159870264585794",
-          "name": "document_AppUser",
-          "indexId": "38:7156736318521247646",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "AppUser"
-        },
-        {
-          "id": "11:4171079243365597252",
-          "name": "document_Gross",
-          "type": 8
-        },
-        {
-          "id": "12:6141572571462227605",
-          "name": "document_Tare",
-          "type": 8
-        },
-        {
-          "id": "13:1464137919603915888",
-          "name": "document_Net",
-          "type": 8
-        },
-        {
-          "id": "14:6639569708666128940",
-          "name": "document_Humidity",
-          "type": 8
-        },
-        {
-          "id": "15:3745211061716169811",
-          "name": "document_Weediness",
-          "type": 8
-        },
-        {
-          "id": "16:6879855998827382225",
-          "name": "document_IsDeleted",
-          "type": 1
-        },
-        {
-          "id": "17:2387939850651566025",
-          "name": "document_ChangedByApp",
-          "type": 1
-        },
-        {
-          "id": "18:1889231728560269932",
-          "name": "document_ChangedByAcc",
-          "type": 1
-        }
-      ],
-      "relations": [
-        {
-          "id": "2:1629334969059597573",
-          "name": "TableGoods",
-          "targetId": "4:8444046993855405783"
         }
       ]
     },
@@ -847,44 +766,6 @@
       ]
     },
     {
-      "id": "14:285776978365605757",
-      "lastPropertyId": "6:3838475501610101486",
-      "name": "HarvestStatus",
-      "properties": [
-        {
-          "id": "1:4318397452005947916",
-          "name": "Id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:8717415849983302533",
-          "name": "ExtId",
-          "type": 9
-        },
-        {
-          "id": "3:7563004206913572071",
-          "name": "Name",
-          "type": 9
-        },
-        {
-          "id": "4:5543088510717126543",
-          "name": "IsDeleted",
-          "type": 1
-        },
-        {
-          "id": "5:5586994938517538136",
-          "name": "CreatedAt",
-          "type": 10
-        },
-        {
-          "id": "6:3838475501610101486",
-          "name": "UpdatedAt",
-          "type": 10
-        }
-      ]
-    },
-    {
       "id": "15:1595499329022426042",
       "lastPropertyId": "6:2502464712672005609",
       "name": "Locality",
@@ -921,11 +802,54 @@
           "type": 10
         }
       ]
+    },
+    {
+      "id": "16:602108393020751439",
+      "lastPropertyId": "7:5773654480249983142",
+      "name": "ServiceWorker",
+      "properties": [
+        {
+          "id": "1:7331691873490605167",
+          "name": "Id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7695352268246587039",
+          "name": "ExtId",
+          "type": 9
+        },
+        {
+          "id": "3:1893548107152200160",
+          "name": "Name",
+          "type": 9
+        },
+        {
+          "id": "4:3884436839836727570",
+          "name": "NfcId",
+          "type": 9
+        },
+        {
+          "id": "5:4815040914526060082",
+          "name": "IsDeleted",
+          "type": 1
+        },
+        {
+          "id": "6:7730011172501733841",
+          "name": "CreatedAt",
+          "type": 10
+        },
+        {
+          "id": "7:5773654480249983142",
+          "name": "UpdatedAt",
+          "type": 10
+        }
+      ]
     }
   ],
-  "lastEntityId": "15:1595499329022426042",
-  "lastIndexId": "40:6925959717295263574",
-  "lastRelationId": "2:1629334969059597573",
+  "lastEntityId": "16:602108393020751439",
+  "lastIndexId": "43:2175209146638276724",
+  "lastRelationId": "",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
@@ -943,7 +867,8 @@
     7404961686637105834,
     4129891640972407455,
     316337868423412833,
-    5316614334196485573
+    5316614334196485573,
+    2579239408896235758
   ],
   "retiredPropertyUids": [
     8494658191607713675,
@@ -1059,7 +984,8 @@
     1749818491695084734,
     5596784390887832759,
     5997134771254352687,
-    4458910067834704373
+    4458910067834704373,
+    6637254081577110712
   ],
   "retiredRelationUids": [
     7352375471897382812

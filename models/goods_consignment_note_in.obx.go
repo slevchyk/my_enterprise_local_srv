@@ -36,6 +36,7 @@ var GoodsConsignmentNoteIn_ = struct {
 	Unit              *objectbox.RelationToOne
 	ConsignmentNoteIn *objectbox.RelationToOne
 	AppId             *objectbox.PropertyString
+	Locality          *objectbox.RelationToOne
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -114,6 +115,13 @@ var GoodsConsignmentNoteIn_ = struct {
 			Entity: &GoodsConsignmentNoteInBinding.Entity,
 		},
 	},
+	Locality: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     70,
+			Entity: &GoodsConsignmentNoteInBinding.Entity,
+		},
+		Target: &LocalityBinding.Entity,
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -151,7 +159,10 @@ func (goodsConsignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("AppId", 9, 69, 6763306841751096049)
 	model.PropertyFlags(2080)
 	model.PropertyIndex(30, 3500087503737737130)
-	model.EntityLastPropertyId(69, 6763306841751096049)
+	model.Property("Locality", 11, 70, 7898631285694533807)
+	model.PropertyFlags(520)
+	model.PropertyRelation("Locality", 42, 6729944132186829092)
+	model.EntityLastPropertyId(70, 7898631285694533807)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -173,6 +184,16 @@ func (goodsConsignmentNoteIn_EntityInfo) PutRelated(ob *objectbox.ObjectBox, obj
 		} else if rId == 0 {
 			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
 			if _, err := BoxForConsignmentNoteIn(ob).Put(rel); err != nil {
+				return err
+			}
+		}
+	}
+	if rel := object.(*GoodsConsignmentNoteIn).Locality; rel != nil {
+		if rId, err := LocalityBinding.GetId(rel); err != nil {
+			return err
+		} else if rId == 0 {
+			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
+			if _, err := BoxForLocality(ob).Put(rel); err != nil {
 				return err
 			}
 		}
@@ -253,6 +274,15 @@ func (goodsConsignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbu
 		}
 	}
 
+	var rIdLocality uint64
+	if rel := obj.Locality; rel != nil {
+		if rId, err := LocalityBinding.GetId(rel); err != nil {
+			return err
+		} else {
+			rIdLocality = rId
+		}
+	}
+
 	var rIdSubdivision uint64
 	if rel := obj.Subdivision; rel != nil {
 		if rId, err := SubdivisionBinding.GetId(rel); err != nil {
@@ -290,12 +320,15 @@ func (goodsConsignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbu
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(69)
+	fbb.StartObject(70)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 68, offsetAppId)
 	if obj.ConsignmentNoteIn != nil {
 		fbutils.SetUint64Slot(fbb, 67, rIdConsignmentNoteIn)
+	}
+	if obj.Locality != nil {
+		fbutils.SetUint64Slot(fbb, 69, rIdLocality)
 	}
 	if obj.Subdivision != nil {
 		fbutils.SetUint64Slot(fbb, 63, rIdSubdivision)
@@ -348,6 +381,15 @@ func (goodsConsignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []b
 		}
 	}
 
+	var relLocality *Locality
+	if rId := fbutils.GetUint64PtrSlot(table, 142); rId != nil && *rId > 0 {
+		if rObject, err := BoxForLocality(ob).Get(*rId); err != nil {
+			return nil, err
+		} else {
+			relLocality = rObject
+		}
+	}
+
 	var relSubdivision *Subdivision
 	if rId := fbutils.GetUint64PtrSlot(table, 130); rId != nil && *rId > 0 {
 		if rObject, err := BoxForSubdivision(ob).Get(*rId); err != nil {
@@ -389,6 +431,7 @@ func (goodsConsignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []b
 		ExtId:             fbutils.GetStringSlot(table, 6),
 		AppId:             fbutils.GetStringSlot(table, 140),
 		ConsignmentNoteIn: relConsignmentNoteIn,
+		Locality:          relLocality,
 		Subdivision:       relSubdivision,
 		GoodsGroup:        relGoodsGroup,
 		Goods:             relGoods,

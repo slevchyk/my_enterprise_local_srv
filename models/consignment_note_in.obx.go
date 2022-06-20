@@ -32,7 +32,6 @@ var ConsignmentNoteIn_ = struct {
 	IsDeleted     *objectbox.PropertyBool
 	CreatedAt     *objectbox.PropertyInt64
 	UpdatedAt     *objectbox.PropertyInt64
-	Driver        *objectbox.RelationToOne
 	Recipient     *objectbox.RelationToOne
 	Sender        *objectbox.RelationToOne
 	HarvestType   *objectbox.RelationToOne
@@ -49,6 +48,10 @@ var ConsignmentNoteIn_ = struct {
 	OperationId   *objectbox.PropertyInt
 	ExtNumber     *objectbox.PropertyString
 	Manager       *objectbox.RelationToOne
+	StatusId      *objectbox.PropertyInt
+	Trailer       *objectbox.RelationToOne
+	Comment       *objectbox.PropertyString
+	Driver        *objectbox.RelationToOne
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -97,13 +100,6 @@ var ConsignmentNoteIn_ = struct {
 			Id:     37,
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
-	},
-	Driver: &objectbox.RelationToOne{
-		Property: &objectbox.BaseProperty{
-			Id:     45,
-			Entity: &ConsignmentNoteInBinding.Entity,
-		},
-		Target: &PersonBinding.Entity,
 	},
 	Recipient: &objectbox.RelationToOne{
 		Property: &objectbox.BaseProperty{
@@ -207,6 +203,32 @@ var ConsignmentNoteIn_ = struct {
 		},
 		Target: &AppUserBinding.Entity,
 	},
+	StatusId: &objectbox.PropertyInt{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     72,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Trailer: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     73,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+		Target: &TrailerBinding.Entity,
+	},
+	Comment: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     74,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Driver: &objectbox.RelationToOne{
+		Property: &objectbox.BaseProperty{
+			Id:     75,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+		Target: &ServiceWorkerBinding.Entity,
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -228,9 +250,6 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 35, 638093717419802601)
 	model.Property("CreatedAt", 10, 36, 8899633992386505214)
 	model.Property("UpdatedAt", 10, 37, 8437818475573608947)
-	model.Property("Driver", 11, 45, 6637254081577110712)
-	model.PropertyFlags(520)
-	model.PropertyRelation("Person", 5, 2579239408896235758)
 	model.Property("Recipient", 11, 46, 1634970022263309275)
 	model.PropertyFlags(520)
 	model.PropertyRelation("Storage", 6, 2583116323191521888)
@@ -261,7 +280,15 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Manager", 11, 71, 3219645736053079691)
 	model.PropertyFlags(520)
 	model.PropertyRelation("AppUser", 39, 7088705508277379986)
-	model.EntityLastPropertyId(71, 3219645736053079691)
+	model.Property("StatusId", 6, 72, 9193349120053975423)
+	model.Property("Trailer", 11, 73, 6433115845668663641)
+	model.PropertyFlags(520)
+	model.PropertyRelation("Trailer", 41, 1905530829399511176)
+	model.Property("Comment", 9, 74, 4525146217534664158)
+	model.Property("Driver", 11, 75, 275258255946157640)
+	model.PropertyFlags(520)
+	model.PropertyRelation("ServiceWorker", 43, 2175209146638276724)
+	model.EntityLastPropertyId(75, 275258255946157640)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -297,12 +324,22 @@ func (consignmentNoteIn_EntityInfo) PutRelated(ob *objectbox.ObjectBox, object i
 			}
 		}
 	}
-	if rel := object.(*ConsignmentNoteIn).Driver; rel != nil {
-		if rId, err := PersonBinding.GetId(rel); err != nil {
+	if rel := object.(*ConsignmentNoteIn).Trailer; rel != nil {
+		if rId, err := TrailerBinding.GetId(rel); err != nil {
 			return err
 		} else if rId == 0 {
 			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
-			if _, err := BoxForPerson(ob).Put(rel); err != nil {
+			if _, err := BoxForTrailer(ob).Put(rel); err != nil {
+				return err
+			}
+		}
+	}
+	if rel := object.(*ConsignmentNoteIn).Driver; rel != nil {
+		if rId, err := ServiceWorkerBinding.GetId(rel); err != nil {
+			return err
+		} else if rId == 0 {
+			// NOTE Put/PutAsync() has a side-effect of setting the rel.ID
+			if _, err := BoxForServiceWorker(ob).Put(rel); err != nil {
 				return err
 			}
 		}
@@ -393,6 +430,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	var offsetNumber = fbutils.CreateStringOffset(fbb, obj.Number)
 	var offsetAppId = fbutils.CreateStringOffset(fbb, obj.AppId)
 	var offsetExtNumber = fbutils.CreateStringOffset(fbb, obj.ExtNumber)
+	var offsetComment = fbutils.CreateStringOffset(fbb, obj.Comment)
 
 	var rIdHarvestType uint64
 	if rel := obj.HarvestType; rel != nil {
@@ -412,9 +450,18 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 		}
 	}
 
+	var rIdTrailer uint64
+	if rel := obj.Trailer; rel != nil {
+		if rId, err := TrailerBinding.GetId(rel); err != nil {
+			return err
+		} else {
+			rIdTrailer = rId
+		}
+	}
+
 	var rIdDriver uint64
 	if rel := obj.Driver; rel != nil {
-		if rId, err := PersonBinding.GetId(rel); err != nil {
+		if rId, err := ServiceWorkerBinding.GetId(rel); err != nil {
 			return err
 		} else {
 			rIdDriver = rId
@@ -458,13 +505,14 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(71)
+	fbb.StartObject(75)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
 	fbutils.SetInt64Slot(fbb, 3, propDate)
 	fbutils.SetUOffsetTSlot(fbb, 4, offsetNumber)
 	fbutils.SetInt64Slot(fbb, 68, int64(obj.OperationId))
+	fbutils.SetInt64Slot(fbb, 71, int64(obj.StatusId))
 	fbutils.SetUOffsetTSlot(fbb, 69, offsetExtNumber)
 	if obj.HarvestType != nil {
 		fbutils.SetUint64Slot(fbb, 57, rIdHarvestType)
@@ -472,9 +520,12 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	if obj.Vehicle != nil {
 		fbutils.SetUint64Slot(fbb, 58, rIdVehicle)
 	}
+	if obj.Trailer != nil {
+		fbutils.SetUint64Slot(fbb, 72, rIdTrailer)
+	}
 	fbutils.SetInt64Slot(fbb, 13, propDepartureDate)
 	if obj.Driver != nil {
-		fbutils.SetUint64Slot(fbb, 44, rIdDriver)
+		fbutils.SetUint64Slot(fbb, 74, rIdDriver)
 	}
 	if obj.Recipient != nil {
 		fbutils.SetUint64Slot(fbb, 45, rIdRecipient)
@@ -488,6 +539,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	if obj.AppUser != nil {
 		fbutils.SetUint64Slot(fbb, 65, rIdAppUser)
 	}
+	fbutils.SetUOffsetTSlot(fbb, 73, offsetComment)
 	fbutils.SetFloat64Slot(fbb, 60, obj.Gross)
 	fbutils.SetFloat64Slot(fbb, 61, obj.Tare)
 	fbutils.SetFloat64Slot(fbb, 62, obj.Net)
@@ -552,9 +604,18 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		}
 	}
 
-	var relDriver *Person
-	if rId := fbutils.GetUint64PtrSlot(table, 92); rId != nil && *rId > 0 {
-		if rObject, err := BoxForPerson(ob).Get(*rId); err != nil {
+	var relTrailer *Trailer
+	if rId := fbutils.GetUint64PtrSlot(table, 148); rId != nil && *rId > 0 {
+		if rObject, err := BoxForTrailer(ob).Get(*rId); err != nil {
+			return nil, err
+		} else {
+			relTrailer = rObject
+		}
+	}
+
+	var relDriver *ServiceWorker
+	if rId := fbutils.GetUint64PtrSlot(table, 152); rId != nil && *rId > 0 {
+		if rObject, err := BoxForServiceWorker(ob).Get(*rId); err != nil {
 			return nil, err
 		} else {
 			relDriver = rObject
@@ -604,15 +665,18 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		Date:          propDate,
 		Number:        fbutils.GetStringSlot(table, 12),
 		OperationId:   fbutils.GetIntSlot(table, 140),
+		StatusId:      fbutils.GetIntSlot(table, 146),
 		ExtNumber:     fbutils.GetStringSlot(table, 142),
 		HarvestType:   relHarvestType,
 		Vehicle:       relVehicle,
+		Trailer:       relTrailer,
 		DepartureDate: propDepartureDate,
 		Driver:        relDriver,
 		Recipient:     relRecipient,
 		Manager:       relManager,
 		Sender:        relSender,
 		AppUser:       relAppUser,
+		Comment:       fbutils.GetStringSlot(table, 150),
 		Gross:         fbutils.GetFloat64Slot(table, 124),
 		Tare:          fbutils.GetFloat64Slot(table, 126),
 		Net:           fbutils.GetFloat64Slot(table, 128),

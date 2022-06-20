@@ -162,10 +162,10 @@ func (goods_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, id
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
+	fbutils.SetBoolSlot(fbb, 7, obj.IsDeleted)
 	if obj.Unit != nil {
 		fbutils.SetUint64Slot(fbb, 14, rIdUnit)
 	}
-	fbutils.SetBoolSlot(fbb, 7, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 8, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 9, propUpdatedAt)
 	return nil
@@ -207,8 +207,8 @@ func (goods_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface{}
 		Id:        propId,
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
-		Unit:      relUnit,
 		IsDeleted: fbutils.GetBoolSlot(table, 18),
+		Unit:      relUnit,
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,
 	}, nil

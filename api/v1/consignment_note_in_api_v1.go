@@ -581,28 +581,6 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		isDataError = true
 	}
 
-	var harvestStatus *models.HarvestStatus
-	if cnii.HarvestStatusId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "HarvestStatus",
-			Action:   "checking data",
-			Message:  "ext id isn't specified",
-		})
-
-		isDataError = true
-	} else {
-		harvestStatus, sm = dao.GetHarvestStatusByExtId(obx, cnii.HarvestStatusId)
-		if harvestStatus == nil {
-			sm.DataType = "HarvestStatus"
-			sm.DataId = cnii.HarvestStatusId
-			sm.Action = "db select by ext id"
-			sm.Message = "not found"
-			pd.Messages = append(pd.Messages, sm)
-
-			isDataError = true
-		}
-	}
-
 	var harvestType *models.HarvestType
 	if cnii.HarvestTypeId == "" {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -679,7 +657,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		isDataError = true
 	}
 
-	var driver *models.Person
+	var driver *models.ServiceWorker
 	if cnii.DriverId == "" {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
 			DataType: "Person",
@@ -689,7 +667,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 		isDataError = true
 	} else {
-		driver, sm = dao.GetPersonByExtId(obx, cnii.DriverId)
+		driver, sm = dao.GetServiceWorkerByExtId(obx, cnii.DriverId)
 		if driver == nil {
 			sm.DataType = "Driver"
 			sm.DataId = cnii.DriverId
@@ -985,8 +963,8 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		Date:          date,
 		Number:        cnii.Number,
 		OperationId:   cnii.OperationId,
+		StatusId:      cnii.StatusId,
 		ExtNumber:     cnii.ExtNumber,
-		HarvestStatus: harvestStatus,
 		HarvestType:   harvestType,
 		Vehicle:       vehicle,
 		Trailer:       trailer,
@@ -996,6 +974,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		Manager:       manager,
 		Sender:        sender,
 		AppUser:       appUser,
+		Comment:       cnii.Comment,
 		Gross:         cnii.Gross,
 		Tare:          cnii.Tare,
 		Net:           cnii.Net,

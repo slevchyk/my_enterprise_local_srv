@@ -126,12 +126,12 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/v1/harvesttype", harvestTypeHandler)
 	http.HandleFunc("/api/v1/storage", storageHandler)
 	http.HandleFunc("/api/v1/person", personHandler)
+	http.HandleFunc("/api/v1/serviceworker", serviceWorkerHandler)
 	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
 	http.HandleFunc("/api/v1/locality", localityHandler)
 	http.HandleFunc("/api/v1/unit", unitHandler)
 	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
 	http.HandleFunc("/api/v1/trailer", trailerHandler)
-	http.HandleFunc("/api/v1/harveststatus", harvestStatusHandler)
 	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
 
 	//app
@@ -291,6 +291,20 @@ func personHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func serviceWorkerHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.ServiceWorkerPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.ServiceWorkerGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
 func subdivisionHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
@@ -354,20 +368,6 @@ func trailerHandler(w http.ResponseWriter, r *http.Request) {
 		api.TrailerPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.TrailerGet(w, r)
-	} else {
-		http.Error(w, "method not specified", http.StatusBadRequest)
-	}
-
-}
-
-func harvestStatusHandler(w http.ResponseWriter, r *http.Request) {
-
-	api := api.NewApiV1(obx)
-
-	if r.Method == http.MethodPost {
-		api.HarvestStatusPost(w, r)
-	} else if r.Method == http.MethodGet {
-		api.HarvestStatusGet(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}

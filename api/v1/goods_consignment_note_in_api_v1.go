@@ -89,6 +89,15 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			consignmentNoteInId = uint64(consignmentNoteInIdFloat64)
 		}
 
+		localityId, ok := v["locality_id"].(string)
+		if !ok || localityId == "" {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "locality_id: incorrect type or empty",
+			})
+			isJsonError = true
+		}
+
 		subdivisionId, ok := v["subdivision_id"].(string)
 		if !ok || subdivisionId == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -193,6 +202,12 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			isDataError = true
 		}
 
+		locality, sm := dao.GetLocalityByExtId(apiV1.obx, localityId)
+		if locality == nil {
+			pd.Messages = append(pd.Messages, sm)
+			isDataError = true
+		}
+
 		subdivision, sm := dao.GetSubdivisionByExtId(apiV1.obx, subdivisionId)
 		if subdivision == nil {
 			pd.Messages = append(pd.Messages, sm)
@@ -244,6 +259,7 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			ExtId:             extId,
 			AppId:             appId,
 			ConsignmentNoteIn: consignmentNoteIn,
+			Locality:          locality,
 			Subdivision:       subdivision,
 			GoodsGroup:        goodsGroup,
 			Goods:             goods,

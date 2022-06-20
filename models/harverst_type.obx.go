@@ -30,6 +30,7 @@ var HarvestType_ = struct {
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
+	Year      *objectbox.PropertyInt
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -67,6 +68,12 @@ var HarvestType_ = struct {
 			Entity: &HarvestTypeBinding.Entity,
 		},
 	},
+	Year: &objectbox.PropertyInt{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     7,
+			Entity: &HarvestTypeBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -84,7 +91,8 @@ func (harvestType_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 4, 7809446098984603525)
 	model.Property("CreatedAt", 10, 5, 5210310893644494224)
 	model.Property("UpdatedAt", 10, 6, 4233746714675610160)
-	model.EntityLastPropertyId(6, 4233746714675610160)
+	model.Property("Year", 6, 7, 3612702368769711068)
+	model.EntityLastPropertyId(7, 3612702368769711068)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -128,10 +136,11 @@ func (harvestType_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Build
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 
 	// build the FlatBuffers object
-	fbb.StartObject(6)
+	fbb.StartObject(7)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
+	fbutils.SetInt64Slot(fbb, 6, int64(obj.Year))
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
@@ -165,6 +174,7 @@ func (harvestType_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (inter
 		Id:        propId,
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
+		Year:      fbutils.GetIntSlot(table, 16),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,

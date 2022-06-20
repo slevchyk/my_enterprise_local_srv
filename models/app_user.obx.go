@@ -43,6 +43,7 @@ var AppUser_ = struct {
 	IsAdministrator     *objectbox.PropertyBool
 	IsDictionaries      *objectbox.PropertyBool
 	TokenExpirationDate *objectbox.PropertyInt64
+	PhotoPath           *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -158,6 +159,12 @@ var AppUser_ = struct {
 			Entity: &AppUserBinding.Entity,
 		},
 	},
+	PhotoPath: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     22,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -188,7 +195,8 @@ func (appUser_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsAdministrator", 1, 19, 3797028530307446237)
 	model.Property("IsDictionaries", 1, 20, 6894104621440000829)
 	model.Property("TokenExpirationDate", 10, 21, 6565581724974588785)
-	model.EntityLastPropertyId(21, 6565581724974588785)
+	model.Property("PhotoPath", 9, 22, 2572403520298632668)
+	model.EntityLastPropertyId(22, 2572403520298632668)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -244,9 +252,10 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetPhone = fbutils.CreateStringOffset(fbb, obj.Phone)
 	var offsetToken = fbutils.CreateStringOffset(fbb, obj.Token)
 	var offsetPassword = fbutils.CreateStringOffset(fbb, obj.Password)
+	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
 
 	// build the FlatBuffers object
-	fbb.StartObject(21)
+	fbb.StartObject(22)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 6, offsetFirstName)
@@ -254,6 +263,7 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	fbutils.SetUOffsetTSlot(fbb, 8, offsetEmail)
 	fbutils.SetUOffsetTSlot(fbb, 9, offsetPhone)
 	fbutils.SetUOffsetTSlot(fbb, 17, offsetPassword)
+	fbutils.SetUOffsetTSlot(fbb, 21, offsetPhotoPath)
 	fbutils.SetUOffsetTSlot(fbb, 10, offsetToken)
 	fbutils.SetInt64Slot(fbb, 20, propTokenExpirationDate)
 	fbutils.SetBoolSlot(fbb, 18, obj.IsAdministrator)
@@ -305,6 +315,7 @@ func (appUser_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		Email:               fbutils.GetStringSlot(table, 20),
 		Phone:               fbutils.GetStringSlot(table, 22),
 		Password:            fbutils.GetStringSlot(table, 38),
+		PhotoPath:           fbutils.GetStringSlot(table, 46),
 		Token:               fbutils.GetStringSlot(table, 24),
 		TokenExpirationDate: propTokenExpirationDate,
 		IsAdministrator:     fbutils.GetBoolSlot(table, 40),
