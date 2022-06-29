@@ -559,7 +559,7 @@ func (api *ApiV1) ConsignmentNoteInDelete(w http.ResponseWriter, r *http.Request
 
 }
 
-func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
+func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool, check bool) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
 
 	var pd models.ServerProcessedData
 	var sm models.ServerMessage
@@ -583,13 +583,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var harvestType *models.HarvestType
 	if cnii.HarvestTypeId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "HarvestType",
-			Action:   "checking data",
-			Message:  "ext id isn't specified",
-		})
+		if check {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "HarvestType",
+				Action:   "checking data",
+				Message:  "ext id isn't specified",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	} else {
 		harvestType, sm = dao.GetHarvestTypeByExtId(obx, cnii.HarvestTypeId)
 		if harvestType == nil {
@@ -627,13 +629,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var trailer *models.Trailer
 	if cnii.TrailerId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "Trailer",
-			Action:   "checking data",
-			Message:  "ext id isn't specified",
-		})
+		if check {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "Trailer",
+				Action:   "checking data",
+				Message:  "ext id isn't specified",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	} else {
 		trailer, sm = dao.GetTrailerByExtId(obx, cnii.VehicleId)
 		if trailer == nil {
@@ -681,13 +685,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var recipient *models.Storage
 	if cnii.RecipientId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "Storage",
-			Action:   "checking data Recipient",
-			Message:  "ext id isn't specified",
-		})
+		if check {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "Storage",
+				Action:   "checking data Recipient",
+				Message:  "ext id isn't specified",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	} else {
 		recipient, sm = dao.GetStorageByExtId(obx, cnii.RecipientId)
 		if recipient == nil {
@@ -705,13 +711,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	var manager *models.AppUser
 	if cnii.OperationId == 0 {
 		if cnii.ManagerId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "AppUser",
-				Action:   "checking data Manager",
-				Message:  "ext id isn't specified",
-			})
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "AppUser",
+					Action:   "checking data Manager",
+					Message:  "ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		} else {
 			manager, sm = dao.GetAppUserByExtId(obx, cnii.ManagerId)
 			if manager == nil {
@@ -726,13 +734,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 	} else {
 		if cnii.SenderId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Storage",
-				Action:   "checking data Sender",
-				Message:  "ext id isn't specified",
-			})
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "Storage",
+					Action:   "checking data Sender",
+					Message:  "ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		} else {
 			sender, sm = dao.GetStorageByExtId(obx, cnii.SenderId)
 			if sender == nil {
@@ -825,13 +835,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 		var rowSubdivision *models.Subdivision
 		if gcnii.SubdivisionId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Subdivision",
-				Action:   "checking data Recipient",
-				Message:  "ext id isn't specified",
-			})
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "Subdivision",
+					Action:   "checking data Recipient",
+					Message:  "ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		} else {
 			rowSubdivision, sm = dao.GetSubdivisionByExtId(obx, gcnii.SubdivisionId)
 			if recipient == nil {
@@ -846,36 +858,38 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 
 		var rowGoodsGroup *models.GoodsGroup
-		if gcnii.GoodsGroupId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "GoodsGroup",
-				Action:   "checking data Recipient",
-				Message:  "ext id isn't specified",
-			})
+		// if gcnii.GoodsGroupId == "" {
+		// 	pd.Messages = append(pd.Messages, models.ServerMessage{
+		// 		DataType: "GoodsGroup",
+		// 		Action:   "checking data Recipient",
+		// 		Message:  "ext id isn't specified",
+		// 	})
 
-			isDataError = true
-		} else {
-			rowGoodsGroup, sm = dao.GetGoodsGroupByExtId(obx, gcnii.GoodsGroupId)
-			if recipient == nil {
-				sm.DataType = "GoodsGroup"
-				sm.DataId = gcnii.GoodsGroupId
-				sm.Action = "db select by ext id"
-				sm.Message = "not found"
-				pd.Messages = append(pd.Messages, sm)
+		// 	isDataError = true
+		// } else {
+		// 	rowGoodsGroup, sm = dao.GetGoodsGroupByExtId(obx, gcnii.GoodsGroupId)
+		// 	if recipient == nil {
+		// 		sm.DataType = "GoodsGroup"
+		// 		sm.DataId = gcnii.GoodsGroupId
+		// 		sm.Action = "db select by ext id"
+		// 		sm.Message = "not found"
+		// 		pd.Messages = append(pd.Messages, sm)
 
-				isDataError = true
-			}
-		}
+		// 		isDataError = true
+		// 	}
+		// }
 
 		var rowGoods *models.Goods
 		if gcnii.GoodsId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Goods",
-				Action:   "checking data Recipient",
-				Message:  "ext id isn't specified",
-			})
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "Goods",
+					Action:   "checking data Recipient",
+					Message:  "ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		} else {
 			rowGoods, sm = dao.GetGoodsByExtId(obx, gcnii.GoodsId)
 			if recipient == nil {
@@ -891,13 +905,15 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 		var rowUnit *models.Unit
 		if gcnii.UnitId == "" {
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataType: "Unit",
-				Action:   "checking data Recipient",
-				Message:  "ext id isn't specified",
-			})
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "Unit",
+					Action:   "checking data Recipient",
+					Message:  "ext id isn't specified",
+				})
 
-			isDataError = true
+				isDataError = true
+			}
 		} else {
 			rowUnit, sm = dao.GetUnitByExtId(obx, gcnii.UnitId)
 			if recipient == nil {
@@ -1220,7 +1236,7 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 
 	box := models.BoxForConsignmentNoteIn(obx)
 
-	cni, gcnis, pd := parseConsignmentNoteIn(obx, cnii, isAcc)
+	cni, gcnis, pd := parseConsignmentNoteIn(obx, cnii, isAcc, false)
 	cni.ChangedByApp = true
 
 	if pd.Status != http.StatusOK {

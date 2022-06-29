@@ -21,6 +21,7 @@ type AppUser struct {
 	Token               string    `json:"token"`
 	TokenExpirationDate time.Time `json:"-"`
 	IsAdministrator     bool      `json:"is_administrator"`
+	IsManualSelecting   bool      `json:"is_manual_selecting"`
 	IsBlocked           bool      `json:"is_blocked"`
 	IsFarm              bool      `json:"is_farm"`
 	IsGasStation        bool      `json:"is_gas_station"`

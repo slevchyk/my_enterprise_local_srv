@@ -11,6 +11,7 @@ type Trailer struct {
 	IsDeleted bool      `json:"is_deleted"`
 	MaxWeight float32   `json:"max_weight"`
 	PhotoPath string    `json:"photo_path"`
+	NfcId     string    `json:"nfc_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

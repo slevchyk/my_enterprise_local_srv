@@ -32,6 +32,7 @@ var Trailer_ = struct {
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
 	PhotoPath *objectbox.PropertyString
+	NfcId     *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -81,6 +82,12 @@ var Trailer_ = struct {
 			Entity: &TrailerBinding.Entity,
 		},
 	},
+	NfcId: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     10,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -100,7 +107,8 @@ func (trailer_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("CreatedAt", 10, 7, 889475617324735826)
 	model.Property("UpdatedAt", 10, 8, 4577958236363959362)
 	model.Property("PhotoPath", 9, 9, 9185563778196944025)
-	model.EntityLastPropertyId(9, 9185563778196944025)
+	model.Property("NfcId", 9, 10, 1769365845039478676)
+	model.EntityLastPropertyId(10, 1769365845039478676)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -143,15 +151,17 @@ func (trailer_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
+	var offsetNfcId = fbutils.CreateStringOffset(fbb, obj.NfcId)
 
 	// build the FlatBuffers object
-	fbb.StartObject(9)
+	fbb.StartObject(10)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
 	fbutils.SetFloat32Slot(fbb, 4, obj.MaxWeight)
 	fbutils.SetUOffsetTSlot(fbb, 8, offsetPhotoPath)
+	fbutils.SetUOffsetTSlot(fbb, 9, offsetNfcId)
 	fbutils.SetInt64Slot(fbb, 6, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 7, propUpdatedAt)
 	return nil
@@ -187,6 +197,7 @@ func (trailer_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
 		MaxWeight: fbutils.GetFloat32Slot(table, 12),
 		PhotoPath: fbutils.GetStringSlot(table, 20),
+		NfcId:     fbutils.GetStringSlot(table, 22),
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,
 	}, nil

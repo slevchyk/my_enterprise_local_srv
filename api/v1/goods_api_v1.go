@@ -176,8 +176,8 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 		} else {
 			pd.Status = http.StatusConflict
 			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "more than 1",
-				Message: err.Error(),
+				Action:  "select by ext id",
+				Message: "more than 1",
 			})
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue
@@ -251,4 +251,10 @@ func (api *ApiV1) GoodsGet(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(bs)
+}
+
+func (api *ApiV1) GoodsDeleteAll(w http.ResponseWriter, r *http.Request) {
+	box := models.BoxForGoods(api.obx)
+	box.RemoveAll()
+	w.WriteHeader(http.StatusOK)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/google/flatbuffers/go"
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/objectbox/objectbox-go/objectbox/fbutils"
+	"github.com/slevchyk/my_enterprise_local_srv/core"
 )
 
 type vehicle_EntityInfo struct {
@@ -30,8 +31,9 @@ var Vehicle_ = struct {
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
-	MaxWeight *objectbox.PropertyFloat32
 	PhotoPath *objectbox.PropertyString
+	NfcId     *objectbox.PropertyString
+	MaxWeight *objectbox.PropertyFloat64
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -69,15 +71,21 @@ var Vehicle_ = struct {
 			Entity: &VehicleBinding.Entity,
 		},
 	},
-	MaxWeight: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     7,
-			Entity: &VehicleBinding.Entity,
-		},
-	},
 	PhotoPath: &objectbox.PropertyString{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     8,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	NfcId: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     9,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	MaxWeight: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     11,
 			Entity: &VehicleBinding.Entity,
 		},
 	},
@@ -98,9 +106,10 @@ func (vehicle_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 4, 2047802226670451377)
 	model.Property("CreatedAt", 10, 5, 8294796580298202505)
 	model.Property("UpdatedAt", 10, 6, 7281112080798607170)
-	model.Property("MaxWeight", 7, 7, 5026788527388023970)
 	model.Property("PhotoPath", 9, 8, 6739210181211194073)
-	model.EntityLastPropertyId(8, 6739210181211194073)
+	model.Property("NfcId", 9, 9, 5502794683142699154)
+	model.Property("MaxWeight", 8, 11, 1839944552499769851)
+	model.EntityLastPropertyId(11, 1839944552499769851)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -143,15 +152,17 @@ func (vehicle_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
+	var offsetNfcId = fbutils.CreateStringOffset(fbb, obj.NfcId)
 
 	// build the FlatBuffers object
-	fbb.StartObject(8)
+	fbb.StartObject(11)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
-	fbutils.SetFloat32Slot(fbb, 6, obj.MaxWeight)
+	fbutils.SetFloat64Slot(fbb, 10, float64(obj.MaxWeight))
 	fbutils.SetUOffsetTSlot(fbb, 7, offsetPhotoPath)
+	fbutils.SetUOffsetTSlot(fbb, 8, offsetNfcId)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -185,8 +196,9 @@ func (vehicle_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
-		MaxWeight: fbutils.GetFloat32Slot(table, 16),
+		MaxWeight: core.Float(fbutils.GetFloat64Slot(table, 24)),
 		PhotoPath: fbutils.GetStringSlot(table, 18),
+		NfcId:     fbutils.GetStringSlot(table, 20),
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,
 	}, nil

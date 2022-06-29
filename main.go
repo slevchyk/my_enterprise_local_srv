@@ -229,6 +229,8 @@ func goodsHandler(w http.ResponseWriter, r *http.Request) {
 		api.GoodsPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.GoodsGet(w, r)
+	} else if r.Method == http.MethodDelete {
+		api.GoodsDeleteAll(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
