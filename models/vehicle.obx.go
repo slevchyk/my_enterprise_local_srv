@@ -33,6 +33,11 @@ var Vehicle_ = struct {
 	UpdatedAt *objectbox.PropertyInt64
 	PhotoPath *objectbox.PropertyString
 	NfcId     *objectbox.PropertyString
+	Length    *objectbox.PropertyFloat64
+	Width     *objectbox.PropertyFloat64
+	Height    *objectbox.PropertyFloat64
+	MinWeight *objectbox.PropertyFloat64
+	Comment   *objectbox.PropertyString
 	MaxWeight *objectbox.PropertyFloat64
 }{
 	Id: &objectbox.PropertyUint64{
@@ -83,9 +88,39 @@ var Vehicle_ = struct {
 			Entity: &VehicleBinding.Entity,
 		},
 	},
+	Length: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     12,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	Width: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     13,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	Height: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     14,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	MinWeight: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     15,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
+	Comment: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     16,
+			Entity: &VehicleBinding.Entity,
+		},
+	},
 	MaxWeight: &objectbox.PropertyFloat64{
 		BaseProperty: &objectbox.BaseProperty{
-			Id:     11,
+			Id:     17,
 			Entity: &VehicleBinding.Entity,
 		},
 	},
@@ -108,8 +143,13 @@ func (vehicle_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("UpdatedAt", 10, 6, 7281112080798607170)
 	model.Property("PhotoPath", 9, 8, 6739210181211194073)
 	model.Property("NfcId", 9, 9, 5502794683142699154)
-	model.Property("MaxWeight", 8, 11, 1839944552499769851)
-	model.EntityLastPropertyId(11, 1839944552499769851)
+	model.Property("Length", 8, 12, 523922608250770412)
+	model.Property("Width", 8, 13, 2933999020946124024)
+	model.Property("Height", 8, 14, 15511630527782703)
+	model.Property("MinWeight", 8, 15, 6019667518297623819)
+	model.Property("Comment", 9, 16, 5714631707887049789)
+	model.Property("MaxWeight", 8, 17, 2475014504135017624)
+	model.EntityLastPropertyId(17, 2475014504135017624)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -153,14 +193,20 @@ func (vehicle_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
 	var offsetNfcId = fbutils.CreateStringOffset(fbb, obj.NfcId)
+	var offsetComment = fbutils.CreateStringOffset(fbb, obj.Comment)
 
 	// build the FlatBuffers object
-	fbb.StartObject(11)
+	fbb.StartObject(17)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
-	fbutils.SetFloat64Slot(fbb, 10, float64(obj.MaxWeight))
+	fbutils.SetFloat64Slot(fbb, 11, float64(obj.Length))
+	fbutils.SetFloat64Slot(fbb, 12, float64(obj.Width))
+	fbutils.SetFloat64Slot(fbb, 13, float64(obj.Height))
+	fbutils.SetFloat64Slot(fbb, 14, float64(obj.MinWeight))
+	fbutils.SetFloat64Slot(fbb, 16, float64(obj.MaxWeight))
+	fbutils.SetUOffsetTSlot(fbb, 15, offsetComment)
 	fbutils.SetUOffsetTSlot(fbb, 7, offsetPhotoPath)
 	fbutils.SetUOffsetTSlot(fbb, 8, offsetNfcId)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
@@ -196,7 +242,12 @@ func (vehicle_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
-		MaxWeight: core.Float(fbutils.GetFloat64Slot(table, 24)),
+		Length:    core.Float(fbutils.GetFloat64Slot(table, 26)),
+		Width:     core.Float(fbutils.GetFloat64Slot(table, 28)),
+		Height:    core.Float(fbutils.GetFloat64Slot(table, 30)),
+		MinWeight: core.Float(fbutils.GetFloat64Slot(table, 32)),
+		MaxWeight: core.Float(fbutils.GetFloat64Slot(table, 36)),
+		Comment:   fbutils.GetStringSlot(table, 34),
 		PhotoPath: fbutils.GetStringSlot(table, 18),
 		NfcId:     fbutils.GetStringSlot(table, 20),
 		CreatedAt: propCreatedAt,

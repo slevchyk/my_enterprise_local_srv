@@ -57,3 +57,13 @@ func GtAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) {
 
 	return aus[0], nil
 }
+
+type AppUserCniRecipient struct {
+	Id        uint64    `json:"srv_id" objectbox:"id"`
+	ExtId     string    `json:"ext_id" objectbox:"index, unique"`
+	AppUser   *AppUser  `json:"app_user" objectbox:"link"`
+	Recipient *Storage  `json:"recipient" objectbox:"link"`
+	IsActive  bool      `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

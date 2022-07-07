@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 //go:generate go run github.com/objectbox/objectbox-go/cmd/objectbox-gogen
 
@@ -15,7 +17,7 @@ type ConsignmentNoteIn struct {
 	ExtNumber     string         `json:"ext_number"`
 	HarvestType   *HarvestType   `json:"harvest_type" objectbox:"link"`
 	Vehicle       *Vehicle       `json:"vehicle" objectbox:"link"`
-	Trailer       *Trailer       `json:"traile" objectbox:"link"`
+	Trailer       *Trailer       `json:"trailer" objectbox:"link"`
 	DepartureDate time.Time      `json:"departure_date"`
 	Driver        *ServiceWorker `json:"driver" objectbox:"link"`
 	Recipient     *Storage       `json:"recipient" objectbox:"link"`

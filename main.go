@@ -1,18 +1,24 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/kardianos/service"
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/slevchyk/my_enterprise_local_srv/api/v1"
+	"github.com/slevchyk/my_enterprise_local_srv/core"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
 
@@ -118,33 +124,139 @@ func (as *apiServer) run() {
 	http.HandleFunc("/test", testHandler)
 	http.HandleFunc("/deleteall", deleteAllHandeler)
 
-	http.HandleFunc("/api/v1/auth", authHandler)
+	http.HandleFunc("/api/v1/auth", basicAuth(authHandler))
 
-	http.HandleFunc("/api/v1/appuser", appUserHandler)
-	http.HandleFunc("/api/v1/goods", goodsHandler)
-	http.HandleFunc("/api/v1/goodsgroup", goodsGroupHandler)
-	http.HandleFunc("/api/v1/harvesttype", harvestTypeHandler)
-	http.HandleFunc("/api/v1/storage", storageHandler)
-	http.HandleFunc("/api/v1/person", personHandler)
-	http.HandleFunc("/api/v1/serviceworker", serviceWorkerHandler)
-	http.HandleFunc("/api/v1/subdivision", subdivisionHandler)
-	http.HandleFunc("/api/v1/locality", localityHandler)
-	http.HandleFunc("/api/v1/unit", unitHandler)
-	http.HandleFunc("/api/v1/vehicle", vehicleHandler)
-	http.HandleFunc("/api/v1/trailer", trailerHandler)
-	http.HandleFunc("/api/v1/consignmentnotein", consignmentnoteinHandler)
+	http.HandleFunc("/api/v1/appuser", basicAuth(appUserHandler))
+	http.HandleFunc("/api/v1/appuser/cnirecipient", basicAuth(appUserCnirecipientHandler))
+	http.HandleFunc("/api/v1/goods", basicAuth(goodsHandler))
+	http.HandleFunc("/api/v1/goodsgroup", basicAuth(goodsGroupHandler))
+	http.HandleFunc("/api/v1/harvesttype", basicAuth(harvestTypeHandler))
+	http.HandleFunc("/api/v1/storage", basicAuth(storageHandler))
+	http.HandleFunc("/api/v1/person", basicAuth(personHandler))
+	http.HandleFunc("/api/v1/serviceworker", basicAuth(serviceWorkerHandler))
+	http.HandleFunc("/api/v1/subdivision", basicAuth(subdivisionHandler))
+	http.HandleFunc("/api/v1/locality", basicAuth(localityHandler))
+	http.HandleFunc("/api/v1/unit", basicAuth(unitHandler))
+	http.HandleFunc("/api/v1/vehicle", basicAuth(vehicleHandler))
+	http.HandleFunc("/api/v1/trailer", basicAuth(trailerHandler))
+	http.HandleFunc("/api/v1/consignmentnotein", basicAuth(consignmentnoteinHandler))
 
 	//app
-	http.HandleFunc("/api/app/v1/consignmentnotein", appConsignmentnoteinHandler)
-	http.HandleFunc("/api/app/v1/consignmentnotein/processed", appConsignmentnoteinProcessedHandler)
-	http.HandleFunc("/api/app/v1/consignmentnotein/changed", appConsignmentnoteinChangedHandler)
+	http.HandleFunc("/api/app/v1/appuser/cnirecipient", basicAuth(appUserCnirecipientHandler))
+
+	http.HandleFunc("/api/app/v1/consignmentnotein", basicAuth(appConsignmentnoteinHandler))
+	http.HandleFunc("/api/app/v1/consignmentnotein/processed", basicAuth(appConsignmentnoteinProcessedHandler))
+	http.HandleFunc("/api/app/v1/consignmentnotein/changed", basicAuth(appConsignmentnoteinChangedHandler))
 
 	port := fmt.Sprintf(":%v", cfg.ServerConfig.Port)
 	err := http.ListenAndServe(port, nil)
+	// err := http.ListenAndServeTLS(port, cfg.ServerC6nfig.TlsCert, cfg.ServerConfig.TlsKey, nil)
 	if err != nil {
 		panic(err)
 	}
 	defer obx.Close()
+}
+
+func basicAuth(pass func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+
+		if len(auth) != 2 || auth[0] != "Basic" {
+			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			return
+		}
+
+		payload, _ := base64.StdEncoding.DecodeString(auth[1])
+		pair := strings.SplitN(string(payload), ":", 2)
+
+		isMain := "false"
+
+		if len(pair) != 2 || !basicAppValidate(pair[0], pair[1]) {
+			if len(pair) != 2 || !basicAdminValidate(pair[0], pair[1]) {
+				http.Error(w, "authorization failed", http.StatusUnauthorized)
+				return
+			}
+			isMain = "true"
+		}
+
+		form, _ := url.ParseQuery(r.URL.RawQuery)
+		form.Del("is_main")
+		form.Add("is_main", isMain)
+		r.URL.RawQuery = form.Encode()
+
+		pass(w, r)
+	}
+}
+
+func basicAppValidate(username, password string) bool {
+	if username == cfg.MobileAuth.User && password == cfg.MobileAuth.Password {
+		return true
+	}
+	return false
+}
+
+func basicAdminValidate(username, password string) bool {
+	if username == cfg.MainAuth.User && password == cfg.MainAuth.Password {
+		return true
+	}
+	return false
+}
+
+func bearerAuth(pass func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+
+		if len(auth) != 2 || auth[0] != "Bearer" {
+			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			return
+		}
+
+		if !bearerValidate(auth[1], r) {
+			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			return
+		}
+
+		pass(w, r)
+	}
+}
+
+func bearerValidate(token string, r *http.Request) bool {
+
+	//формат токена не вірний
+	pair := strings.SplitN(string(token), "|", 2)
+	if len(pair) != 2 {
+		return false
+	}
+
+	hash := core.EncodeHmac("password", pair[1])
+	//підпис токена не відповідає вісту токена
+	if pair[0] != hash {
+		return false
+	}
+
+	var accessToken models.AccessToken
+
+	err := core.DecodeFromBase64(&accessToken, pair[1])
+	//структура токена пощкоджена
+	if err != nil {
+		return false
+	}
+
+	//час дії токена вийшов
+	if accessToken.ExpiresAt.Before(time.Now()) {
+		return false
+	}
+
+	form, _ := url.ParseQuery(r.URL.RawQuery)
+	form.Del("auid")
+	form.Add("auid", strconv.Itoa(int(accessToken.Id)))
+	r.URL.RawQuery = form.Encode()
+
+	return true
 }
 
 func (as *apiServer) Stop(s service.Service) error {
@@ -160,6 +272,13 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
+
+	fvIsMain := r.FormValue("is_main")
+	if fvIsMain == "false" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	BoxForAppUser := models.BoxForAppUser(obx)
 	BoxForAppUser.RemoveAll()
 
@@ -184,11 +303,17 @@ func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
 	BoxForSubdivision := models.BoxForSubdivision(obx)
 	BoxForSubdivision.RemoveAll()
 
+	BoxForLocality := models.BoxForLocality(obx)
+	BoxForLocality.RemoveAll()
+
 	BoxForUnit := models.BoxForUnit(obx)
 	BoxForUnit.RemoveAll()
 
 	BoxForVehicle := models.BoxForVehicle(obx)
 	BoxForVehicle.RemoveAll()
+
+	BoxForTrailer := models.BoxForTrailer(obx)
+	BoxForTrailer.RemoveAll()
 
 	//документи
 
@@ -212,9 +337,40 @@ func appUserHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.AppUserPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.AppUserGet(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+func appUserCnirecipientHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		api.AppUserCniRecipientPost(w, r)
+	} else if r.Method == http.MethodGet {
+		api.AppUserCniRecipientGet(w, r)
+	} else if r.Method == http.MethodDelete {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		api.AppUserCniRecipientDelete(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
@@ -226,10 +382,20 @@ func goodsHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.GoodsPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.GoodsGet(w, r)
 	} else if r.Method == http.MethodDelete {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.GoodsDeleteAll(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
@@ -242,6 +408,11 @@ func goodsGroupHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.GoodsGroupPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.GoodsGroupGet(w, r)
@@ -256,6 +427,11 @@ func harvestTypeHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.HarvestTypePost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.HarvestTypeGet(w, r)
@@ -270,6 +446,11 @@ func storageHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.StoragePost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.StorageGet(w, r)
@@ -284,6 +465,11 @@ func personHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.PersonPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.PersonGet(w, r)
@@ -298,6 +484,11 @@ func serviceWorkerHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.ServiceWorkerPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.ServiceWorkerGet(w, r)
@@ -312,6 +503,11 @@ func subdivisionHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.SubdivisionPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.SubdivisionGet(w, r)
@@ -326,6 +522,11 @@ func localityHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.LocalityPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.LocalityGet(w, r)
@@ -340,6 +541,11 @@ func unitHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.UnitPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.UnitGet(w, r)
@@ -353,6 +559,11 @@ func vehicleHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.VehiclePost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.VehicleGet(w, r)
@@ -367,6 +578,11 @@ func trailerHandler(w http.ResponseWriter, r *http.Request) {
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
+		fvIsMain := r.FormValue("is_main")
+		if fvIsMain == "false" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		api.TrailerPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.TrailerGet(w, r)
@@ -379,6 +595,12 @@ func trailerHandler(w http.ResponseWriter, r *http.Request) {
 func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
+
+	fvIsMain := r.FormValue("is_main")
+	if fvIsMain == "false" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	if r.Method == http.MethodPost {
 		api.ConsignmentNoteInPost(w, r)
@@ -395,6 +617,12 @@ func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 func appConsignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
+
+	// fvIsMain := r.FormValue("is_main")
+	// if fvIsMain == "false" {
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
 
 	if r.Method == http.MethodPost {
 		api.ConsignmentNoteInAppPost(w, r)

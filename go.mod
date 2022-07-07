@@ -7,4 +7,5 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/kardianos/service v1.2.0
 	github.com/objectbox/objectbox-go v1.4.0
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )

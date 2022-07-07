@@ -26,8 +26,9 @@ func ObjectBoxModel() *objectbox.Model {
 	model.RegisterBinding(TrailerBinding)
 	model.RegisterBinding(LocalityBinding)
 	model.RegisterBinding(ServiceWorkerBinding)
-	model.LastEntityId(16, 602108393020751439)
-	model.LastIndexId(43, 2175209146638276724)
+	model.RegisterBinding(AppUserCniRecipientBinding)
+	model.LastEntityId(17, 1720428749164872770)
+	model.LastIndexId(47, 8288459648892467887)
 
 	return model
 }

@@ -639,7 +639,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			isDataError = true
 		}
 	} else {
-		trailer, sm = dao.GetTrailerByExtId(obx, cnii.VehicleId)
+		trailer, sm = dao.GetTrailerByExtId(obx, cnii.TrailerId)
 		if trailer == nil {
 			sm.DataType = "Trailer"
 			sm.DataId = cnii.TrailerId
@@ -846,7 +846,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			}
 		} else {
 			rowSubdivision, sm = dao.GetSubdivisionByExtId(obx, gcnii.SubdivisionId)
-			if recipient == nil {
+			if rowSubdivision == nil {
 				sm.DataType = "Subdivision"
 				sm.DataId = gcnii.SubdivisionId
 				sm.Action = "db select by ext id"
@@ -868,7 +868,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		// 	isDataError = true
 		// } else {
 		// 	rowGoodsGroup, sm = dao.GetGoodsGroupByExtId(obx, gcnii.GoodsGroupId)
-		// 	if recipient == nil {
+		// 	if rowGoodsGroup == nil {
 		// 		sm.DataType = "GoodsGroup"
 		// 		sm.DataId = gcnii.GoodsGroupId
 		// 		sm.Action = "db select by ext id"
@@ -892,7 +892,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			}
 		} else {
 			rowGoods, sm = dao.GetGoodsByExtId(obx, gcnii.GoodsId)
-			if recipient == nil {
+			if rowGoods == nil {
 				sm.DataType = "Goods"
 				sm.DataId = gcnii.GoodsId
 				sm.Action = "db select by ext id"
@@ -916,7 +916,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			}
 		} else {
 			rowUnit, sm = dao.GetUnitByExtId(obx, gcnii.UnitId)
-			if recipient == nil {
+			if rowUnit == nil {
 				sm.DataType = "Unit"
 				sm.DataId = gcnii.UnitId
 				sm.Action = "db select by ext id"

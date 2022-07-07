@@ -30,6 +30,7 @@ var Storage_ = struct {
 	IsDeleted *objectbox.PropertyBool
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
+	FullName  *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -67,6 +68,12 @@ var Storage_ = struct {
 			Entity: &StorageBinding.Entity,
 		},
 	},
+	FullName: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     7,
+			Entity: &StorageBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -84,7 +91,8 @@ func (storage_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("IsDeleted", 1, 4, 5164260545655055010)
 	model.Property("CreatedAt", 10, 5, 6417364354843288764)
 	model.Property("UpdatedAt", 10, 6, 6436511152935532170)
-	model.EntityLastPropertyId(6, 6436511152935532170)
+	model.Property("FullName", 9, 7, 3228946079679440554)
+	model.EntityLastPropertyId(7, 3228946079679440554)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -126,12 +134,14 @@ func (storage_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 
 	var offsetExtId = fbutils.CreateStringOffset(fbb, obj.ExtId)
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
+	var offsetFullName = fbutils.CreateStringOffset(fbb, obj.FullName)
 
 	// build the FlatBuffers object
-	fbb.StartObject(6)
+	fbb.StartObject(7)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
+	fbutils.SetUOffsetTSlot(fbb, 6, offsetFullName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
@@ -165,6 +175,7 @@ func (storage_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		Id:        propId,
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
+		FullName:  fbutils.GetStringSlot(table, 16),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
 		CreatedAt: propCreatedAt,
 		UpdatedAt: propUpdatedAt,

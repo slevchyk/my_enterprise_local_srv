@@ -9,7 +9,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port int `json:"port"`
+	Port    int    `json:"port"`
+	TlsCert string `json:"tls_cert"`
+	TlsKey  string `json:"tls_key"`
 }
 
 type ServiceConfig struct {

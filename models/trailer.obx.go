@@ -8,6 +8,7 @@ import (
 	"github.com/google/flatbuffers/go"
 	"github.com/objectbox/objectbox-go/objectbox"
 	"github.com/objectbox/objectbox-go/objectbox/fbutils"
+	"github.com/slevchyk/my_enterprise_local_srv/core"
 )
 
 type trailer_EntityInfo struct {
@@ -28,11 +29,16 @@ var Trailer_ = struct {
 	ExtId     *objectbox.PropertyString
 	Name      *objectbox.PropertyString
 	IsDeleted *objectbox.PropertyBool
-	MaxWeight *objectbox.PropertyFloat32
 	CreatedAt *objectbox.PropertyInt64
 	UpdatedAt *objectbox.PropertyInt64
 	PhotoPath *objectbox.PropertyString
 	NfcId     *objectbox.PropertyString
+	Length    *objectbox.PropertyFloat64
+	Width     *objectbox.PropertyFloat64
+	Height    *objectbox.PropertyFloat64
+	MinWeight *objectbox.PropertyFloat64
+	Comment   *objectbox.PropertyString
+	MaxWeight *objectbox.PropertyFloat64
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -55,12 +61,6 @@ var Trailer_ = struct {
 	IsDeleted: &objectbox.PropertyBool{
 		BaseProperty: &objectbox.BaseProperty{
 			Id:     4,
-			Entity: &TrailerBinding.Entity,
-		},
-	},
-	MaxWeight: &objectbox.PropertyFloat32{
-		BaseProperty: &objectbox.BaseProperty{
-			Id:     5,
 			Entity: &TrailerBinding.Entity,
 		},
 	},
@@ -88,6 +88,42 @@ var Trailer_ = struct {
 			Entity: &TrailerBinding.Entity,
 		},
 	},
+	Length: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     11,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
+	Width: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     12,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
+	Height: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     13,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
+	MinWeight: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     14,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
+	Comment: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     15,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
+	MaxWeight: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     16,
+			Entity: &TrailerBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -103,12 +139,17 @@ func (trailer_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("ExtId", 9, 2, 3924205386727081595)
 	model.Property("Name", 9, 3, 7439380208901930246)
 	model.Property("IsDeleted", 1, 4, 1198123329569085660)
-	model.Property("MaxWeight", 7, 5, 1863085959529203247)
 	model.Property("CreatedAt", 10, 7, 889475617324735826)
 	model.Property("UpdatedAt", 10, 8, 4577958236363959362)
 	model.Property("PhotoPath", 9, 9, 9185563778196944025)
 	model.Property("NfcId", 9, 10, 1769365845039478676)
-	model.EntityLastPropertyId(10, 1769365845039478676)
+	model.Property("Length", 8, 11, 950859159545281760)
+	model.Property("Width", 8, 12, 3599388779908271401)
+	model.Property("Height", 8, 13, 584506919811690399)
+	model.Property("MinWeight", 8, 14, 7445612038046966123)
+	model.Property("Comment", 9, 15, 1302651315541893097)
+	model.Property("MaxWeight", 8, 16, 3840384290259943035)
+	model.EntityLastPropertyId(16, 3840384290259943035)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -152,14 +193,20 @@ func (trailer_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetName = fbutils.CreateStringOffset(fbb, obj.Name)
 	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
 	var offsetNfcId = fbutils.CreateStringOffset(fbb, obj.NfcId)
+	var offsetComment = fbutils.CreateStringOffset(fbb, obj.Comment)
 
 	// build the FlatBuffers object
-	fbb.StartObject(10)
+	fbb.StartObject(16)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
 	fbutils.SetBoolSlot(fbb, 3, obj.IsDeleted)
-	fbutils.SetFloat32Slot(fbb, 4, obj.MaxWeight)
+	fbutils.SetFloat64Slot(fbb, 10, float64(obj.Length))
+	fbutils.SetFloat64Slot(fbb, 11, float64(obj.Width))
+	fbutils.SetFloat64Slot(fbb, 12, float64(obj.Height))
+	fbutils.SetFloat64Slot(fbb, 13, float64(obj.MinWeight))
+	fbutils.SetFloat64Slot(fbb, 15, float64(obj.MaxWeight))
+	fbutils.SetUOffsetTSlot(fbb, 14, offsetComment)
 	fbutils.SetUOffsetTSlot(fbb, 8, offsetPhotoPath)
 	fbutils.SetUOffsetTSlot(fbb, 9, offsetNfcId)
 	fbutils.SetInt64Slot(fbb, 6, propCreatedAt)
@@ -195,7 +242,12 @@ func (trailer_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		ExtId:     fbutils.GetStringSlot(table, 6),
 		Name:      fbutils.GetStringSlot(table, 8),
 		IsDeleted: fbutils.GetBoolSlot(table, 10),
-		MaxWeight: fbutils.GetFloat32Slot(table, 12),
+		Length:    core.Float(fbutils.GetFloat64Slot(table, 24)),
+		Width:     core.Float(fbutils.GetFloat64Slot(table, 26)),
+		Height:    core.Float(fbutils.GetFloat64Slot(table, 28)),
+		MinWeight: core.Float(fbutils.GetFloat64Slot(table, 30)),
+		MaxWeight: core.Float(fbutils.GetFloat64Slot(table, 34)),
+		Comment:   fbutils.GetStringSlot(table, 32),
 		PhotoPath: fbutils.GetStringSlot(table, 20),
 		NfcId:     fbutils.GetStringSlot(table, 22),
 		CreatedAt: propCreatedAt,

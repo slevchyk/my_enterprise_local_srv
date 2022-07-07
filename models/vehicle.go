@@ -13,7 +13,12 @@ type Vehicle struct {
 	ExtId     string     `json:"ext_id"`
 	Name      string     `json:"name"`
 	IsDeleted bool       `json:"is_deleted"`
+	Length    core.Float `json:"length"`
+	Width     core.Float `json:"width"`
+	Height    core.Float `json:"height"`
+	MinWeight core.Float `json:"min_weight"`
 	MaxWeight core.Float `json:"max_weight"`
+	Comment   string     `json:"comment"`
 	PhotoPath string     `json:"photo_path"`
 	NfcId     string     `json:"nfc_id"`
 	CreatedAt time.Time  `json:"created_at"`
