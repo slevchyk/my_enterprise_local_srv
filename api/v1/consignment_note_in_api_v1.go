@@ -283,7 +283,7 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	au, err := models.GtAppUserByToken(api.obx, fvToken)
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -358,7 +358,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	au, err := models.GtAppUserByToken(api.obx, fvToken)
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -366,10 +366,27 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 
 	box := models.BoxForConsignmentNoteIn(api.obx)
 
-	if fvAll == "true" {
-		query = box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id))
+	if au.IsElevator {
+		boxAppUserCniRecipient := models.BoxForAppUserCniRecipient(api.obx)
+		queryAppUserCniRecipient := boxAppUserCniRecipient.Query(models.AppUserCniRecipient_.AppUser.Equals(au.Id))
+		aucrIds, err := queryAppUserCniRecipient.FindIds()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if fvAll == "true" {
+			query = box.Query(objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...)))
+		} else {
+			query = box.Query(objectbox.All(models.ConsignmentNoteIn_.ChangedByAcc.Equals(true), objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...))))
+		}
 	} else {
-		query = box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.ChangedByAcc.Equals(true))
+
+		if fvAll == "true" {
+			query = box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id))
+		} else {
+			query = box.Query(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.ChangedByAcc.Equals(true))
+		}
 	}
 
 	cnis, err = query.Find()
@@ -447,7 +464,7 @@ func (api *ApiV1) ConsignmentNoteInAppProcessed(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	au, err := models.GtAppUserByToken(api.obx, fvToken)
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -523,7 +540,7 @@ func (api *ApiV1) ConsignmentNoteInAppChanged(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	au, err := models.GtAppUserByToken(api.obx, fvToken)
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -651,14 +668,16 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 	}
 
-	departureDate, err := time.Parse("2006-01-02T15:04:05", cnii.DepartureDateId)
+	departureDate, err := time.Parse("2006-01-02T15:04:05", cnii.DepartureDate)
 	if err != nil {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			Action:  "checking value",
-			Message: "departureDate: can't convert to date format",
-		})
+		if check {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				Action:  "checking value",
+				Message: "departureDate: can't convert to date format",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	}
 
 	var driver *models.ServiceWorker

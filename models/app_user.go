@@ -29,11 +29,12 @@ type AppUser struct {
 	IsPayDesk           bool      `json:"is_pay_desk"`
 	IsWarehouse         bool      `json:"is_warehouse"`
 	IsDictionaries      bool      `json:"is_dictionaries"`
+	IsElevator          bool      `json:"is_elevator"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
 }
 
-func GtAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) {
+func GetAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) {
 
 	box := BoxForAppUser(ob)
 	query := box.Query(AppUser_.Token.Equals(token, true))

@@ -43,7 +43,7 @@
     },
     {
       "id": "2:3772536781229214116",
-      "lastPropertyId": "24:8642972488482966165",
+      "lastPropertyId": "25:8686396539319905421",
       "name": "AppUser",
       "properties": [
         {
@@ -150,6 +150,11 @@
         {
           "id": "24:8642972488482966165",
           "name": "IsManualSelecting",
+          "type": 1
+        },
+        {
+          "id": "25:8686396539319905421",
+          "name": "IsElevator",
           "type": 1
         }
       ]

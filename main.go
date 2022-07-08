@@ -124,6 +124,7 @@ func (as *apiServer) run() {
 	http.HandleFunc("/test", testHandler)
 	http.HandleFunc("/deleteall", deleteAllHandeler)
 
+	http.HandleFunc("/api/v1/check", basicAuth(checkHandler))
 	http.HandleFunc("/api/v1/auth", basicAuth(authHandler))
 
 	http.HandleFunc("/api/v1/appuser", basicAuth(appUserHandler))
@@ -323,6 +324,10 @@ func deleteAllHandeler(w http.ResponseWriter, r *http.Request) {
 	BoxForGoodsConsignmentNoteIn := models.BoxForGoodsConsignmentNoteIn(obx)
 	BoxForGoodsConsignmentNoteIn.RemoveAll()
 
+	w.WriteHeader(http.StatusOK)
+}
+
+func checkHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 

@@ -45,6 +45,7 @@ var AppUser_ = struct {
 	TokenExpirationDate *objectbox.PropertyInt64
 	PhotoPath           *objectbox.PropertyString
 	IsManualSelecting   *objectbox.PropertyBool
+	IsElevator          *objectbox.PropertyBool
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -172,6 +173,12 @@ var AppUser_ = struct {
 			Entity: &AppUserBinding.Entity,
 		},
 	},
+	IsElevator: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     25,
+			Entity: &AppUserBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -204,7 +211,8 @@ func (appUser_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("TokenExpirationDate", 10, 21, 6565581724974588785)
 	model.Property("PhotoPath", 9, 22, 2572403520298632668)
 	model.Property("IsManualSelecting", 1, 24, 8642972488482966165)
-	model.EntityLastPropertyId(24, 8642972488482966165)
+	model.Property("IsElevator", 1, 25, 8686396539319905421)
+	model.EntityLastPropertyId(25, 8686396539319905421)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -263,7 +271,7 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	var offsetPhotoPath = fbutils.CreateStringOffset(fbb, obj.PhotoPath)
 
 	// build the FlatBuffers object
-	fbb.StartObject(24)
+	fbb.StartObject(25)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 6, offsetFirstName)
@@ -283,6 +291,7 @@ func (appUser_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, 
 	fbutils.SetBoolSlot(fbb, 15, obj.IsPayDesk)
 	fbutils.SetBoolSlot(fbb, 16, obj.IsWarehouse)
 	fbutils.SetBoolSlot(fbb, 19, obj.IsDictionaries)
+	fbutils.SetBoolSlot(fbb, 24, obj.IsElevator)
 	fbutils.SetInt64Slot(fbb, 4, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 5, propUpdatedAt)
 	return nil
@@ -336,6 +345,7 @@ func (appUser_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface
 		IsPayDesk:           fbutils.GetBoolSlot(table, 34),
 		IsWarehouse:         fbutils.GetBoolSlot(table, 36),
 		IsDictionaries:      fbutils.GetBoolSlot(table, 42),
+		IsElevator:          fbutils.GetBoolSlot(table, 52),
 		CreatedAt:           propCreatedAt,
 		UpdatedAt:           propUpdatedAt,
 	}, nil
