@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/objectbox/objectbox-go/objectbox"
+	"github.com/slevchyk/my_enterprise_local_srv/core"
 	"github.com/slevchyk/my_enterprise_local_srv/dao"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
@@ -314,14 +315,50 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 		pd.ExtId = v.ExtId
 
 		//перевіримо чи дані які прийшли дійсно від авторизованого користувача
-		if v.AppUserId != au.ExtId {
-			pd.Status = http.StatusUnauthorized
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "checking token",
-				Message: "app user != token",
-			})
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-			continue
+		if au.IsElevator {
+			boxAppUserCniRecipient := models.BoxForAppUserCniRecipient(api.obx)
+			queryAppUserCniRecipient := boxAppUserCniRecipient.Query(models.AppUserCniRecipient_.AppUser.Equals(au.Id))
+			aucrs, err := queryAppUserCniRecipient.Find()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			isAccess := false
+
+			if au.ExtId == v.AppUserId {
+				isAccess = true
+			}
+
+			if !isAccess {
+				for _, aucr := range aucrs {
+					if aucr.Recipient.ExtId == v.RecipientId {
+						isAccess = true
+						break
+					}
+				}
+			}
+
+			if !isAccess {
+				pd.Status = http.StatusUnauthorized
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "checking token",
+					Message: "app user != token",
+				})
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
+			}
+
+		} else {
+			if au.ExtId != v.AppUserId {
+				pd.Status = http.StatusUnauthorized
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					Action:  "checking token",
+					Message: "app user != token",
+				})
+				sa.ProcessedData = append(sa.ProcessedData, pd)
+				continue
+			}
 		}
 
 		pd = postConsignmentNoteIn(api.obx, v, false)
@@ -375,10 +412,26 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		var tn = time.Now()
+		var tbp = core.Bod(tn.AddDate(0, 0, -1))
+		var tep = core.Eod(tn)
+
+		beginPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tbp)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		endPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tep)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		if fvAll == "true" {
 			query = box.Query(objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...)))
 		} else {
-			query = box.Query(objectbox.All(models.ConsignmentNoteIn_.ChangedByAcc.Equals(true), objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...))))
+			query = box.Query(objectbox.All(models.ConsignmentNoteIn_.Date.Between(beginPeriod, endPeriod), objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...))))
 		}
 	} else {
 
