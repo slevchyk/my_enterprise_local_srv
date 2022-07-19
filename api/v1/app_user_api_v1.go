@@ -221,6 +221,10 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	fvId := r.FormValue("id")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
 
 	sa := models.ServerAnswer{Object: "AppUser",
 		WebMethod: "get",
@@ -247,6 +251,46 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 			query.Close()
 			return
 		}
+	}
+
+	bs, err := json.Marshal(aus)
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(bs)
+}
+
+func (api *ApiV1) AppUserAppGet(w http.ResponseWriter, r *http.Request) {
+
+	var aus []*models.AppUser
+	var err error
+
+	fvToken := r.FormValue("token")
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	sa := models.ServerAnswer{Object: "AppUser",
+		WebMethod: "get",
+		DateUTC:   time.Now()}
+
+	box := models.BoxForAppUser(api.obx)
+
+	query := box.Query(models.AppUser_.ExtId.Equals(au.ExtId, true))
+	aus, err = query.Find()
+	query.Close()
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		query.Close()
+		return
 	}
 
 	bs, err := json.Marshal(aus)

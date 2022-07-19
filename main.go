@@ -143,6 +143,7 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/v1/consignmentnotein", basicAuth(consignmentnoteinHandler))
 
 	//app
+	http.HandleFunc("/api/app/v1/appuser", basicAuth(appUserAppHandler))
 	http.HandleFunc("/api/app/v1/appuser/cnirecipient", basicAuth(appUserCnirecipientHandler))
 
 	http.HandleFunc("/api/app/v1/consignmentnotein", basicAuth(appConsignmentnoteinHandler))
@@ -339,14 +340,15 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 
 func appUserHandler(w http.ResponseWriter, r *http.Request) {
 
+	fvIsMain := r.FormValue("is_main")
+	if fvIsMain == "false" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	api := api.NewApiV1(obx)
 
 	if r.Method == http.MethodPost {
-		fvIsMain := r.FormValue("is_main")
-		if fvIsMain == "false" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
 		api.AppUserPost(w, r)
 	} else if r.Method == http.MethodGet {
 		api.AppUserGet(w, r)
@@ -613,6 +615,25 @@ func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 		api.ConsignmentNoteInGet(w, r)
 	} else if r.Method == http.MethodDelete {
 		api.ConsignmentNoteInDelete(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
+//APPLICATION APIs
+func appUserAppHandler(w http.ResponseWriter, r *http.Request) {
+
+	fvIsMain := r.FormValue("is_main")
+	if fvIsMain == "true" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodGet {
+		api.AppUserAppGet(w, r)
 	} else {
 		http.Error(w, "method not specified", http.StatusBadRequest)
 	}
