@@ -4,6 +4,7 @@ type GoodsConsignmentNoteInImport struct {
 	Id                uint64  `json:"srv_id"`
 	ExtId             string  `json:"ext_id"`
 	AppId             string  `json:"app_id"`
+	LocalityId        string  `json:"locality_id"`
 	SubdivisionId     string  `json:"subdivision_id"`
 	GoodsGroupId      string  `json:"goods_group_Id"`
 	GoodsId           string  `json:"goods_id"`

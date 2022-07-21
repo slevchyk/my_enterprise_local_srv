@@ -655,7 +655,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		})
 
 		isDataError = true
-	}	
+	}
 
 	var harvestType *models.HarvestType
 	if cnii.HarvestTypeId == "" || cnii.HarvestTypeId == "00000000-0000-0000-0000-000000000000" {
@@ -862,7 +862,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	var createdAt time.Time
 	if isAcc {
 		createdAt = time.Now().UTC()
-	} else {		
+	} else {
 		createdAt, err = parseDate(cnii.CreatedAt, abn)
 		if err != nil {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -877,7 +877,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	var updatedAt time.Time
 	if isAcc {
 		updatedAt = time.Now().UTC()
-	} else {		
+	} else {
 		updatedAt, err = parseDate(cnii.UpdatedAt, abn)
 		if err != nil {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -908,6 +908,30 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 					Action:  "checking value",
 					Message: "row app id isn't specified",
 				})
+
+				isDataError = true
+			}
+		}
+
+		var rowLocality *models.Locality
+		if gcnii.LocalityId == "" || gcnii.LocalityId == "00000000-0000-0000-0000-000000000000" {
+			if check {
+				pd.Messages = append(pd.Messages, models.ServerMessage{
+					DataType: "Loclity",
+					Action:   "checking data locality",
+					Message:  "ext id isn't specified",
+				})
+
+				isDataError = true
+			}
+		} else {
+			rowLocality, sm = dao.GetLocalityByExtId(obx, gcnii.LocalityId)
+			if rowLocality == nil {
+				sm.DataType = "locality"
+				sm.DataId = gcnii.LocalityId
+				sm.Action = "db select by ext id"
+				sm.Message = "not found"
+				pd.Messages = append(pd.Messages, sm)
 
 				isDataError = true
 			}
@@ -1010,7 +1034,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		var rowCreatedAt time.Time
 		if isAcc {
 			rowCreatedAt = time.Now().UTC()
-		} else {			
+		} else {
 			rowCreatedAt, err = parseDate(gcnii.CreatedAt, abn)
 			if err != nil {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -1025,7 +1049,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		var rowUpdatedAt time.Time
 		if isAcc {
 			rowUpdatedAt = time.Now().UTC()
-		} else {			
+		} else {
 			rowUpdatedAt, err = parseDate(gcnii.UpdatedAt, abn)
 			if err != nil {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -1041,6 +1065,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			Id:                gcnii.Id,
 			AppId:             gcnii.AppId,
 			ExtId:             gcnii.ExtId,
+			Locality:          rowLocality,
 			Subdivision:       rowSubdivision,
 			GoodsGroup:        rowGoodsGroup,
 			Goods:             rowGoods,
