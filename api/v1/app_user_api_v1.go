@@ -293,6 +293,20 @@ func (api *ApiV1) AppUserAppGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	query = box.Query(models.AppUser_.ExtId.NotEquals(au.ExtId, true))
+	aues, err := query.Find()
+	query.Close()
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		query.Close()
+		return
+	}
+
+	for _, v := range aues {
+		aus = append(aus, v.CopyToExport())
+	}
+
 	bs, err := json.Marshal(aus)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError

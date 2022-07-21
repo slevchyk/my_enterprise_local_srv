@@ -42,7 +42,7 @@ func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) 
 
 	for _, v := range cniis {
 
-		pd := postConsignmentNoteIn(api.obx, v, true)
+		pd := postConsignmentNoteIn(api.obx, v, true, false, 0)
 
 		if len(pd.Messages) > 0 {
 			pd.Status = http.StatusBadRequest
@@ -361,7 +361,7 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 			}
 		}
 
-		pd = postConsignmentNoteIn(api.obx, v, false)
+		pd = postConsignmentNoteIn(api.obx, v, false, au.IsElevator, api.abn)
 
 		if len(pd.Messages) > 0 {
 			pd.Status = http.StatusBadRequest
@@ -406,31 +406,37 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 	if au.IsElevator {
 		boxAppUserCniRecipient := models.BoxForAppUserCniRecipient(api.obx)
 		queryAppUserCniRecipient := boxAppUserCniRecipient.Query(models.AppUserCniRecipient_.AppUser.Equals(au.Id))
-		aucrIds, err := queryAppUserCniRecipient.FindIds()
+
+		aucrs, err := queryAppUserCniRecipient.Find()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		var tn = time.Now()
-		var tbp = core.Bod(tn.AddDate(0, 0, -1))
-		var tep = core.Eod(tn)
+		var aucrIds []uint64
 
-		beginPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tbp)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		endPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tep)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		for _, aucr := range aucrs {
+			aucrIds = append(aucrIds, aucr.Recipient.Id)
 		}
 
 		if fvAll == "true" {
 			query = box.Query(objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...)))
 		} else {
+			var tn = time.Now()
+			var tbp = core.Bod(tn.AddDate(0, 0, -1))
+			var tep = core.Eod(tn)
+
+			beginPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tbp)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			endPeriod, err := objectbox.TimeInt64ConvertToDatabaseValue(tep)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 			query = box.Query(objectbox.All(models.ConsignmentNoteIn_.Date.Between(beginPeriod, endPeriod), objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...))))
 		}
 	} else {
@@ -629,7 +635,7 @@ func (api *ApiV1) ConsignmentNoteInDelete(w http.ResponseWriter, r *http.Request
 
 }
 
-func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool, check bool) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
+func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool, check bool, isElevator bool, abn int) (models.ConsignmentNoteIn, []models.GoodsConsignmentNoteIn, models.ServerProcessedData) {
 
 	var pd models.ServerProcessedData
 	var sm models.ServerMessage
@@ -641,7 +647,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	isDataError := false
 
-	date, err := time.Parse("2006-01-02T15:04:05", cnii.Date)
+	date, err := parseDate(cnii.Date, abn)
 	if err != nil {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
 			Action:  "checking value",
@@ -649,10 +655,10 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		})
 
 		isDataError = true
-	}
+	}	
 
 	var harvestType *models.HarvestType
-	if cnii.HarvestTypeId == "" {
+	if cnii.HarvestTypeId == "" || cnii.HarvestTypeId == "00000000-0000-0000-0000-000000000000" {
 		if check {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "HarvestType",
@@ -676,7 +682,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var vehicle *models.Vehicle
-	if cnii.VehicleId == "" {
+	if cnii.VehicleId == "" || cnii.VehicleId == "00000000-0000-0000-0000-000000000000" {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
 			DataType: "Vehicle",
 			Action:   "checking data",
@@ -698,7 +704,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var trailer *models.Trailer
-	if cnii.TrailerId == "" {
+	if cnii.TrailerId == "" || cnii.TrailerId == "00000000-0000-0000-0000-000000000000" {
 		if check {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "Trailer",
@@ -721,7 +727,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 	}
 
-	departureDate, err := time.Parse("2006-01-02T15:04:05", cnii.DepartureDate)
+	departureDate, err := parseDate(cnii.DepartureDate, abn)
 	if err != nil {
 		if check {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
@@ -734,7 +740,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var driver *models.ServiceWorker
-	if cnii.DriverId == "" {
+	if cnii.DriverId == "" || cnii.DriverId == "00000000-0000-0000-0000-000000000000" {
 		pd.Messages = append(pd.Messages, models.ServerMessage{
 			DataType: "Person",
 			Action:   "checking data Driver",
@@ -756,7 +762,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var recipient *models.Storage
-	if cnii.RecipientId == "" {
+	if cnii.RecipientId == "" || cnii.RecipientId == "00000000-0000-0000-0000-000000000000" {
 		if check {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "Storage",
@@ -781,8 +787,8 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var sender *models.Storage
 	var manager *models.AppUser
-	if cnii.OperationId == 0 {
-		if cnii.ManagerId == "" {
+	if cnii.OperationId == 1 {
+		if cnii.ManagerId == "" || cnii.ManagerId == "00000000-0000-0000-0000-000000000000" {
 			if check {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					DataType: "AppUser",
@@ -805,7 +811,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 			}
 		}
 	} else {
-		if cnii.SenderId == "" {
+		if cnii.SenderId == "" || cnii.SenderId == "00000000-0000-0000-0000-000000000000" {
 			if check {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					DataType: "Storage",
@@ -830,14 +836,16 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	var appUser *models.AppUser
-	if cnii.AppUserId == "" {
-		pd.Messages = append(pd.Messages, models.ServerMessage{
-			DataType: "AppUser",
-			Action:   "checking data",
-			Message:  "ext id isn't specified",
-		})
+	if cnii.AppUserId == "" || cnii.AppUserId == "00000000-0000-0000-0000-000000000000" {
+		if !isElevator {
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "AppUser",
+				Action:   "checking data",
+				Message:  "ext id isn't specified",
+			})
 
-		isDataError = true
+			isDataError = true
+		}
 	} else {
 		appUser, sm = dao.GetAppUserByExtId(obx, cnii.AppUserId)
 		if appUser == nil {
@@ -854,8 +862,8 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	var createdAt time.Time
 	if isAcc {
 		createdAt = time.Now()
-	} else {
-		createdAt, err = time.Parse("2006-01-02T15:04:05", cnii.CreatedAt)
+	} else {		
+		createdAt, err = parseDate(cnii.CreatedAt, abn)
 		if err != nil {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
@@ -868,9 +876,9 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var updatedAt time.Time
 	if isAcc {
-		updatedAt = time.Now()
-	} else {
-		updatedAt, err = time.Parse("2006-01-02T15:04:05", cnii.UpdatedAt)
+		updatedAt = time.Now().UTC()
+	} else {		
+		updatedAt, err = parseDate(cnii.UpdatedAt, abn)
 		if err != nil {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
@@ -884,7 +892,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	for _, gcnii := range cnii.Goods {
 
 		if isAcc {
-			if gcnii.ExtId == "" {
+			if gcnii.ExtId == "" || gcnii.ExtId == "00000000-0000-0000-0000-000000000000" {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					RowId:   gcnii.ExtId,
 					Action:  "checking value",
@@ -894,7 +902,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 				isDataError = true
 			}
 		} else {
-			if gcnii.AppId == "" {
+			if gcnii.AppId == "" || gcnii.AppId == "00000000-0000-0000-0000-000000000000" {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					RowId:   gcnii.AppId,
 					Action:  "checking value",
@@ -906,7 +914,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 
 		var rowSubdivision *models.Subdivision
-		if gcnii.SubdivisionId == "" {
+		if gcnii.SubdivisionId == "" || gcnii.SubdivisionId == "00000000-0000-0000-0000-000000000000" {
 			if check {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					DataType: "Subdivision",
@@ -930,7 +938,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 
 		var rowGoodsGroup *models.GoodsGroup
-		// if gcnii.GoodsGroupId == "" {
+		// if gcnii.GoodsGroupId == "" || gcnii.GoodsGroupId == "00000000-0000-0000-0000-000000000000" {
 		// 	pd.Messages = append(pd.Messages, models.ServerMessage{
 		// 		DataType: "GoodsGroup",
 		// 		Action:   "checking data Recipient",
@@ -952,7 +960,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		// }
 
 		var rowGoods *models.Goods
-		if gcnii.GoodsId == "" {
+		if gcnii.GoodsId == "" || gcnii.GoodsId == "00000000-0000-0000-0000-000000000000" {
 			if check {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					DataType: "Goods",
@@ -976,7 +984,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		}
 
 		var rowUnit *models.Unit
-		if gcnii.UnitId == "" {
+		if gcnii.UnitId == "" || gcnii.UnitId == "00000000-0000-0000-0000-000000000000" {
 			if check {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					DataType: "Unit",
@@ -1002,8 +1010,8 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		var rowCreatedAt time.Time
 		if isAcc {
 			rowCreatedAt = time.Now()
-		} else {
-			rowCreatedAt, err = time.Parse("2006-01-02T15:04:05", gcnii.CreatedAt)
+		} else {			
+			rowCreatedAt, err = parseDate(gcnii.CreatedAt, abn)
 			if err != nil {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "checking value",
@@ -1016,9 +1024,9 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 		var rowUpdatedAt time.Time
 		if isAcc {
-			rowUpdatedAt = time.Now()
-		} else {
-			rowUpdatedAt, err = time.Parse("2006-01-02T15:04:05", gcnii.UpdatedAt)
+			rowUpdatedAt = time.Now().UTC()
+		} else {			
+			rowUpdatedAt, err = parseDate(gcnii.UpdatedAt, abn)
 			if err != nil {
 				pd.Messages = append(pd.Messages, models.ServerMessage{
 					Action:  "checking value",
@@ -1295,7 +1303,7 @@ func postGoodsConsignmentNoteIn(obx *objectbox.ObjectBox, cni models.Consignment
 	return spd
 }
 
-func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool) models.ServerProcessedData {
+func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNoteInImport, isAcc bool, isElevator bool, abn int) models.ServerProcessedData {
 
 	var existCni *models.ConsignmentNoteIn
 	var err error
@@ -1308,7 +1316,7 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 
 	box := models.BoxForConsignmentNoteIn(obx)
 
-	cni, gcnis, pd := parseConsignmentNoteIn(obx, cnii, isAcc, false)
+	cni, gcnis, pd := parseConsignmentNoteIn(obx, cnii, isAcc, false, isElevator, abn)
 	cni.ChangedByApp = true
 
 	if pd.Status != http.StatusOK {
@@ -1409,6 +1417,9 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 
 		cni.Id = cnis[0].Id
 		cni.CreatedAt = cnis[0].CreatedAt
+		if isElevator {
+			cni.AppUser = cnis[0].AppUser
+		}
 		cni.UpdatedAt = time.Now()
 		cni.ChangedByAcc = isAcc
 		cni.ChangedByApp = !isAcc

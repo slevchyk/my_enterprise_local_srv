@@ -30,6 +30,7 @@ type AppUser struct {
 	IsWarehouse         bool      `json:"is_warehouse"`
 	IsDictionaries      bool      `json:"is_dictionaries"`
 	IsElevator          bool      `json:"is_elevator"`
+	IsViewMode          bool      `json:"is_view_mode"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
 }
@@ -57,6 +58,15 @@ func GetAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) 
 	}
 
 	return aus[0], nil
+}
+
+func (au *AppUser) CopyToExport() *AppUser {
+	return &AppUser{
+		Id:        au.Id,
+		ExtId:     au.ExtId,
+		FirstName: au.FirstName,
+		LastName:  au.LastName,
+	}
 }
 
 type AppUserCniRecipient struct {

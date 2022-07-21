@@ -643,6 +643,7 @@ func appUserAppHandler(w http.ResponseWriter, r *http.Request) {
 func appConsignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
+	api.SetAbn(r)
 
 	// fvIsMain := r.FormValue("is_main")
 	// if fvIsMain == "false" {
