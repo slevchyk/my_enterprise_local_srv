@@ -16,20 +16,20 @@ type ServerAnswer struct {
 }
 
 type ServerProcessedData struct {
-	Status       int             `json:"status"`
-	ChangedByAcc bool            `json:"changed_by_app"`
-	AppId        string          `json:"app_id"`
-	SrvId        uint64          `json:"srv_id"`
-	ExtId        string          `json:"ext_id"`
-	Messages     []ServerMessage `json:"messages"`
-	Rows []ServerProcessedRow `json:"rows"`
+	Status       int                  `json:"status"`
+	ChangedByAcc bool                 `json:"changed_by_app"`
+	AppId        string               `json:"app_id"`
+	SrvId        uint64               `json:"srv_id"`
+	ExtId        string               `json:"ext_id"`
+	Messages     []ServerMessage      `json:"messages"`
+	Rows         []ServerProcessedRow `json:"rows"`
 }
 type ServerProcessedRow struct {
-	Status       int             `json:"status"`	
-	AppId        string          `json:"app_id"`
-	SrvId        uint64          `json:"srv_id"`
-	ExtId        string          `json:"ext_id"`
-	Messages     []ServerMessage `json:"messages"`
+	Status   int             `json:"status"`
+	AppId    string          `json:"app_id"`
+	SrvId    uint64          `json:"srv_id"`
+	ExtId    string          `json:"ext_id"`
+	Messages []ServerMessage `json:"messages"`
 }
 
 type ServerMessage struct {
@@ -47,7 +47,7 @@ func (sa ServerAnswer) Send(w http.ResponseWriter) {
 	}
 
 	if sa.DateUTC.IsZero() {
-		sa.DateUTC = time.Now()
+		sa.DateUTC = time.Now().UTC()
 	}
 
 	bs, err := json.Marshal(sa)

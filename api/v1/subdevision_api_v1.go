@@ -144,8 +144,8 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(Subdivisions) == 0 {
-			Subdivision.CreatedAt = time.Now()
-			Subdivision.UpdatedAt = time.Now()
+			Subdivision.CreatedAt = time.Now().UTC()
+			Subdivision.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&Subdivision)
 			if err != nil {
@@ -161,7 +161,7 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(Subdivisions) == 1 {
 			Subdivision.Id = Subdivisions[0].Id
 			Subdivision.CreatedAt = Subdivisions[0].CreatedAt
-			Subdivision.UpdatedAt = time.Now()
+			Subdivision.UpdatedAt = time.Now().UTC()
 
 			err := box.Update(&Subdivision)
 			if err != nil {
@@ -207,7 +207,7 @@ func (api *ApiV1) SubdivisionGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Subdivision",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForSubdivision(api.obx)
 

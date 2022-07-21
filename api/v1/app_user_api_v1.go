@@ -25,7 +25,7 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "AppUser",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -117,8 +117,8 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(appUsers) == 0 {
-			v.CreatedAt = time.Now()
-			v.UpdatedAt = time.Now()
+			v.CreatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -135,7 +135,7 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(appUsers) == 1 {
 			v.Id = appUsers[0].Id
 			v.CreatedAt = appUsers[0].CreatedAt
-			v.UpdatedAt = time.Now()
+			v.UpdatedAt = time.Now().UTC()
 
 			// pd.SrvId = string(v.Id)
 			pd.SrvId = v.Id
@@ -228,7 +228,7 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "AppUser",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForAppUser(api.obx)
 
@@ -279,7 +279,7 @@ func (api *ApiV1) AppUserAppGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "AppUser",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForAppUser(api.obx)
 
@@ -362,7 +362,7 @@ func (api *ApiV1) AppUserAuth(w http.ResponseWriter, r *http.Request) {
 
 	au := aus[0]
 	au.Token = uuid.NewString()
-	au.TokenExpirationDate = time.Now().AddDate(0, 0, 7)
+	au.TokenExpirationDate = time.Now().UTC().AddDate(0, 0, 7)
 
 	_, err = box.Put(au)
 	if err != nil {
@@ -389,7 +389,7 @@ func (api *ApiV1) AppUserCniRecipientPost(w http.ResponseWriter, r *http.Request
 	sa := models.ServerAnswer{
 		Object:    "AppUserCniRecipient",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -457,8 +457,8 @@ func (api *ApiV1) AppUserCniRecipientPost(w http.ResponseWriter, r *http.Request
 		if len(aucrs) == 0 {
 
 			if aucr.CreatedAt.IsZero() {
-				aucr.CreatedAt = time.Now()
-				aucr.UpdatedAt = time.Now()
+				aucr.CreatedAt = time.Now().UTC()
+				aucr.UpdatedAt = time.Now().UTC()
 			}
 
 			srvId, err := box.Put(&aucr)
@@ -529,7 +529,7 @@ func (api *ApiV1) AppUserCniRecipientGet(w http.ResponseWriter, r *http.Request)
 
 	sa := models.ServerAnswer{Object: "AppUserCniRecipient",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForAppUserCniRecipient(api.obx)
 
@@ -574,7 +574,7 @@ func (api *ApiV1) AppUserCniRecipientDelete(w http.ResponseWriter, r *http.Reque
 
 	sa := models.ServerAnswer{Object: "AppUserCniRecipient",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForAppUserCniRecipient(api.obx)
 

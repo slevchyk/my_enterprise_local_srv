@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) StoragePost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Storage",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {

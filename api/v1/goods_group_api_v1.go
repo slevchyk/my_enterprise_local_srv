@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) GoodsGroupPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "GoodsGroup",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) GoodsGroupPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(GoodsGroups) == 0 {
-			v.CreatedAt = time.Now()
-			v.UpdatedAt = time.Now()
+			v.CreatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) GoodsGroupPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(GoodsGroups) == 1 {
 			v.Id = GoodsGroups[0].Id
 			v.CreatedAt = GoodsGroups[0].CreatedAt
-			v.UpdatedAt = time.Now()
+			v.UpdatedAt = time.Now().UTC()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) GoodsGroupGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "GoodsGroup",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForGoodsGroup(api.obx)
 

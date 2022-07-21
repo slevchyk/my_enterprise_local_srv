@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) PersonPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(Persons) == 0 {
-			v.CreatedAt = time.Now()
-			v.UpdatedAt = time.Now()
+			v.CreatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) PersonPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(Persons) == 1 {
 			v.Id = Persons[0].Id
 			v.CreatedAt = Persons[0].CreatedAt
-			v.UpdatedAt = time.Now()
+			v.UpdatedAt = time.Now().UTC()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) PersonGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Person",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForPerson(api.obx)
 

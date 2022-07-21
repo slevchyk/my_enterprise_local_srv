@@ -36,7 +36,7 @@ func IsPasswordCorrect(hashedpassword, password string) bool {
 }
 
 func GenerateOtp() string {
-	randomeSource := rand.NewSource(time.Now().UnixNano())
+	randomeSource := rand.NewSource(time.Now().UTC().UnixNano())
 	randomeData := rand.New(randomeSource)
 	code := strconv.Itoa(randomeData.Int())[:6]
 
@@ -101,7 +101,7 @@ func GanerateAccessToken(id uint64) (string, error) {
 	}
 
 	accessToken.Id = id
-	accessToken.ExpiresAt = time.Now().Add(24 * time.Hour)
+	accessToken.ExpiresAt = time.Now().UTC().Add(24 * time.Hour)
 
 	accessToken64, err := EncodeToBase64(accessToken)
 	if err != nil {

@@ -249,7 +249,7 @@ func bearerValidate(token string, r *http.Request) bool {
 	}
 
 	//час дії токена вийшов
-	if accessToken.ExpiresAt.Before(time.Now()) {
+	if accessToken.ExpiresAt.Before(time.Now().UTC()) {
 		return false
 	}
 

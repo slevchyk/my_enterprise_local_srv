@@ -53,7 +53,7 @@ func GetAppUserByToken(ob *objectbox.ObjectBox, token string) (*AppUser, error) 
 
 	au := aus[0]
 
-	if au.TokenExpirationDate.Before(time.Now()) {
+	if au.TokenExpirationDate.Before(time.Now().UTC()) {
 		return nil, errors.New("token expire")
 	}
 

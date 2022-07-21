@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Goods",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -144,8 +144,8 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(goodss) == 0 {
-			goods.CreatedAt = time.Now()
-			goods.UpdatedAt = time.Now()
+			goods.CreatedAt = time.Now().UTC()
+			goods.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&goods)
 			if err != nil {
@@ -161,7 +161,7 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(goodss) == 1 {
 			goods.Id = goodss[0].Id
 			goods.CreatedAt = goodss[0].CreatedAt
-			goods.UpdatedAt = time.Now()
+			goods.UpdatedAt = time.Now().UTC()
 
 			err := box.Update(&goods)
 			if err != nil {
@@ -207,7 +207,7 @@ func (api *ApiV1) GoodsGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Goods",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC().UTC()}
 
 	// obx, err := objectbox.NewBuilder().Model(models.ObjectBoxModel()).Build()
 	// if err != nil {

@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 
 	sa := models.ServerAnswer{Object: "GoodsConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -272,8 +272,8 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 
 		if len(GoodsConsignmentNoteIns) == 0 {
 			if GoodsConsignmentNoteIn.CreatedAt.IsZero() {
-				GoodsConsignmentNoteIn.CreatedAt = time.Now()
-				GoodsConsignmentNoteIn.UpdatedAt = time.Now()
+				GoodsConsignmentNoteIn.CreatedAt = time.Now().UTC()
+				GoodsConsignmentNoteIn.UpdatedAt = time.Now().UTC()
 			}
 
 			_, err := box.Put(&GoodsConsignmentNoteIn)
@@ -289,7 +289,7 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 		} else if len(GoodsConsignmentNoteIns) == 1 {
 			GoodsConsignmentNoteIn.Id = GoodsConsignmentNoteIns[0].Id
 			GoodsConsignmentNoteIn.CreatedAt = GoodsConsignmentNoteIns[0].CreatedAt
-			GoodsConsignmentNoteIn.UpdatedAt = time.Now()
+			GoodsConsignmentNoteIn.UpdatedAt = time.Now().UTC()
 
 			err := box.Update(&GoodsConsignmentNoteIn)
 			if err != nil {
@@ -333,7 +333,7 @@ func (api *ApiV1) GoodsConsignmentNoteInGet(w http.ResponseWriter, r *http.Reque
 
 	sa := models.ServerAnswer{Object: "GoodsConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	if fvConsignemntNoteInId == "" {
 		sa.Status = http.StatusBadRequest

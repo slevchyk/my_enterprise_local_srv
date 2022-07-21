@@ -22,7 +22,7 @@ func (api *ApiV1) ConsignmentNoteInPost(w http.ResponseWriter, r *http.Request) 
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -67,7 +67,7 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForConsignmentNoteIn(api.obx)
 
@@ -275,7 +275,7 @@ func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Reques
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	if fvToken == "" {
 		sa.Status = http.StatusUnauthorized
@@ -386,7 +386,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	if fvToken == "" {
 		sa.Status = http.StatusBadRequest
@@ -422,7 +422,7 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 		if fvAll == "true" {
 			query = box.Query(objectbox.Any(models.ConsignmentNoteIn_.AppUser.Equals(au.Id), models.ConsignmentNoteIn_.Recipient.In(aucrIds...)))
 		} else {
-			var tn = time.Now()
+			var tn = time.Now().UTC()
 			var tbp = core.Bod(tn.AddDate(0, 0, -1))
 			var tep = core.Eod(tn)
 
@@ -513,7 +513,7 @@ func (api *ApiV1) ConsignmentNoteInAppProcessed(w http.ResponseWriter, r *http.R
 		Status:    http.StatusOK,
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -590,7 +590,7 @@ func (api *ApiV1) ConsignmentNoteInAppChanged(w http.ResponseWriter, r *http.Req
 	sa := models.ServerAnswer{
 		Object:    "ConsignmentNoteIn",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	if fvToken == "" {
 		sa.Status = http.StatusBadRequest
@@ -861,7 +861,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 	var createdAt time.Time
 	if isAcc {
-		createdAt = time.Now()
+		createdAt = time.Now().UTC()
 	} else {		
 		createdAt, err = parseDate(cnii.CreatedAt, abn)
 		if err != nil {
@@ -1009,7 +1009,7 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 
 		var rowCreatedAt time.Time
 		if isAcc {
-			rowCreatedAt = time.Now()
+			rowCreatedAt = time.Now().UTC()
 		} else {			
 			rowCreatedAt, err = parseDate(gcnii.CreatedAt, abn)
 			if err != nil {
@@ -1260,7 +1260,7 @@ func postGoodsConsignmentNoteIn(obx *objectbox.ObjectBox, cni models.Consignment
 			gcni.Id = existGcnis[0].Id
 			gcni.ConsignmentNoteIn = &cni
 			gcni.CreatedAt = existGcnis[0].CreatedAt
-			gcni.UpdatedAt = time.Now()
+			gcni.UpdatedAt = time.Now().UTC()
 
 			err = box.Update(&gcni)
 			if err != nil {
@@ -1376,8 +1376,8 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 	if len(cnis) == 0 {
 
 		if cni.CreatedAt.IsZero() {
-			cni.CreatedAt = time.Now()
-			cni.UpdatedAt = time.Now()
+			cni.CreatedAt = time.Now().UTC()
+			cni.UpdatedAt = time.Now().UTC()
 		}
 
 		srvId, err := box.Put(&cni)
@@ -1420,7 +1420,7 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 		if isElevator {
 			cni.AppUser = cnis[0].AppUser
 		}
-		cni.UpdatedAt = time.Now()
+		cni.UpdatedAt = time.Now().UTC()
 		cni.ChangedByAcc = isAcc
 		cni.ChangedByApp = !isAcc
 

@@ -17,7 +17,7 @@ func (apiV1 *ApiV1) TrailerPost(w http.ResponseWriter, r *http.Request) {
 	sa := models.ServerAnswer{
 		Object:    "Trailer",
 		WebMethod: "post",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	bs, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -85,8 +85,8 @@ func (apiV1 *ApiV1) TrailerPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(Trailers) == 0 {
-			v.CreatedAt = time.Now()
-			v.UpdatedAt = time.Now()
+			v.CreatedAt = time.Now().UTC()
+			v.UpdatedAt = time.Now().UTC()
 
 			_, err := box.Put(&v)
 			if err != nil {
@@ -102,7 +102,7 @@ func (apiV1 *ApiV1) TrailerPost(w http.ResponseWriter, r *http.Request) {
 		} else if len(Trailers) == 1 {
 			v.Id = Trailers[0].Id
 			v.CreatedAt = Trailers[0].CreatedAt
-			v.UpdatedAt = time.Now()
+			v.UpdatedAt = time.Now().UTC()
 
 			pd.SrvId = v.Id
 
@@ -142,7 +142,7 @@ func (api *ApiV1) TrailerGet(w http.ResponseWriter, r *http.Request) {
 
 	sa := models.ServerAnswer{Object: "Trailer",
 		WebMethod: "get",
-		DateUTC:   time.Now()}
+		DateUTC:   time.Now().UTC()}
 
 	box := models.BoxForTrailer(api.obx)
 
