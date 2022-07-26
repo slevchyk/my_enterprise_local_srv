@@ -38,7 +38,11 @@ func (api *ApiV1) SetAbn(r *http.Request) {
 func parseDate(date string, abn int) (time.Time, error) {
 
 	if abn < 5 {
-		return time.Parse("2006-01-02T15:04:05", date)
+		t, err := time.Parse("2006-01-02T15:04:05", date)
+		if err == nil {
+			return t, err
+		}
+		return time.Parse("2006-01-02T15:04:05Z", date)
 	} else {
 		return time.Parse("2006-01-02T15:04:05Z", date)
 	}

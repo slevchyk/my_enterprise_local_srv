@@ -630,8 +630,53 @@ func (api *ApiV1) ConsignmentNoteInAppChanged(w http.ResponseWriter, r *http.Req
 
 func (api *ApiV1) ConsignmentNoteInDelete(w http.ResponseWriter, r *http.Request) {
 
-	box := models.BoxForGoodsConsignmentNoteIn(api.obx)
-	box.RemoveAll()
+	var err error
+
+	fvId := r.FormValue("id")
+
+	idInt, err := strconv.Atoi(fvId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	id := uint64(idInt)
+
+	boxBoxForConsignmentNoteIn := models.BoxForConsignmentNoteIn(api.obx)
+	boxGoodsConsignmentNoteIn := models.BoxForGoodsConsignmentNoteIn(api.obx)
+
+	query := boxGoodsConsignmentNoteIn.Query(models.GoodsConsignmentNoteIn_.ConsignmentNoteIn.Equals(id))
+	gcnis, err := query.Find()
+	query.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = api.obx.RunInWriteTx(
+		func() error {
+
+			for _, gcni := range gcnis {
+				err = boxGoodsConsignmentNoteIn.RemoveId(gcni.Id)
+				if err != nil {
+					return err
+				}
+			}
+
+			err = boxBoxForConsignmentNoteIn.RemoveId(id)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -1441,6 +1486,15 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 		}
 
 		cni.Id = cnis[0].Id
+
+		if cni.ExtId == "" {
+			cni.ExtId = cnis[0].ExtId
+		}
+
+		if cni.AppId == "" {
+			cni.AppId = cnis[0].AppId
+		}
+
 		cni.CreatedAt = cnis[0].CreatedAt
 		if isElevator {
 			cni.AppUser = cnis[0].AppUser
