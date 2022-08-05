@@ -265,6 +265,84 @@ func (api *ApiV1) ConsignmentNoteInGet(w http.ResponseWriter, r *http.Request) {
 	w.Write(bs)
 }
 
+func (api *ApiV1) ConsignmentNoteInProcessed(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	fvToken := r.FormValue("token")
+
+	sa := models.ServerAnswer{
+		Status:    http.StatusOK,
+		Object:    "ConsignmentNoteIn",
+		WebMethod: "post",
+		DateUTC:   time.Now().UTC()}
+
+	bs, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
+	}
+
+	au, err := models.GetAppUserByToken(api.obx, fvToken)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	var jsonData []int
+	err = json.Unmarshal(bs, &jsonData)
+	if err != nil {
+		sa.Status = http.StatusInternalServerError
+		sa.Error = err.Error()
+		sa.Send(w)
+		return
+	}
+
+	box := models.BoxForConsignmentNoteIn(api.obx)
+
+	for _, v := range jsonData {
+
+		var pd models.ServerProcessedData
+
+		srvId := uint64(v)
+		pd.SrvId = srvId
+		pd.Status = http.StatusOK
+
+		c, err := box.Get(srvId)
+		if err != nil {
+			pd.Status = http.StatusNotFound
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataId:  fmt.Sprintln(srvId),
+				Action:  "select by srv id",
+				Message: err.Error(),
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
+		}
+
+		if c.AppUser.Id != au.Id {
+			pd.Status = http.StatusNotFound
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataId:  fmt.Sprintln(srvId),
+				Action:  "select by srv id",
+				Message: "no such data",
+			})
+
+			sa.ProcessedData = append(sa.ProcessedData, pd)
+			continue
+		}
+
+		sa.ProcessedData = append(sa.ProcessedData, pd)
+		c.ChangedByApp = false
+		box.Put(c)
+	}
+
+	sa.Send(w)
+}
+
 func (api *ApiV1) ConsignmentNoteInAppPost(w http.ResponseWriter, r *http.Request) {
 
 	var err error

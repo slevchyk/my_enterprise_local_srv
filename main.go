@@ -141,6 +141,7 @@ func (as *apiServer) run() {
 	http.HandleFunc("/api/v1/vehicle", basicAuth(vehicleHandler))
 	http.HandleFunc("/api/v1/trailer", basicAuth(trailerHandler))
 	http.HandleFunc("/api/v1/consignmentnotein", basicAuth(consignmentnoteinHandler))
+	http.HandleFunc("/api/v1/consignmentnotein/processed", basicAuth(consignmentnoteinProcessedHandler))
 
 	//app
 	http.HandleFunc("/api/app/v1/appuser", basicAuth(appUserAppHandler))
@@ -621,6 +622,18 @@ func consignmentnoteinHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func consignmentnoteinProcessedHandler(w http.ResponseWriter, r *http.Request) {
+
+	api := api.NewApiV1(obx)
+
+	if r.Method == http.MethodPost {
+		api.ConsignmentNoteInProcessed(w, r)
+	} else {
+		http.Error(w, "method not specified", http.StatusBadRequest)
+	}
+
+}
+
 //APPLICATION APIs
 func appUserAppHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -672,6 +685,7 @@ func appConsignmentnoteinProcessedHandler(w http.ResponseWriter, r *http.Request
 	}
 
 }
+
 func appConsignmentnoteinChangedHandler(w http.ResponseWriter, r *http.Request) {
 
 	api := api.NewApiV1(obx)
