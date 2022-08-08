@@ -28,6 +28,7 @@ type AppUser struct {
 	IsHarvesting        bool      `json:"is_harvesting"`
 	IsPayDesk           bool      `json:"is_pay_desk"`
 	IsWarehouse         bool      `json:"is_warehouse"`
+	IsReports           bool      `json:"is_reports"`
 	IsDictionaries      bool      `json:"is_dictionaries"`
 	IsElevator          bool      `json:"is_elevator"`
 	IsViewMode          bool      `json:"is_view_mode"`
