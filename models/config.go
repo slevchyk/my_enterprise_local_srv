@@ -5,7 +5,7 @@ type Config struct {
 	ServiceConfig  ServiceConfig  `json:"service_cfg"`
 	DatabaseConfig DatabaseConfig `json:"database_cfg"`
 	MainAuth       AuthConfig     `json:"main_auth"`
-	MobileAuth     AuthConfig     `json:"mobile_auth"`
+	MobileAuth     AuthConfig     `json:"mobile_auth"`	
 }
 
 type ServerConfig struct {

@@ -269,8 +269,6 @@ func (api *ApiV1) ConsignmentNoteInProcessed(w http.ResponseWriter, r *http.Requ
 
 	var err error
 
-	fvToken := r.FormValue("token")
-
 	sa := models.ServerAnswer{
 		Status:    http.StatusOK,
 		Object:    "ConsignmentNoteIn",
@@ -282,12 +280,6 @@ func (api *ApiV1) ConsignmentNoteInProcessed(w http.ResponseWriter, r *http.Requ
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
 		sa.Send(w)
-		return
-	}
-
-	au, err := models.GetAppUserByToken(api.obx, fvToken)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -317,18 +309,6 @@ func (api *ApiV1) ConsignmentNoteInProcessed(w http.ResponseWriter, r *http.Requ
 				DataId:  fmt.Sprintln(srvId),
 				Action:  "select by srv id",
 				Message: err.Error(),
-			})
-
-			sa.ProcessedData = append(sa.ProcessedData, pd)
-			continue
-		}
-
-		if c.AppUser.Id != au.Id {
-			pd.Status = http.StatusNotFound
-			pd.Messages = append(pd.Messages, models.ServerMessage{
-				DataId:  fmt.Sprintln(srvId),
-				Action:  "select by srv id",
-				Message: "no such data",
 			})
 
 			sa.ProcessedData = append(sa.ProcessedData, pd)
@@ -1483,7 +1463,21 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 				Action:   "query by id",
 				Message:  err.Error(),
 			})
+
+			return pd
 		}
+
+		if existCni == nil {
+			pd.Status = http.StatusInternalServerError
+			pd.Messages = append(pd.Messages, models.ServerMessage{
+				DataType: "ConsignmentNoteIn",
+				DataId:   fmt.Sprint(cnii.Id),
+				Action:   "query by id",
+				Message:  "not found",
+			})
+			return pd
+		}
+
 		cnis = append(cnis, existCni)
 	} else if cnii.ExtId != "" {
 		query := box.Query(models.ConsignmentNoteIn_.ExtId.Equals(cnii.ExtId, true))
@@ -1550,14 +1544,29 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 
 	} else if len(cnis) == 1 {
 
-		if !isAcc && cnis[0].ChangedByAcc {
+		// //Acc base priority
+		// if !isAcc && cnis[0].ChangedByAcc {
+		// 	pd.Status = http.StatusLocked
+		// 	pd.ChangedByAcc = true
+		// 	pd.Messages = append(pd.Messages, models.ServerMessage{
+		// 		DataType: "ConsignmentNoteIn",
+		// 		DataId:   fmt.Sprint(cnii.Id),
+		// 		Action:   "update",
+		// 		Message:  "changed by accounting db",
+		// 	})
+
+		// 	return pd
+		// }
+
+		//App base priority
+		if isAcc && cnis[0].ChangedByApp {
 			pd.Status = http.StatusLocked
 			pd.ChangedByAcc = true
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "ConsignmentNoteIn",
 				DataId:   fmt.Sprint(cnii.Id),
 				Action:   "update",
-				Message:  "changed by accounting db",
+				Message:  "changed by app",
 			})
 
 			return pd

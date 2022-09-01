@@ -94,7 +94,7 @@ func getConfig() (models.Config, error) {
 		return cfg, errors.New(msg)
 	}
 
-	path := filepath.Join(dir, "config.json")
+	path := filepath.Join(dir, "dev_config.json")
 
 	f, err := os.ReadFile(path)
 	if err != nil {
