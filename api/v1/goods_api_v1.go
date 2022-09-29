@@ -141,6 +141,7 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 			ExtId: extId,
 			Name:  name,
 			Unit:  unit,
+			IsDeleted: v["is_deleted"].(bool),
 		}
 
 		if len(goodss) == 0 {
