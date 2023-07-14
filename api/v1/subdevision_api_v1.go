@@ -141,6 +141,7 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 			ExtId:    extId,
 			Name:     name,
 			Locality: locality,
+			IsDeleted: v["is_deleted"].(bool),
 		}
 
 		if len(Subdivisions) == 0 {
