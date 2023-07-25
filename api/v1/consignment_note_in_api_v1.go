@@ -463,7 +463,10 @@ func (api *ApiV1) ConsignmentNoteInAppGet(w http.ResponseWriter, r *http.Request
 
 	if au.IsElevator {
 		boxAppUserCniRecipient := models.BoxForAppUserCniRecipient(api.obx)
-		queryAppUserCniRecipient := boxAppUserCniRecipient.Query(models.AppUserCniRecipient_.AppUser.Equals(au.Id))
+		queryAppUserCniRecipient := boxAppUserCniRecipient.Query(
+			objectbox.All(
+				models.AppUserCniRecipient_.AppUser.Equals(au.Id),
+				models.AppUserCniRecipient_.IsActive.Equals(true)))
 
 		aucrs, err := queryAppUserCniRecipient.Find()
 		if err != nil {
