@@ -52,6 +52,8 @@ var ConsignmentNoteIn_ = struct {
 	Trailer       *objectbox.RelationToOne
 	Comment       *objectbox.PropertyString
 	Driver        *objectbox.RelationToOne
+	Oiliness      *objectbox.PropertyFloat64
+	Seals         *objectbox.PropertyString
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -229,6 +231,18 @@ var ConsignmentNoteIn_ = struct {
 		},
 		Target: &ServiceWorkerBinding.Entity,
 	},
+	Oiliness: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     76,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Seals: &objectbox.PropertyString{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     77,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -288,7 +302,9 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Driver", 11, 75, 275258255946157640)
 	model.PropertyFlags(520)
 	model.PropertyRelation("ServiceWorker", 43, 2175209146638276724)
-	model.EntityLastPropertyId(75, 275258255946157640)
+	model.Property("Oiliness", 8, 76, 8122642568852967281)
+	model.Property("Seals", 9, 77, 5201624989076407106)
+	model.EntityLastPropertyId(77, 5201624989076407106)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -431,6 +447,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	var offsetAppId = fbutils.CreateStringOffset(fbb, obj.AppId)
 	var offsetExtNumber = fbutils.CreateStringOffset(fbb, obj.ExtNumber)
 	var offsetComment = fbutils.CreateStringOffset(fbb, obj.Comment)
+	var offsetSeals = fbutils.CreateStringOffset(fbb, obj.Seals)
 
 	var rIdHarvestType uint64
 	if rel := obj.HarvestType; rel != nil {
@@ -505,7 +522,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(75)
+	fbb.StartObject(77)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
@@ -545,6 +562,8 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	fbutils.SetFloat64Slot(fbb, 62, obj.Net)
 	fbutils.SetFloat64Slot(fbb, 63, obj.Humidity)
 	fbutils.SetFloat64Slot(fbb, 64, obj.Weediness)
+	fbutils.SetFloat64Slot(fbb, 75, obj.Oiliness)
+	fbutils.SetUOffsetTSlot(fbb, 76, offsetSeals)
 	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 35, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 36, propUpdatedAt)
@@ -682,6 +701,8 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 		Net:           fbutils.GetFloat64Slot(table, 128),
 		Humidity:      fbutils.GetFloat64Slot(table, 130),
 		Weediness:     fbutils.GetFloat64Slot(table, 132),
+		Oiliness:      fbutils.GetFloat64Slot(table, 154),
+		Seals:         fbutils.GetStringSlot(table, 156),
 		IsDeleted:     fbutils.GetBoolSlot(table, 72),
 		CreatedAt:     propCreatedAt,
 		UpdatedAt:     propUpdatedAt,
@@ -899,7 +920,8 @@ func (asyncBox *ConsignmentNoteInAsyncBox) Remove(object *ConsignmentNoteIn) err
 // Query provides a way to search stored objects
 //
 // For example, you can find all ConsignmentNoteIn which Id is either 42 or 47:
-// 		box.Query(ConsignmentNoteIn_.Id.In(42, 47)).Find()
+//
+//	box.Query(ConsignmentNoteIn_.Id.In(42, 47)).Find()
 type ConsignmentNoteInQuery struct {
 	*objectbox.Query
 }

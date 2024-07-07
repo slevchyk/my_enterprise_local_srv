@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,7 +27,7 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
-	bs, err := ioutil.ReadAll(r.Body)
+	bs, err := io.ReadAll(r.Body)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -154,8 +154,8 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 		} else {
 			pd.Status = http.StatusConflict
 			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "more than 1",
-				Message: err.Error(),
+				Action:  "select",
+				Message: "more than 1",
 			})
 
 			sa.ProcessedData = append(sa.ProcessedData, pd)
@@ -197,7 +197,7 @@ func (apiV1 *ApiV1) AppUserPost(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				bs, err := ioutil.ReadAll(resp.Body)
+				bs, err := io.ReadAll(resp.Body)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
@@ -221,10 +221,6 @@ func (api *ApiV1) AppUserGet(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	fvId := r.FormValue("id")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
 
 	sa := models.ServerAnswer{Object: "AppUser",
 		WebMethod: "get",
@@ -391,7 +387,7 @@ func (api *ApiV1) AppUserCniRecipientPost(w http.ResponseWriter, r *http.Request
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
-	bs, err := ioutil.ReadAll(r.Body)
+	bs, err := io.ReadAll(r.Body)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()

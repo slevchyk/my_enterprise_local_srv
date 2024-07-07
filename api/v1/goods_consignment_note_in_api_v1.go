@@ -304,8 +304,8 @@ func (apiV1 *ApiV1) GoodsConsignmentNoteInPost(w http.ResponseWriter, r *http.Re
 			pd.Status = http.StatusInternalServerError
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				DataType: "GoodsConsignmentNoteIn",
-				Action:   "more than 1",
-				Message:  err.Error(),
+				Action:   "select",
+				Message:  "more than 1",
 			})
 		}
 

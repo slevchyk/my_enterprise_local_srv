@@ -171,7 +171,7 @@
     },
     {
       "id": "3:8603667634404417786",
-      "lastPropertyId": "75:275258255946157640",
+      "lastPropertyId": "77:5201624989076407106",
       "name": "ConsignmentNoteIn",
       "properties": [
         {
@@ -342,6 +342,16 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "ServiceWorker"
+        },
+        {
+          "id": "76:8122642568852967281",
+          "name": "Oiliness",
+          "type": 8
+        },
+        {
+          "id": "77:5201624989076407106",
+          "name": "Seals",
+          "type": 9
         }
       ]
     },
@@ -696,7 +706,7 @@
     },
     {
       "id": "11:1924487076928445410",
-      "lastPropertyId": "17:2475014504135017624",
+      "lastPropertyId": "19:419646093088121380",
       "name": "Vehicle",
       "properties": [
         {
@@ -769,6 +779,22 @@
           "id": "17:2475014504135017624",
           "name": "MaxWeight",
           "type": 8
+        },
+        {
+          "id": "18:3865780643844888825",
+          "name": "DefTrailer",
+          "indexId": "48:3222562739687006292",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Trailer"
+        },
+        {
+          "id": "19:419646093088121380",
+          "name": "DefDriver",
+          "indexId": "49:547996278691202718",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "ServiceWorker"
         }
       ]
     },
@@ -981,10 +1007,98 @@
           "type": 10
         }
       ]
+    },
+    {
+      "id": "18:3928159787491915519",
+      "lastPropertyId": "16:8768853457139016146",
+      "name": "VehicleImport",
+      "properties": [
+        {
+          "id": "1:3305164315838620365",
+          "name": "Id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1959607379369983453",
+          "name": "ExtId",
+          "type": 9
+        },
+        {
+          "id": "3:4495523189833224085",
+          "name": "Name",
+          "type": 9
+        },
+        {
+          "id": "4:6477995439407178031",
+          "name": "IsDeleted",
+          "type": 1
+        },
+        {
+          "id": "5:884073393702277082",
+          "name": "Length",
+          "type": 8
+        },
+        {
+          "id": "6:6783753808289818300",
+          "name": "Width",
+          "type": 8
+        },
+        {
+          "id": "7:5390617234041942943",
+          "name": "Height",
+          "type": 8
+        },
+        {
+          "id": "8:2983923145552962984",
+          "name": "MinWeight",
+          "type": 8
+        },
+        {
+          "id": "9:5779199848780285083",
+          "name": "MaxWeight",
+          "type": 8
+        },
+        {
+          "id": "10:3682145699734791637",
+          "name": "Comment",
+          "type": 9
+        },
+        {
+          "id": "11:1846027210865495343",
+          "name": "PhotoPath",
+          "type": 9
+        },
+        {
+          "id": "12:5881614396633403948",
+          "name": "NfcId",
+          "type": 9
+        },
+        {
+          "id": "13:7664158350002246278",
+          "name": "DefTrailerExtId",
+          "type": 9
+        },
+        {
+          "id": "14:4594866031181129181",
+          "name": "DefDriverExtId",
+          "type": 9
+        },
+        {
+          "id": "15:8170612890188281368",
+          "name": "CreatedAt",
+          "type": 10
+        },
+        {
+          "id": "16:8768853457139016146",
+          "name": "UpdatedAt",
+          "type": 10
+        }
+      ]
     }
   ],
-  "lastEntityId": "17:1720428749164872770",
-  "lastIndexId": "47:8288459648892467887",
+  "lastEntityId": "18:3928159787491915519",
+  "lastIndexId": "49:547996278691202718",
   "lastRelationId": "",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,

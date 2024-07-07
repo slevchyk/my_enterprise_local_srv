@@ -93,9 +93,9 @@ func getConfig() (models.Config, error) {
 		log.Println(msg)
 		return cfg, errors.New(msg)
 	}
-
+	
 	path := filepath.Join(dir, "config.json")
-	// path := filepath.Join(dir, "dev_config.json")
+	//path := filepath.Join(dir, "dev_config.json")
 
 	f, err := os.ReadFile(path)
 	if err != nil {
@@ -635,7 +635,7 @@ func consignmentnoteinProcessedHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//APPLICATION APIs
+// APPLICATION APIs
 func appUserAppHandler(w http.ResponseWriter, r *http.Request) {
 
 	fvIsMain := r.FormValue("is_main")

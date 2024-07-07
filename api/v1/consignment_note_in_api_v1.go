@@ -1207,6 +1207,8 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 		Net:           cnii.Net,
 		Humidity:      cnii.Humidity,
 		Weediness:     cnii.Weediness,
+		Oiliness:      cnii.Oiliness,
+		Seals:         cnii.Seals,
 		IsDeleted:     cnii.IsDeleted,
 		CreatedAt:     createdAt,
 		UpdatedAt:     updatedAt,
@@ -1575,7 +1577,8 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 			return pd
 		}
 
-		cni.Id = cnis[0].Id
+		cni.Id = cnis[0].Id	
+		pd.SrvId = cnis[0].Id	
 
 		if cni.ExtId == "" {
 			cni.ExtId = cnis[0].ExtId

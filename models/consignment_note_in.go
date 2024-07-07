@@ -30,6 +30,8 @@ type ConsignmentNoteIn struct {
 	Net           float64        `json:"net"`
 	Humidity      float64        `json:"humidity"`
 	Weediness     float64        `json:"weediness"`
+	Oiliness      float64        `json:"oiliness"`
+	Seals         string         `json:"seals"`
 	IsDeleted     bool           `json:"is_deleted"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`

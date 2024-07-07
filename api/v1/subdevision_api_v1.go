@@ -177,8 +177,8 @@ func (apiV1 *ApiV1) SubdivisionPost(w http.ResponseWriter, r *http.Request) {
 		} else {
 			pd.Status = http.StatusConflict
 			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "more than 1",
-				Message: err.Error(),
+				Action:  "select",
+				Message: "more than 1",
 			})
 			sa.ProcessedData = append(sa.ProcessedData, pd)
 			continue

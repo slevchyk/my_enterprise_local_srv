@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"	
 	"net/http"
 	"time"
 
@@ -19,7 +19,7 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
-	bs, err := ioutil.ReadAll(r.Body)
+	bs, err := io.ReadAll(r.Body)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()

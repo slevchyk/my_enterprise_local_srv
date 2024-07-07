@@ -118,8 +118,8 @@ func (apiV1 *ApiV1) UnitPost(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "more than 1",
-				Message: err.Error(),
+				Action:  "select",
+				Message: "more than 1",
 			})
 			pd.Status = http.StatusConflict
 			sa.ProcessedData = append(sa.ProcessedData, pd)

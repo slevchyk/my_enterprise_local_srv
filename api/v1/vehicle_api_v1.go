@@ -2,16 +2,17 @@ package api
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
+	"github.com/slevchyk/my_enterprise_local_srv/dao"
 	"github.com/slevchyk/my_enterprise_local_srv/models"
 )
 
 func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
-	var vs []models.Vehicle
+	var vis []models.VehicleImport
 	var err error
 
 	sa := models.ServerAnswer{
@@ -19,7 +20,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 		WebMethod: "post",
 		DateUTC:   time.Now().UTC()}
 
-	bs, err := ioutil.ReadAll(r.Body)
+	bs, err := io.ReadAll(r.Body)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -27,7 +28,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.Unmarshal(bs, &vs)
+	err = json.Unmarshal(bs, &vis)
 	if err != nil {
 		sa.Status = http.StatusInternalServerError
 		sa.Error = err.Error()
@@ -37,15 +38,15 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
 	box := models.BoxForVehicle(apiV1.obx)
 
-	for _, v := range vs {
+	for _, vi := range vis {
 
 		pd := models.ServerProcessedData{
-			ExtId: v.ExtId,
+			ExtId: vi.ExtId,
 		}
 
 		isDataError := false
 
-		if v.ExtId == "" {
+		if vi.ExtId == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
 				Message: "ext id is empty",
@@ -53,7 +54,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 			isDataError = true
 		}
 
-		if v.Name == "" {
+		if vi.Name == "" {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
 				Action:  "checking value",
 				Message: "name is empty",
@@ -67,7 +68,7 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		query := box.Query(models.Vehicle_.ExtId.Equals(v.ExtId, true))
+		query := box.Query(models.Vehicle_.ExtId.Equals(vi.ExtId, true))
 		Vehicles, err := query.Find()
 		query.Close()
 
@@ -82,6 +83,26 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 
 			query.Close()
 			continue
+		}
+
+		trailer, _ := dao.GetTrailerByExtId(apiV1.obx, vi.DefTrailerExtId)
+		driver, _ := dao.GetServiceWorkerByExtId(apiV1.obx, vi.DefDriverExtId)
+
+		v := models.Vehicle{
+
+			ExtId:      vi.ExtId,
+			Name:       vi.Name,
+			IsDeleted:  vi.IsDeleted,
+			Length:     float64(vi.Length),
+			Width:      float64(vi.Width),
+			Height:     float64(vi.Height),
+			MinWeight:  float64(vi.MinWeight),
+			MaxWeight:  float64(vi.MaxWeight),
+			Comment:    vi.Comment,
+			PhotoPath:  vi.PhotoPath,
+			NfcId:      vi.NfcId,
+			DefTrailer: trailer,
+			DefDriver:  driver,
 		}
 
 		if len(Vehicles) == 0 {
@@ -118,8 +139,8 @@ func (apiV1 *ApiV1) VehiclePost(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			pd.Messages = append(pd.Messages, models.ServerMessage{
-				Action:  "more than 1",
-				Message: err.Error(),
+				Action:  "select",
+				Message: "more than 1",
 			})
 			pd.Status = http.StatusConflict
 			sa.ProcessedData = append(sa.ProcessedData, pd)

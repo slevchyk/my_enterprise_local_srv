@@ -24,6 +24,8 @@ type ConsignmentNoteInImport struct {
 	Net           float64                        `json:"net"`
 	Humidity      float64                        `json:"humidity"`
 	Weediness     float64                        `json:"weediness"`
+	Oiliness      float64                        `json:"oiliness"`
+	Seals         string                         `json:"seals"`
 	IsDeleted     bool                           `json:"is_deleted"`
 	CreatedAt     string                         `json:"created_at"`
 	UpdatedAt     string                         `json:"updated_at"`
