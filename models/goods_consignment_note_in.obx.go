@@ -652,7 +652,8 @@ func (asyncBox *GoodsConsignmentNoteInAsyncBox) Remove(object *GoodsConsignmentN
 // Query provides a way to search stored objects
 //
 // For example, you can find all GoodsConsignmentNoteIn which Id is either 42 or 47:
-// 		box.Query(GoodsConsignmentNoteIn_.Id.In(42, 47)).Find()
+//
+//	box.Query(GoodsConsignmentNoteIn_.Id.In(42, 47)).Find()
 type GoodsConsignmentNoteInQuery struct {
 	*objectbox.Query
 }

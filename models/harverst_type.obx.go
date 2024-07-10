@@ -390,7 +390,8 @@ func (asyncBox *HarvestTypeAsyncBox) Remove(object *HarvestType) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all HarvestType which Id is either 42 or 47:
-// 		box.Query(HarvestType_.Id.In(42, 47)).Find()
+//
+//	box.Query(HarvestType_.Id.In(42, 47)).Find()
 type HarvestTypeQuery struct {
 	*objectbox.Query
 }

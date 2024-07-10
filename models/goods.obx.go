@@ -24,13 +24,21 @@ var GoodsBinding = goods_EntityInfo{
 
 // Goods_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var Goods_ = struct {
-	Id        *objectbox.PropertyUint64
-	ExtId     *objectbox.PropertyString
-	Name      *objectbox.PropertyString
-	IsDeleted *objectbox.PropertyBool
-	CreatedAt *objectbox.PropertyInt64
-	UpdatedAt *objectbox.PropertyInt64
-	Unit      *objectbox.RelationToOne
+	Id               *objectbox.PropertyUint64
+	ExtId            *objectbox.PropertyString
+	Name             *objectbox.PropertyString
+	IsDeleted        *objectbox.PropertyBool
+	CreatedAt        *objectbox.PropertyInt64
+	UpdatedAt        *objectbox.PropertyInt64
+	Unit             *objectbox.RelationToOne
+	IsOiliness       *objectbox.PropertyBool
+	IsOilinessDry    *objectbox.PropertyBool
+	IsErucicAcid     *objectbox.PropertyBool
+	IsGlucosinolates *objectbox.PropertyBool
+	IsMycotoxins     *objectbox.PropertyBool
+	IsProtein        *objectbox.PropertyBool
+	IsProteinDry     *objectbox.PropertyBool
+	IsAcid           *objectbox.PropertyBool
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -75,6 +83,54 @@ var Goods_ = struct {
 		},
 		Target: &UnitBinding.Entity,
 	},
+	IsOiliness: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     16,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsOilinessDry: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     17,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsErucicAcid: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     18,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsGlucosinolates: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     19,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsMycotoxins: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     20,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsProtein: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     21,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsProteinDry: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     22,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
+	IsAcid: &objectbox.PropertyBool{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     23,
+			Entity: &GoodsBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -95,7 +151,15 @@ func (goods_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.Property("Unit", 11, 15, 4053967826014371844)
 	model.PropertyFlags(520)
 	model.PropertyRelation("Unit", 2, 5957139385693366257)
-	model.EntityLastPropertyId(15, 4053967826014371844)
+	model.Property("IsOiliness", 1, 16, 6958449070744003436)
+	model.Property("IsOilinessDry", 1, 17, 8293128413918247490)
+	model.Property("IsErucicAcid", 1, 18, 8397601130670111846)
+	model.Property("IsGlucosinolates", 1, 19, 5721743692662733350)
+	model.Property("IsMycotoxins", 1, 20, 6321014573852160707)
+	model.Property("IsProtein", 1, 21, 4688638062562025764)
+	model.Property("IsProteinDry", 1, 22, 5875536471782537028)
+	model.Property("IsAcid", 1, 23, 8801162713009126334)
+	model.EntityLastPropertyId(23, 8801162713009126334)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -158,7 +222,7 @@ func (goods_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, id
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(15)
+	fbb.StartObject(23)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 2, offsetName)
@@ -166,6 +230,14 @@ func (goods_EntityInfo) Flatten(object interface{}, fbb *flatbuffers.Builder, id
 	if obj.Unit != nil {
 		fbutils.SetUint64Slot(fbb, 14, rIdUnit)
 	}
+	fbutils.SetBoolSlot(fbb, 15, obj.IsOiliness)
+	fbutils.SetBoolSlot(fbb, 16, obj.IsOilinessDry)
+	fbutils.SetBoolSlot(fbb, 17, obj.IsErucicAcid)
+	fbutils.SetBoolSlot(fbb, 18, obj.IsGlucosinolates)
+	fbutils.SetBoolSlot(fbb, 19, obj.IsMycotoxins)
+	fbutils.SetBoolSlot(fbb, 20, obj.IsProtein)
+	fbutils.SetBoolSlot(fbb, 21, obj.IsProteinDry)
+	fbutils.SetBoolSlot(fbb, 22, obj.IsAcid)
 	fbutils.SetInt64Slot(fbb, 8, propCreatedAt)
 	fbutils.SetInt64Slot(fbb, 9, propUpdatedAt)
 	return nil
@@ -204,13 +276,21 @@ func (goods_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) (interface{}
 	}
 
 	return &Goods{
-		Id:        propId,
-		ExtId:     fbutils.GetStringSlot(table, 6),
-		Name:      fbutils.GetStringSlot(table, 8),
-		IsDeleted: fbutils.GetBoolSlot(table, 18),
-		Unit:      relUnit,
-		CreatedAt: propCreatedAt,
-		UpdatedAt: propUpdatedAt,
+		Id:               propId,
+		ExtId:            fbutils.GetStringSlot(table, 6),
+		Name:             fbutils.GetStringSlot(table, 8),
+		IsDeleted:        fbutils.GetBoolSlot(table, 18),
+		Unit:             relUnit,
+		IsOiliness:       fbutils.GetBoolSlot(table, 34),
+		IsOilinessDry:    fbutils.GetBoolSlot(table, 36),
+		IsErucicAcid:     fbutils.GetBoolSlot(table, 38),
+		IsGlucosinolates: fbutils.GetBoolSlot(table, 40),
+		IsMycotoxins:     fbutils.GetBoolSlot(table, 42),
+		IsProtein:        fbutils.GetBoolSlot(table, 44),
+		IsProteinDry:     fbutils.GetBoolSlot(table, 46),
+		IsAcid:           fbutils.GetBoolSlot(table, 48),
+		CreatedAt:        propCreatedAt,
+		UpdatedAt:        propUpdatedAt,
 	}, nil
 }
 
@@ -423,7 +503,8 @@ func (asyncBox *GoodsAsyncBox) Remove(object *Goods) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Goods which Id is either 42 or 47:
-// 		box.Query(Goods_.Id.In(42, 47)).Find()
+//
+//	box.Query(Goods_.Id.In(42, 47)).Find()
 type GoodsQuery struct {
 	*objectbox.Query
 }

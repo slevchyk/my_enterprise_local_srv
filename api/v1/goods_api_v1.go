@@ -141,6 +141,14 @@ func (apiV1 *ApiV1) GoodsPost(w http.ResponseWriter, r *http.Request) {
 			ExtId: extId,
 			Name:  name,
 			Unit:  unit,
+			IsOiliness: v["is_oiliness"].(bool),
+			IsOilinessDry: v["is_oiliness_dry"].(bool),
+			IsErucicAcid: v["is_erucic_acid"].(bool),			
+			IsGlucosinolates: v["is_glucosinolates"].(bool),
+			IsMycotoxins: v["is_mycotoxins"].(bool),
+			IsProtein: v["is_protein"].(bool),
+			IsProteinDry: v["is_protein_dry"].(bool),
+			IsAcid: v["is_acid"].(bool),			
 			IsDeleted: v["is_deleted"].(bool),
 		}
 

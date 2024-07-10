@@ -423,7 +423,8 @@ func (asyncBox *SubdivisionAsyncBox) Remove(object *Subdivision) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Subdivision which Id is either 42 or 47:
-// 		box.Query(Subdivision_.Id.In(42, 47)).Find()
+//
+//	box.Query(Subdivision_.Id.In(42, 47)).Find()
 type SubdivisionQuery struct {
 	*objectbox.Query
 }

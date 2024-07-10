@@ -1185,33 +1185,40 @@ func parseConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNot
 	}
 
 	cni := models.ConsignmentNoteIn{
-		ExtId:         cnii.ExtId,
-		AppId:         cnii.AppId,
-		Date:          date,
-		Number:        cnii.Number,
-		OperationId:   cnii.OperationId,
-		StatusId:      cnii.StatusId,
-		ExtNumber:     cnii.ExtNumber,
-		HarvestType:   harvestType,
-		Vehicle:       vehicle,
-		Trailer:       trailer,
-		DepartureDate: departureDate,
-		Driver:        driver,
-		Recipient:     recipient,
-		Manager:       manager,
-		Sender:        sender,
-		AppUser:       appUser,
-		Comment:       cnii.Comment,
-		Gross:         cnii.Gross,
-		Tare:          cnii.Tare,
-		Net:           cnii.Net,
-		Humidity:      cnii.Humidity,
-		Weediness:     cnii.Weediness,
-		Oiliness:      cnii.Oiliness,
-		Seals:         cnii.Seals,
-		IsDeleted:     cnii.IsDeleted,
-		CreatedAt:     createdAt,
-		UpdatedAt:     updatedAt,
+		ExtId:          cnii.ExtId,
+		AppId:          cnii.AppId,
+		Date:           date,
+		Number:         cnii.Number,
+		OperationId:    cnii.OperationId,
+		StatusId:       cnii.StatusId,
+		ExtNumber:      cnii.ExtNumber,
+		HarvestType:    harvestType,
+		Vehicle:        vehicle,
+		Trailer:        trailer,
+		DepartureDate:  departureDate,
+		Driver:         driver,
+		Recipient:      recipient,
+		Manager:        manager,
+		Sender:         sender,
+		AppUser:        appUser,
+		Comment:        cnii.Comment,
+		Gross:          cnii.Gross,
+		Tare:           cnii.Tare,
+		Net:            cnii.Net,
+		Humidity:       cnii.Humidity,
+		Weediness:      cnii.Weediness,
+		Oiliness:       cnii.Oiliness,
+		OilinessDry:    cnii.OilinessDry,
+		ErucicAcid:     cnii.ErucicAcid,
+		Glucosinolates: cnii.Glucosinolates,
+		Mycotoxins:     cnii.Mycotoxins,
+		Protein:        cnii.Protein,
+		ProteinDry:     cnii.ProteinDry,
+		Acid:           cnii.Acid,
+		Seals:          cnii.Seals,
+		IsDeleted:      cnii.IsDeleted,
+		CreatedAt:      createdAt,
+		UpdatedAt:      updatedAt,
 	}
 
 	pd.Status = http.StatusOK
@@ -1577,8 +1584,8 @@ func postConsignmentNoteIn(obx *objectbox.ObjectBox, cnii models.ConsignmentNote
 			return pd
 		}
 
-		cni.Id = cnis[0].Id	
-		pd.SrvId = cnis[0].Id	
+		cni.Id = cnis[0].Id
+		pd.SrvId = cnis[0].Id
 
 		if cni.ExtId == "" {
 			cni.ExtId = cnis[0].ExtId

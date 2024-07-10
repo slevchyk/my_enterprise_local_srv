@@ -464,7 +464,8 @@ func (asyncBox *TrailerAsyncBox) Remove(object *Trailer) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Trailer which Id is either 42 or 47:
-// 		box.Query(Trailer_.Id.In(42, 47)).Find()
+//
+//	box.Query(Trailer_.Id.In(42, 47)).Find()
 type TrailerQuery struct {
 	*objectbox.Query
 }

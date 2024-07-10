@@ -380,7 +380,8 @@ func (asyncBox *UnitAsyncBox) Remove(object *Unit) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Unit which Id is either 42 or 47:
-// 		box.Query(Unit_.Id.In(42, 47)).Find()
+//
+//	box.Query(Unit_.Id.In(42, 47)).Find()
 type UnitQuery struct {
 	*objectbox.Query
 }

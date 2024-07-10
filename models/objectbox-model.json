@@ -171,7 +171,7 @@
     },
     {
       "id": "3:8603667634404417786",
-      "lastPropertyId": "77:5201624989076407106",
+      "lastPropertyId": "84:6800323456376890280",
       "name": "ConsignmentNoteIn",
       "properties": [
         {
@@ -352,6 +352,41 @@
           "id": "77:5201624989076407106",
           "name": "Seals",
           "type": 9
+        },
+        {
+          "id": "78:9223269427472773661",
+          "name": "OilinessDry",
+          "type": 8
+        },
+        {
+          "id": "79:1665258700230231904",
+          "name": "ErucicAcid",
+          "type": 8
+        },
+        {
+          "id": "80:1472550784331603858",
+          "name": "Glucosinolates",
+          "type": 8
+        },
+        {
+          "id": "81:6977115531987935736",
+          "name": "Mycotoxins",
+          "type": 8
+        },
+        {
+          "id": "82:9121722096587725111",
+          "name": "Protein",
+          "type": 8
+        },
+        {
+          "id": "83:5605840209222527936",
+          "name": "ProteinDry",
+          "type": 8
+        },
+        {
+          "id": "84:6800323456376890280",
+          "name": "Acid",
+          "type": 8
         }
       ]
     },
@@ -452,7 +487,7 @@
     },
     {
       "id": "5:6473635341756201923",
-      "lastPropertyId": "15:4053967826014371844",
+      "lastPropertyId": "23:8801162713009126334",
       "name": "Goods",
       "properties": [
         {
@@ -493,6 +528,46 @@
           "type": 11,
           "flags": 520,
           "relationTarget": "Unit"
+        },
+        {
+          "id": "16:6958449070744003436",
+          "name": "IsOiliness",
+          "type": 1
+        },
+        {
+          "id": "17:8293128413918247490",
+          "name": "IsOilinessDry",
+          "type": 1
+        },
+        {
+          "id": "18:8397601130670111846",
+          "name": "IsErucicAcid",
+          "type": 1
+        },
+        {
+          "id": "19:5721743692662733350",
+          "name": "IsGlucosinolates",
+          "type": 1
+        },
+        {
+          "id": "20:6321014573852160707",
+          "name": "IsMycotoxins",
+          "type": 1
+        },
+        {
+          "id": "21:4688638062562025764",
+          "name": "IsProtein",
+          "type": 1
+        },
+        {
+          "id": "22:5875536471782537028",
+          "name": "IsProteinDry",
+          "type": 1
+        },
+        {
+          "id": "23:8801162713009126334",
+          "name": "IsAcid",
+          "type": 1
         }
       ]
     },

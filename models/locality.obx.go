@@ -380,7 +380,8 @@ func (asyncBox *LocalityAsyncBox) Remove(object *Locality) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Locality which Id is either 42 or 47:
-// 		box.Query(Locality_.Id.In(42, 47)).Find()
+//
+//	box.Query(Locality_.Id.In(42, 47)).Find()
 type LocalityQuery struct {
 	*objectbox.Query
 }

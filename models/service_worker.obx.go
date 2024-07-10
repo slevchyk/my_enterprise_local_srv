@@ -391,7 +391,8 @@ func (asyncBox *ServiceWorkerAsyncBox) Remove(object *ServiceWorker) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all ServiceWorker which Id is either 42 or 47:
-// 		box.Query(ServiceWorker_.Id.In(42, 47)).Find()
+//
+//	box.Query(ServiceWorker_.Id.In(42, 47)).Find()
 type ServiceWorkerQuery struct {
 	*objectbox.Query
 }

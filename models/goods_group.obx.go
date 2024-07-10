@@ -380,7 +380,8 @@ func (asyncBox *GoodsGroupAsyncBox) Remove(object *GoodsGroup) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all GoodsGroup which Id is either 42 or 47:
-// 		box.Query(GoodsGroup_.Id.In(42, 47)).Find()
+//
+//	box.Query(GoodsGroup_.Id.In(42, 47)).Find()
 type GoodsGroupQuery struct {
 	*objectbox.Query
 }

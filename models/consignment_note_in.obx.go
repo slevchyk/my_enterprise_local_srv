@@ -24,36 +24,43 @@ var ConsignmentNoteInBinding = consignmentNoteIn_EntityInfo{
 
 // ConsignmentNoteIn_ contains type-based Property helpers to facilitate some common operations such as Queries.
 var ConsignmentNoteIn_ = struct {
-	Id            *objectbox.PropertyUint64
-	ExtId         *objectbox.PropertyString
-	Date          *objectbox.PropertyInt64
-	Number        *objectbox.PropertyString
-	DepartureDate *objectbox.PropertyInt64
-	IsDeleted     *objectbox.PropertyBool
-	CreatedAt     *objectbox.PropertyInt64
-	UpdatedAt     *objectbox.PropertyInt64
-	Recipient     *objectbox.RelationToOne
-	Sender        *objectbox.RelationToOne
-	HarvestType   *objectbox.RelationToOne
-	Vehicle       *objectbox.RelationToOne
-	AppId         *objectbox.PropertyString
-	Gross         *objectbox.PropertyFloat64
-	Tare          *objectbox.PropertyFloat64
-	Net           *objectbox.PropertyFloat64
-	Humidity      *objectbox.PropertyFloat64
-	Weediness     *objectbox.PropertyFloat64
-	AppUser       *objectbox.RelationToOne
-	ChangedByAcc  *objectbox.PropertyBool
-	ChangedByApp  *objectbox.PropertyBool
-	OperationId   *objectbox.PropertyInt
-	ExtNumber     *objectbox.PropertyString
-	Manager       *objectbox.RelationToOne
-	StatusId      *objectbox.PropertyInt
-	Trailer       *objectbox.RelationToOne
-	Comment       *objectbox.PropertyString
-	Driver        *objectbox.RelationToOne
-	Oiliness      *objectbox.PropertyFloat64
-	Seals         *objectbox.PropertyString
+	Id             *objectbox.PropertyUint64
+	ExtId          *objectbox.PropertyString
+	Date           *objectbox.PropertyInt64
+	Number         *objectbox.PropertyString
+	DepartureDate  *objectbox.PropertyInt64
+	IsDeleted      *objectbox.PropertyBool
+	CreatedAt      *objectbox.PropertyInt64
+	UpdatedAt      *objectbox.PropertyInt64
+	Recipient      *objectbox.RelationToOne
+	Sender         *objectbox.RelationToOne
+	HarvestType    *objectbox.RelationToOne
+	Vehicle        *objectbox.RelationToOne
+	AppId          *objectbox.PropertyString
+	Gross          *objectbox.PropertyFloat64
+	Tare           *objectbox.PropertyFloat64
+	Net            *objectbox.PropertyFloat64
+	Humidity       *objectbox.PropertyFloat64
+	Weediness      *objectbox.PropertyFloat64
+	AppUser        *objectbox.RelationToOne
+	ChangedByAcc   *objectbox.PropertyBool
+	ChangedByApp   *objectbox.PropertyBool
+	OperationId    *objectbox.PropertyInt
+	ExtNumber      *objectbox.PropertyString
+	Manager        *objectbox.RelationToOne
+	StatusId       *objectbox.PropertyInt
+	Trailer        *objectbox.RelationToOne
+	Comment        *objectbox.PropertyString
+	Driver         *objectbox.RelationToOne
+	Oiliness       *objectbox.PropertyFloat64
+	Seals          *objectbox.PropertyString
+	OilinessDry    *objectbox.PropertyFloat64
+	ErucicAcid     *objectbox.PropertyFloat64
+	Glucosinolates *objectbox.PropertyFloat64
+	Mycotoxins     *objectbox.PropertyFloat64
+	Protein        *objectbox.PropertyFloat64
+	ProteinDry     *objectbox.PropertyFloat64
+	Acid           *objectbox.PropertyFloat64
 }{
 	Id: &objectbox.PropertyUint64{
 		BaseProperty: &objectbox.BaseProperty{
@@ -243,6 +250,48 @@ var ConsignmentNoteIn_ = struct {
 			Entity: &ConsignmentNoteInBinding.Entity,
 		},
 	},
+	OilinessDry: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     78,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	ErucicAcid: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     79,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Glucosinolates: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     80,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Mycotoxins: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     81,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Protein: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     82,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	ProteinDry: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     83,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
+	Acid: &objectbox.PropertyFloat64{
+		BaseProperty: &objectbox.BaseProperty{
+			Id:     84,
+			Entity: &ConsignmentNoteInBinding.Entity,
+		},
+	},
 }
 
 // GeneratorVersion is called by ObjectBox to verify the compatibility of the generator used to generate this code
@@ -304,7 +353,14 @@ func (consignmentNoteIn_EntityInfo) AddToModel(model *objectbox.Model) {
 	model.PropertyRelation("ServiceWorker", 43, 2175209146638276724)
 	model.Property("Oiliness", 8, 76, 8122642568852967281)
 	model.Property("Seals", 9, 77, 5201624989076407106)
-	model.EntityLastPropertyId(77, 5201624989076407106)
+	model.Property("OilinessDry", 8, 78, 9223269427472773661)
+	model.Property("ErucicAcid", 8, 79, 1665258700230231904)
+	model.Property("Glucosinolates", 8, 80, 1472550784331603858)
+	model.Property("Mycotoxins", 8, 81, 6977115531987935736)
+	model.Property("Protein", 8, 82, 9121722096587725111)
+	model.Property("ProteinDry", 8, 83, 5605840209222527936)
+	model.Property("Acid", 8, 84, 6800323456376890280)
+	model.EntityLastPropertyId(84, 6800323456376890280)
 }
 
 // GetId is called by ObjectBox during Put operations to check for existing ID on an object
@@ -522,7 +578,7 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	}
 
 	// build the FlatBuffers object
-	fbb.StartObject(77)
+	fbb.StartObject(84)
 	fbutils.SetUint64Slot(fbb, 0, id)
 	fbutils.SetUOffsetTSlot(fbb, 1, offsetExtId)
 	fbutils.SetUOffsetTSlot(fbb, 59, offsetAppId)
@@ -563,6 +619,13 @@ func (consignmentNoteIn_EntityInfo) Flatten(object interface{}, fbb *flatbuffers
 	fbutils.SetFloat64Slot(fbb, 63, obj.Humidity)
 	fbutils.SetFloat64Slot(fbb, 64, obj.Weediness)
 	fbutils.SetFloat64Slot(fbb, 75, obj.Oiliness)
+	fbutils.SetFloat64Slot(fbb, 77, obj.OilinessDry)
+	fbutils.SetFloat64Slot(fbb, 78, obj.ErucicAcid)
+	fbutils.SetFloat64Slot(fbb, 79, obj.Glucosinolates)
+	fbutils.SetFloat64Slot(fbb, 80, obj.Mycotoxins)
+	fbutils.SetFloat64Slot(fbb, 81, obj.Protein)
+	fbutils.SetFloat64Slot(fbb, 82, obj.ProteinDry)
+	fbutils.SetFloat64Slot(fbb, 83, obj.Acid)
 	fbutils.SetUOffsetTSlot(fbb, 76, offsetSeals)
 	fbutils.SetBoolSlot(fbb, 34, obj.IsDeleted)
 	fbutils.SetInt64Slot(fbb, 35, propCreatedAt)
@@ -678,36 +741,43 @@ func (consignmentNoteIn_EntityInfo) Load(ob *objectbox.ObjectBox, bytes []byte) 
 	}
 
 	return &ConsignmentNoteIn{
-		Id:            propId,
-		ExtId:         fbutils.GetStringSlot(table, 6),
-		AppId:         fbutils.GetStringSlot(table, 122),
-		Date:          propDate,
-		Number:        fbutils.GetStringSlot(table, 12),
-		OperationId:   fbutils.GetIntSlot(table, 140),
-		StatusId:      fbutils.GetIntSlot(table, 146),
-		ExtNumber:     fbutils.GetStringSlot(table, 142),
-		HarvestType:   relHarvestType,
-		Vehicle:       relVehicle,
-		Trailer:       relTrailer,
-		DepartureDate: propDepartureDate,
-		Driver:        relDriver,
-		Recipient:     relRecipient,
-		Manager:       relManager,
-		Sender:        relSender,
-		AppUser:       relAppUser,
-		Comment:       fbutils.GetStringSlot(table, 150),
-		Gross:         fbutils.GetFloat64Slot(table, 124),
-		Tare:          fbutils.GetFloat64Slot(table, 126),
-		Net:           fbutils.GetFloat64Slot(table, 128),
-		Humidity:      fbutils.GetFloat64Slot(table, 130),
-		Weediness:     fbutils.GetFloat64Slot(table, 132),
-		Oiliness:      fbutils.GetFloat64Slot(table, 154),
-		Seals:         fbutils.GetStringSlot(table, 156),
-		IsDeleted:     fbutils.GetBoolSlot(table, 72),
-		CreatedAt:     propCreatedAt,
-		UpdatedAt:     propUpdatedAt,
-		ChangedByApp:  fbutils.GetBoolSlot(table, 138),
-		ChangedByAcc:  fbutils.GetBoolSlot(table, 136),
+		Id:             propId,
+		ExtId:          fbutils.GetStringSlot(table, 6),
+		AppId:          fbutils.GetStringSlot(table, 122),
+		Date:           propDate,
+		Number:         fbutils.GetStringSlot(table, 12),
+		OperationId:    fbutils.GetIntSlot(table, 140),
+		StatusId:       fbutils.GetIntSlot(table, 146),
+		ExtNumber:      fbutils.GetStringSlot(table, 142),
+		HarvestType:    relHarvestType,
+		Vehicle:        relVehicle,
+		Trailer:        relTrailer,
+		DepartureDate:  propDepartureDate,
+		Driver:         relDriver,
+		Recipient:      relRecipient,
+		Manager:        relManager,
+		Sender:         relSender,
+		AppUser:        relAppUser,
+		Comment:        fbutils.GetStringSlot(table, 150),
+		Gross:          fbutils.GetFloat64Slot(table, 124),
+		Tare:           fbutils.GetFloat64Slot(table, 126),
+		Net:            fbutils.GetFloat64Slot(table, 128),
+		Humidity:       fbutils.GetFloat64Slot(table, 130),
+		Weediness:      fbutils.GetFloat64Slot(table, 132),
+		Oiliness:       fbutils.GetFloat64Slot(table, 154),
+		OilinessDry:    fbutils.GetFloat64Slot(table, 158),
+		ErucicAcid:     fbutils.GetFloat64Slot(table, 160),
+		Glucosinolates: fbutils.GetFloat64Slot(table, 162),
+		Mycotoxins:     fbutils.GetFloat64Slot(table, 164),
+		Protein:        fbutils.GetFloat64Slot(table, 166),
+		ProteinDry:     fbutils.GetFloat64Slot(table, 168),
+		Acid:           fbutils.GetFloat64Slot(table, 170),
+		Seals:          fbutils.GetStringSlot(table, 156),
+		IsDeleted:      fbutils.GetBoolSlot(table, 72),
+		CreatedAt:      propCreatedAt,
+		UpdatedAt:      propUpdatedAt,
+		ChangedByApp:   fbutils.GetBoolSlot(table, 138),
+		ChangedByAcc:   fbutils.GetBoolSlot(table, 136),
 	}, nil
 }
 

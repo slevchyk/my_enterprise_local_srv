@@ -391,7 +391,8 @@ func (asyncBox *StorageAsyncBox) Remove(object *Storage) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all Storage which Id is either 42 or 47:
-// 		box.Query(Storage_.Id.In(42, 47)).Find()
+//
+//	box.Query(Storage_.Id.In(42, 47)).Find()
 type StorageQuery struct {
 	*objectbox.Query
 }

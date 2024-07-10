@@ -580,7 +580,8 @@ func (asyncBox *AppUserAsyncBox) Remove(object *AppUser) error {
 // Query provides a way to search stored objects
 //
 // For example, you can find all AppUser which Id is either 42 or 47:
-// 		box.Query(AppUser_.Id.In(42, 47)).Find()
+//
+//	box.Query(AppUser_.Id.In(42, 47)).Find()
 type AppUserQuery struct {
 	*objectbox.Query
 }
@@ -1053,7 +1054,8 @@ func (asyncBox *AppUserCniRecipientAsyncBox) Remove(object *AppUserCniRecipient)
 // Query provides a way to search stored objects
 //
 // For example, you can find all AppUserCniRecipient which Id is either 42 or 47:
-// 		box.Query(AppUserCniRecipient_.Id.In(42, 47)).Find()
+//
+//	box.Query(AppUserCniRecipient_.Id.In(42, 47)).Find()
 type AppUserCniRecipientQuery struct {
 	*objectbox.Query
 }
